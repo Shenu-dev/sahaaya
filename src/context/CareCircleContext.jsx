@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
 import { DOSE_STATUS } from '../lib/constants';
+import { formatTimeTo12Hour, checkIsFutureDose } from '../lib/dateUtils';
 
 const CareCircleContext = createContext(null);
 
@@ -103,7 +104,7 @@ export function CareCircleProvider({ children }) {
       status: DOSE_STATUS.TAKEN,
       recorded_at: new Date(Date.now() - 3 * 3600 * 1000).toISOString(),
       recorded_by_name: 'Kamla Sharma',
-      notes: 'Taken after light breakfast',
+      notes: 'Taken after light breakfast with warm water',
     },
     {
       id: 'dose-2',
@@ -155,12 +156,19 @@ export function CareCircleProvider({ children }) {
     },
   ]);
 
+  // Determine current user's Care Circle permission
+  const currentMember = members.find(
+    (m) => m.id === profile?.id || m.profile_id === user?.id || m.role === profile?.role
+  );
+  const currentPermissions = currentMember?.permissions || (profile?.role === 'elderly' ? 'admin' : 'write');
+  const isReadOnly = currentPermissions === 'read';
+  const canModifyDoses = !isReadOnly;
+
   // Load Real Supabase Data when user is logged in and DB configured
   const fetchCircleData = useCallback(async () => {
     if (!isSupabaseConfigured || !supabase || !user) return;
 
     try {
-      // 1. Fetch user's Care Circle membership
       const { data: memberData } = await supabase
         .from('care_circle_members')
         .select('*, care_circles(*)')
@@ -172,7 +180,6 @@ export function CareCircleProvider({ children }) {
         if (activeCircle) {
           setCareCircle(activeCircle);
 
-          // 2. Fetch Elderly Profile
           const { data: elderlyData } = await supabase
             .from('elderly_profiles')
             .select('*')
@@ -182,19 +189,16 @@ export function CareCircleProvider({ children }) {
           if (elderlyData) {
             setElderlyProfile(elderlyData);
 
-            // 3. Trigger Idempotent Dose Generation for Today
             const todayStr = new Date().toISOString().split('T')[0];
             await supabase.rpc('generate_daily_doses', {
               p_elderly_id: elderlyData.id,
               p_target_date: todayStr,
             });
 
-            // 4. Trigger Missed Dose Evaluator
             await supabase.rpc('evaluate_missed_doses', {
               p_elderly_id: elderlyData.id,
             });
 
-            // 5. Fetch Medications
             const { data: medsData } = await supabase
               .from('medications')
               .select('*')
@@ -202,7 +206,6 @@ export function CareCircleProvider({ children }) {
               .eq('is_active', true);
             if (medsData) setMedications(medsData);
 
-            // 6. Fetch Today's Doses
             const { data: dosesData } = await supabase
               .from('medication_doses')
               .select('*, medications(name, dosage, form)')
@@ -220,7 +223,6 @@ export function CareCircleProvider({ children }) {
               );
             }
 
-            // 7. Fetch Appointments
             const { data: apptsData } = await supabase
               .from('appointments')
               .select('*')
@@ -228,7 +230,6 @@ export function CareCircleProvider({ children }) {
               .order('appointment_time', { ascending: true });
             if (apptsData) setAppointments(apptsData);
 
-            // 8. Fetch Members
             const { data: allMembers } = await supabase
               .from('care_circle_members')
               .select('*, profiles(full_name, email, phone)')
@@ -237,6 +238,7 @@ export function CareCircleProvider({ children }) {
               setMembers(
                 allMembers.map((m) => ({
                   id: m.id,
+                  profile_id: m.profile_id,
                   full_name: m.profiles?.full_name || 'Member',
                   role: m.member_role,
                   permissions: m.permissions,
@@ -245,7 +247,6 @@ export function CareCircleProvider({ children }) {
               );
             }
 
-            // 9. Fetch Activity Logs
             const { data: logsData } = await supabase
               .from('activity_logs')
               .select('*')
@@ -265,10 +266,40 @@ export function CareCircleProvider({ children }) {
     fetchCircleData();
   }, [fetchCircleData]);
 
-  // Mark Dose Status (Never auto-marks; records actor & timestamp)
-  const markDose = async (doseId, newStatus, notes = '') => {
+  // Mark Dose Status (Never auto-marks; records actor & timestamp; validates early admin)
+  const markDose = async (doseId, newStatus, notes = '', isEarlyConfirmed = false) => {
+    if (!canModifyDoses) {
+      return {
+        success: false,
+        error: 'Permission Denied: Read-only members are not authorized to update medication doses.',
+      };
+    }
+
+    const targetDose = todayDoses.find((d) => d.id === doseId);
+    if (!targetDose) return { success: false, error: 'Dose not found' };
+
     const actorName = profile?.full_name || user?.email || 'Care Circle Member';
-    const recordedAt = new Date().toISOString();
+    const actualRecordedTime = new Date();
+    const recordedAt = actualRecordedTime.toISOString();
+    const formattedActualTime = actualRecordedTime.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true });
+
+    // Check if premature dose confirmation
+    let finalNotes = notes || '';
+    if (newStatus === DOSE_STATUS.TAKEN && targetDose.scheduled_time) {
+      const futureCheck = checkIsFutureDose(targetDose.scheduled_time);
+      if (futureCheck.isFuture) {
+        if (!isEarlyConfirmed) {
+          return {
+            success: false,
+            needsEarlyConfirmation: true,
+            dose: targetDose,
+            minutesAhead: futureCheck.minutesAhead,
+          };
+        }
+        // Append explicit early notation
+        finalNotes = `[Early Administration at ${formattedActualTime} • Scheduled for ${futureCheck.formattedScheduled}] ${finalNotes}`.trim();
+      }
+    }
 
     if (isSupabaseConfigured && supabase && user) {
       try {
@@ -278,7 +309,7 @@ export function CareCircleProvider({ children }) {
             status: newStatus,
             recorded_at: recordedAt,
             recorded_by: user.id,
-            notes: notes || null,
+            notes: finalNotes || null,
             updated_at: recordedAt,
           })
           .eq('id', doseId);
@@ -301,19 +332,17 @@ export function CareCircleProvider({ children }) {
               status: newStatus,
               recorded_at: recordedAt,
               recorded_by_name: actorName,
-              notes,
+              notes: finalNotes,
             }
           : d
       )
     );
 
-    // Append to activity log
-    const med = todayDoses.find((d) => d.id === doseId);
-    const medName = med?.med_name || 'Medication';
+    const medName = targetDose.med_name || 'Medication';
     const newLog = {
       id: `act-${Date.now()}`,
       action_type: 'dose_marked',
-      description: `${actorName} marked ${medName} as ${newStatus.toUpperCase()}${notes ? ` ("${notes}")` : ''}.`,
+      description: `${actorName} marked ${medName} as ${newStatus.toUpperCase()}${finalNotes ? ` ("${finalNotes}")` : ''}.`,
       created_at: recordedAt,
     };
     setActivityLogs((prev) => [newLog, ...prev]);
@@ -342,7 +371,6 @@ export function CareCircleProvider({ children }) {
 
         if (medError) throw medError;
 
-        // Create schedule
         if (newMed && medData.scheduledTime) {
           await supabase.from('medication_schedules').insert({
             medication_id: newMed.id,
@@ -358,7 +386,6 @@ export function CareCircleProvider({ children }) {
       }
     }
 
-    // Local fallback
     const newMedItem = {
       id: `med-${Date.now()}`,
       name: medData.name,
@@ -370,7 +397,6 @@ export function CareCircleProvider({ children }) {
     };
     setMedications((prev) => [...prev, newMedItem]);
 
-    // Add corresponding upcoming dose for today
     const newDose = {
       id: `dose-${Date.now()}`,
       medication_id: newMedItem.id,
@@ -430,12 +456,28 @@ export function CareCircleProvider({ children }) {
     return { success: true };
   };
 
-  // Calculate Adherence Metrics
+  // =========================================================================
+  // MATHEMATICALLY RIGOROUS ADHERENCE METRICS
+  // =========================================================================
   const takenCount = todayDoses.filter((d) => d.status === DOSE_STATUS.TAKEN).length;
   const missedCount = todayDoses.filter((d) => d.status === DOSE_STATUS.MISSED).length;
+  const skippedCount = todayDoses.filter((d) => d.status === DOSE_STATUS.SKIPPED).length;
   const upcomingCount = todayDoses.filter((d) => d.status === DOSE_STATUS.UPCOMING).length;
+  const unconfirmedCount = todayDoses.filter((d) => d.status === DOSE_STATUS.UNCONFIRMED).length;
   const totalCount = todayDoses.length;
-  const adherenceRate = totalCount > 0 ? Math.round((takenCount / (totalCount - upcomingCount || 1)) * 100) : 100;
+
+  // Eligible / Due doses: all doses that have reached their scheduled time or were resolved early
+  const dueDosesCount = takenCount + missedCount + skippedCount + unconfirmedCount;
+  
+  // Adherence on eligible due doses: (Taken / (Taken + Missed + Skipped + Unconfirmed)) * 100
+  const adherenceRate = dueDosesCount > 0 
+    ? Math.round((takenCount / dueDosesCount) * 100) 
+    : null; // null indicates no doses have come due yet
+
+  // Overall day completion rate
+  const dayCompletionRate = totalCount > 0 
+    ? Math.round((takenCount / totalCount) * 100) 
+    : 0;
 
   return (
     <CareCircleContext.Provider
@@ -448,12 +490,20 @@ export function CareCircleProvider({ children }) {
         todayDoses,
         activityLogs,
         notifications,
+        canModifyDoses,
+        isReadOnly,
+        currentPermissions,
         adherenceMetrics: {
           takenCount,
           missedCount,
+          skippedCount,
           upcomingCount,
+          unconfirmedCount,
+          dueDosesCount,
           totalCount,
-          adherenceRate: Math.min(100, Math.max(0, adherenceRate)),
+          hasDueDoses: dueDosesCount > 0,
+          adherenceRate,
+          dayCompletionRate,
         },
         markDose,
         addMedication,

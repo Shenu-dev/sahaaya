@@ -10,7 +10,8 @@ import Input from '../components/common/Input';
 
 export default function CareCirclePage() {
   const { profile } = useAuth();
-  const { careCircle, members, elderlyProfile, activityLogs } = useCareCircle();
+  const { careCircle, members, elderlyProfile, activityLogs, currentPermissions } = useCareCircle();
+  const canInvite = currentPermissions === 'admin' || profile?.role === 'elderly';
 
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
@@ -73,17 +74,23 @@ export default function CareCirclePage() {
           </p>
         </div>
 
-        <Button
-          variant="primary"
-          size="md"
-          icon={UserPlus}
-          onClick={() => {
-            setGeneratedInviteLink('');
-            setInviteModalOpen(true);
-          }}
-        >
-          Invite Member
-        </Button>
+        {canInvite ? (
+          <Button
+            variant="primary"
+            size="md"
+            icon={UserPlus}
+            onClick={() => {
+              setGeneratedInviteLink('');
+              setInviteModalOpen(true);
+            }}
+          >
+            Invite Member
+          </Button>
+        ) : (
+          <Badge variant="warning" size="md">
+            Admin Required to Invite
+          </Badge>
+        )}
       </div>
 
       <div className="grid lg:grid-cols-12 gap-8">
@@ -110,12 +117,12 @@ export default function CareCirclePage() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap justify-end">
                   <Badge variant={member.role === 'elderly' ? 'primary' : 'default'} size="sm">
-                    {member.role}
+                    {member.role === 'elderly' ? 'Elderly Individual' : member.role === 'family' ? 'Family Member' : 'Caregiver'}
                   </Badge>
-                  <Badge variant={member.permissions === 'admin' ? 'demo' : 'info'} size="sm">
-                    {member.permissions}
+                  <Badge variant={member.permissions === 'admin' ? 'demo' : member.permissions === 'write' ? 'info' : 'warning'} size="sm">
+                    {member.permissions === 'admin' ? 'Admin' : member.permissions === 'write' ? 'Write' : 'Read Only'}
                   </Badge>
                 </div>
               </div>

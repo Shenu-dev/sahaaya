@@ -13,31 +13,59 @@ import {
 import { useCareCircle } from '../context/CareCircleContext';
 import { useAuth } from '../context/AuthContext';
 import { DOSE_STATUS } from '../lib/constants';
+import { formatTimeTo12Hour, formatDateTimeToReadable, checkIsFutureDose } from '../lib/dateUtils';
 import Button from '../components/common/Button';
 import Badge from '../components/common/Badge';
 import Card from '../components/common/Card';
 import Modal from '../components/common/Modal';
 import Input from '../components/common/Input';
+import EarlyDoseModal from '../components/common/EarlyDoseModal';
 
 export default function CaregiverDashboard() {
   const { profile } = useAuth();
-  const { elderlyProfile, todayDoses, appointments, markDose, activityLogs, careCircle } = useCareCircle();
+  const { 
+    elderlyProfile, 
+    todayDoses, 
+    appointments, 
+    markDose, 
+    activityLogs, 
+    careCircle,
+    canModifyDoses 
+  } = useCareCircle();
 
   const [administerModalOpen, setAdministerModalOpen] = useState(false);
   const [selectedDose, setSelectedDose] = useState(null);
-  const [caregiverNotes, setCaregiverNotes] = useState('Administered after meal. Patient is in good spirits.');
+  const [caregiverNotes, setCaregiverNotes] = useState('Administered per schedule. Patient vitals stable.');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Premature Dose Early Confirmation State
+  const [earlyModalOpen, setEarlyModalOpen] = useState(false);
+  const [earlyMinutesAhead, setEarlyMinutesAhead] = useState(0);
 
   const handleOpenAdminister = (dose) => {
     setSelectedDose(dose);
     setCaregiverNotes('Administered per schedule. Patient vitals stable.');
+
+    // Check if early administration
+    const futureCheck = checkIsFutureDose(dose.scheduled_time);
+    if (futureCheck.isFuture) {
+      setEarlyMinutesAhead(futureCheck.minutesAhead);
+      setEarlyModalOpen(true);
+      return;
+    }
+
+    setAdministerModalOpen(true);
+  };
+
+  const handleConfirmEarlyWarning = () => {
+    setEarlyModalOpen(false);
     setAdministerModalOpen(true);
   };
 
   const handleConfirmAdminister = async (status) => {
     if (!selectedDose) return;
     setIsSubmitting(true);
-    await markDose(selectedDose.id, status, caregiverNotes);
+    await markDose(selectedDose.id, status, caregiverNotes, true);
     setIsSubmitting(false);
     setAdministerModalOpen(false);
     setSelectedDose(null);
@@ -48,7 +76,7 @@ export default function CaregiverDashboard() {
       {/* Header Bar */}
       <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-subtle flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className="text-xs font-bold text-teal-700 uppercase tracking-wider">Clinical Caregiver Portal</span>
             {careCircle?.is_demo && <Badge variant="demo" size="sm">Demo Environment</Badge>}
           </div>
@@ -62,7 +90,7 @@ export default function CaregiverDashboard() {
 
         <Badge variant="primary" size="lg" className="gap-2">
           <HeartHandshake className="w-4 h-4" />
-          <span>Active Shift</span>
+          <span>Active Clinical Shift</span>
         </Badge>
       </div>
 
@@ -70,7 +98,7 @@ export default function CaregiverDashboard() {
         {/* Left 8 Cols: Shift Medication Administration Checklist */}
         <div className="lg:col-span-8 space-y-6">
           <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-subtle space-y-6">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-100 flex-wrap gap-2">
               <div className="flex items-center gap-3">
                 <div className="p-2.5 bg-blue-50 text-blue-700 rounded-xl">
                   <Pill className="w-5 h-5" />
@@ -95,16 +123,16 @@ export default function CaregiverDashboard() {
                     }`}
                   >
                     <div className="space-y-1">
-                      <div className="flex items-center gap-2.5">
+                      <div className="flex items-center gap-2.5 flex-wrap">
                         <span className="font-bold text-slate-900 text-base">{dose.med_name}</span>
                         <Badge doseStatus={dose.status} size="sm" />
                       </div>
                       <p className="text-xs text-slate-600 font-medium">
-                        Dose: {dose.dosage} • Time: {dose.scheduled_time}
+                        Dose: {dose.dosage} • Scheduled: <span className="font-bold text-slate-800">{formatTimeTo12Hour(dose.scheduled_time)}</span>
                       </p>
                       {dose.recorded_at && (
                         <p className="text-xs text-emerald-800 font-semibold">
-                          Recorded by: {dose.recorded_by_name || 'Caregiver'} at {new Date(dose.recorded_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          Recorded at: <span className="font-bold">{formatTimeTo12Hour(dose.recorded_at)}</span> by {dose.recorded_by_name || 'Caregiver'}
                         </p>
                       )}
                       {dose.notes && (
@@ -112,7 +140,7 @@ export default function CaregiverDashboard() {
                       )}
                     </div>
 
-                    {!isTaken && (
+                    {!isTaken && canModifyDoses && (
                       <Button
                         variant="primary"
                         size="md"
@@ -141,7 +169,7 @@ export default function CaregiverDashboard() {
                   <div className="space-y-0.5">
                     <p className="font-semibold text-slate-800">{log.description}</p>
                     <span className="text-slate-400">
-                      {new Date(log.created_at).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}
+                      {formatDateTimeToReadable(log.created_at)}
                     </span>
                   </div>
                 </div>
@@ -198,12 +226,7 @@ export default function CaregiverDashboard() {
                 <span className="font-bold text-slate-900 block">{appt.doctor_name}</span>
                 <span className="text-slate-600 block">{appt.specialty}</span>
                 <span className="text-teal-800 font-bold block">
-                  {new Date(appt.appointment_time).toLocaleDateString([], {
-                    month: 'short',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
+                  {formatDateTimeToReadable(appt.appointment_time)}
                 </span>
               </div>
             ))}
@@ -216,7 +239,7 @@ export default function CaregiverDashboard() {
         isOpen={administerModalOpen}
         onClose={() => setAdministerModalOpen(false)}
         title="Record Medication Administration"
-        subtitle={`Administering ${selectedDose?.med_name} (${selectedDose?.dosage}) to ${elderlyProfile?.full_name}.`}
+        subtitle={`Administering ${selectedDose?.med_name} (${selectedDose?.dosage}) to ${elderlyProfile?.full_name}. Scheduled: ${formatTimeTo12Hour(selectedDose?.scheduled_time)}.`}
       >
         <div className="space-y-4">
           <Input
@@ -247,6 +270,18 @@ export default function CaregiverDashboard() {
           </div>
         </div>
       </Modal>
+
+      {/* Premature Early Dose Confirmation Modal */}
+      <EarlyDoseModal
+        isOpen={earlyModalOpen}
+        onClose={() => {
+          setEarlyModalOpen(false);
+          setSelectedDose(null);
+        }}
+        onConfirm={handleConfirmEarlyWarning}
+        dose={selectedDose}
+        minutesAhead={earlyMinutesAhead}
+      />
     </div>
   );
 }

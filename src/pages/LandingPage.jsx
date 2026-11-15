@@ -121,13 +121,25 @@ export default function LandingPage({ onNavigate, onDemoLogin }) {
 
                 {/* Simulated Senior UI Card */}
                 <div className="mt-5 space-y-4">
-                  <div className="bg-teal-50/70 rounded-2xl p-4 border border-teal-100">
-                    <span className="text-xs font-bold text-teal-800 uppercase tracking-wider">Today's Morning Medication</span>
-                    <h3 className="text-2xl font-black text-slate-900 mt-1">Amlodipine 5mg</h3>
-                    <p className="text-sm font-medium text-slate-600 mt-0.5">Take 1 tablet after breakfast with water</p>
-                    <div className="mt-3 flex items-center justify-between text-xs text-slate-500 font-medium">
-                      <span>Scheduled: 8:00 AM</span>
-                      <span className="text-amber-700 font-bold bg-amber-100 px-2.5 py-0.5 rounded-full">Due Now</span>
+                  {/* Previously Completed Morning Dose */}
+                  <div className="bg-emerald-50/60 rounded-xl px-3.5 py-2 border border-emerald-200 flex items-center justify-between text-xs">
+                    <span className="font-semibold text-emerald-900">
+                      ✓ Morning: Amlodipine Besylate 5mg
+                    </span>
+                    <span className="text-emerald-700 font-bold">Taken at 8:15 AM</span>
+                  </div>
+
+                  {/* Immediate Next Dose */}
+                  <div className="bg-teal-50/80 rounded-2xl p-4 border border-teal-200">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-teal-800 uppercase tracking-wider">Next Due Medication</span>
+                      <span className="text-xs font-bold text-blue-700 bg-blue-100 px-2.5 py-0.5 rounded-full">Upcoming</span>
+                    </div>
+                    <h3 className="text-2xl font-black text-slate-900 mt-1">Metformin HCl ER 500mg</h3>
+                    <p className="text-sm font-medium text-slate-600 mt-0.5">Take with lunch. Do not crush or chew.</p>
+                    <div className="mt-3 flex items-center justify-between text-xs text-slate-600 font-medium pt-2 border-t border-teal-100">
+                      <span>Scheduled: <strong className="text-slate-900">1:00 PM</strong></span>
+                      <span className="text-slate-500">1 tablet oral</span>
                     </div>
                   </div>
 

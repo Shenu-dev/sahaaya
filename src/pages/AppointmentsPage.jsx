@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Calendar, Plus, MapPin, Clock, FileText, CheckCircle2 } from 'lucide-react';
 import { useCareCircle } from '../context/CareCircleContext';
+import { formatDateTimeToReadable } from '../lib/dateUtils';
 import Button from '../components/common/Button';
 import Badge from '../components/common/Badge';
 import Card from '../components/common/Card';
@@ -8,7 +9,7 @@ import Modal from '../components/common/Modal';
 import Input from '../components/common/Input';
 
 export default function AppointmentsPage() {
-  const { appointments, addAppointment, elderlyProfile } = useCareCircle();
+  const { appointments, addAppointment, elderlyProfile, canModifyDoses, isReadOnly } = useCareCircle();
 
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [doctorName, setDoctorName] = useState('');
@@ -54,14 +55,21 @@ export default function AppointmentsPage() {
           </p>
         </div>
 
-        <Button
-          variant="primary"
-          size="md"
-          icon={Plus}
-          onClick={() => setAddModalOpen(true)}
-        >
-          Schedule Appointment
-        </Button>
+        {canModifyDoses && (
+          <Button
+            variant="primary"
+            size="md"
+            icon={Plus}
+            onClick={() => setAddModalOpen(true)}
+          >
+            Schedule Appointment
+          </Button>
+        )}
+        {isReadOnly && (
+          <Badge variant="warning" size="md">
+            Read-Only (Scheduling Restricted)
+          </Badge>
+        )}
       </div>
 
       {/* Appointment Grid */}
@@ -86,14 +94,7 @@ export default function AppointmentsPage() {
               <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4 text-teal-600 shrink-0" />
                 <span className="font-bold text-teal-800">
-                  {new Date(appt.appointment_time).toLocaleDateString([], {
-                    weekday: 'short',
-                    month: 'short',
-                    day: 'numeric',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
+                  {formatDateTimeToReadable(appt.appointment_time)}
                 </span>
               </div>
             </div>

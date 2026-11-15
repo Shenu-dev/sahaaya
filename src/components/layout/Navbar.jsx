@@ -146,10 +146,10 @@ export default function Navbar({ activeTab, onTabChange }) {
         </div>
 
         {/* Mobile Sub-Navigation Bar */}
-        <div className="lg:hidden flex items-center justify-around py-2.5 border-t border-slate-100 text-xs font-semibold">
+        <div className="lg:hidden flex items-center justify-around py-2 border-t border-slate-100 text-xs font-semibold">
           <button
             onClick={() => onTabChange('dashboard')}
-            className={`px-3 py-1.5 rounded-lg ${
+            className={`px-3 py-1.5 rounded-lg min-h-[36px] ${
               activeTab === 'dashboard' ? 'bg-teal-50 text-teal-800 font-bold' : 'text-slate-600'
             }`}
           >
@@ -157,7 +157,7 @@ export default function Navbar({ activeTab, onTabChange }) {
           </button>
           <button
             onClick={() => onTabChange('medications')}
-            className={`px-3 py-1.5 rounded-lg ${
+            className={`px-3 py-1.5 rounded-lg min-h-[36px] ${
               activeTab === 'medications' ? 'bg-teal-50 text-teal-800 font-bold' : 'text-slate-600'
             }`}
           >
@@ -165,7 +165,7 @@ export default function Navbar({ activeTab, onTabChange }) {
           </button>
           <button
             onClick={() => onTabChange('appointments')}
-            className={`px-3 py-1.5 rounded-lg ${
+            className={`px-3 py-1.5 rounded-lg min-h-[36px] ${
               activeTab === 'appointments' ? 'bg-teal-50 text-teal-800 font-bold' : 'text-slate-600'
             }`}
           >
@@ -173,12 +173,43 @@ export default function Navbar({ activeTab, onTabChange }) {
           </button>
           <button
             onClick={() => onTabChange('circle')}
-            className={`px-3 py-1.5 rounded-lg ${
+            className={`px-3 py-1.5 rounded-lg min-h-[36px] ${
               activeTab === 'circle' ? 'bg-teal-50 text-teal-800 font-bold' : 'text-slate-600'
             }`}
           >
             Care Circle
           </button>
+        </div>
+
+        {/* Mobile Demo Persona Quick Switcher */}
+        <div className="sm:hidden flex items-center justify-between px-2 py-1.5 bg-teal-50/80 border-t border-teal-100 text-[11px]">
+          <span className="font-bold text-teal-900">Demo Persona:</span>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => signInAsDemo('elderly')}
+              className={`px-2 py-0.5 rounded font-bold ${
+                profile?.role === 'elderly' ? 'bg-teal-700 text-white' : 'text-teal-800 bg-white border border-teal-200'
+              }`}
+            >
+              Elderly
+            </button>
+            <button
+              onClick={() => signInAsDemo('family')}
+              className={`px-2 py-0.5 rounded font-bold ${
+                profile?.role === 'family' ? 'bg-teal-700 text-white' : 'text-teal-800 bg-white border border-teal-200'
+              }`}
+            >
+              Family
+            </button>
+            <button
+              onClick={() => signInAsDemo('caregiver')}
+              className={`px-2 py-0.5 rounded font-bold ${
+                profile?.role === 'caregiver' ? 'bg-teal-700 text-white' : 'text-teal-800 bg-white border border-teal-200'
+              }`}
+            >
+              Caregiver
+            </button>
+          </div>
         </div>
       </div>
     </header>

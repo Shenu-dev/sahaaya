@@ -2,23 +2,44 @@ import React, { useState } from 'react';
 import { CheckCircle2, Clock, Phone, AlertCircle, Calendar, ShieldCheck, Heart, Sparkles, UserCheck } from 'lucide-react';
 import { useCareCircle } from '../context/CareCircleContext';
 import { DOSE_STATUS } from '../lib/constants';
+import { formatTimeTo12Hour, formatDateTimeToReadable } from '../lib/dateUtils';
 import Button from '../components/common/Button';
 import Badge from '../components/common/Badge';
 import Card from '../components/common/Card';
 import Modal from '../components/common/Modal';
+import EarlyDoseModal from '../components/common/EarlyDoseModal';
 
 export default function ElderlyDashboard() {
-  const { elderlyProfile, todayDoses, appointments, markDose, careCircle } = useCareCircle();
+  const { elderlyProfile, todayDoses, appointments, markDose, careCircle, canModifyDoses } = useCareCircle();
   const [skipModalOpen, setSkipModalOpen] = useState(false);
   const [selectedDose, setSelectedDose] = useState(null);
   const [skipReason, setSkipReason] = useState('Feeling unwell / nauseous');
 
-  // Find the immediate next upcoming or missed dose
-  const nextDose = todayDoses.find((d) => d.status === DOSE_STATUS.UPCOMING) || todayDoses[0];
+  // Premature Dose Early Confirmation State
+  const [earlyModalOpen, setEarlyModalOpen] = useState(false);
+  const [earlyDoseTarget, setEarlyDoseTarget] = useState(null);
+  const [earlyMinutesAhead, setEarlyMinutesAhead] = useState(0);
+
+  // Find the immediate next upcoming dose
+  const nextDose = todayDoses.find((d) => d.status === DOSE_STATUS.UPCOMING);
   const upcomingAppointment = appointments.find((a) => a.status === 'upcoming');
 
-  const handleMarkTaken = async (doseId) => {
-    await markDose(doseId, DOSE_STATUS.TAKEN, 'Taken by senior');
+  const handleMarkTaken = async (dose, isEarlyConfirmed = false) => {
+    if (!dose) return;
+    const res = await markDose(dose.id, DOSE_STATUS.TAKEN, 'Confirmed by Senior', isEarlyConfirmed);
+    if (res?.needsEarlyConfirmation) {
+      setEarlyDoseTarget(res.dose);
+      setEarlyMinutesAhead(res.minutesAhead);
+      setEarlyModalOpen(true);
+    }
+  };
+
+  const handleConfirmEarlyDose = async () => {
+    if (earlyDoseTarget) {
+      await markDose(earlyDoseTarget.id, DOSE_STATUS.TAKEN, 'Confirmed by Senior (Early Administration)', true);
+      setEarlyModalOpen(false);
+      setEarlyDoseTarget(null);
+    }
   };
 
   const handleOpenSkipModal = (dose) => {
@@ -28,7 +49,7 @@ export default function ElderlyDashboard() {
 
   const handleConfirmSkip = async () => {
     if (selectedDose) {
-      await markDose(selectedDose.id, DOSE_STATUS.SKIPPED, skipReason);
+      await markDose(selectedDose.id, DOSE_STATUS.SKIPPED, skipReason, true);
       setSkipModalOpen(false);
       setSelectedDose(null);
     }
@@ -60,7 +81,8 @@ export default function ElderlyDashboard() {
           {elderlyProfile?.emergency_contact_phone && (
             <a
               href={`tel:${elderlyProfile.emergency_contact_phone}`}
-              className="inline-flex items-center gap-3 bg-red-600 hover:bg-red-700 text-white font-extrabold text-lg px-6 py-4 rounded-2xl shadow-lg border-2 border-red-400 touch-target-elderly transition-transform active:scale-95"
+              className="inline-flex items-center gap-3 bg-red-600 hover:bg-red-700 text-white font-extrabold text-lg px-6 py-4 rounded-2xl shadow-lg border-2 border-red-400 touch-target-elderly transition-transform active:scale-95 focus-visible:ring-4 focus-visible:ring-red-400 focus-visible:outline-none"
+              aria-label="Call emergency contact now"
             >
               <Phone className="w-6 h-6 fill-white" />
               <span>Call Emergency</span>
@@ -70,7 +92,7 @@ export default function ElderlyDashboard() {
       </div>
 
       {/* Immediate Next Dose Hero (Prominent Single-Action Center) */}
-      {nextDose && nextDose.status === DOSE_STATUS.UPCOMING && (
+      {nextDose ? (
         <div className="bg-white rounded-3xl p-6 sm:p-8 border-3 border-teal-500 shadow-xl space-y-6">
           <div className="flex items-center justify-between flex-wrap gap-2">
             <span className="text-sm font-bold text-teal-800 bg-teal-100 px-3.5 py-1.5 rounded-full uppercase tracking-wider">
@@ -78,7 +100,7 @@ export default function ElderlyDashboard() {
             </span>
             <span className="text-lg font-bold text-slate-700 flex items-center gap-1.5">
               <Clock className="w-5 h-5 text-teal-600" />
-              <span>Scheduled: {nextDose.scheduled_time}</span>
+              <span>Scheduled: {formatTimeTo12Hour(nextDose.scheduled_time)}</span>
             </span>
           </div>
 
@@ -90,7 +112,7 @@ export default function ElderlyDashboard() {
               Dosage: {nextDose.dosage}
             </p>
             <p className="text-lg text-slate-600 mt-2 font-medium bg-slate-50 p-4 rounded-2xl border border-slate-200">
-              Instructions: Take with warm water after eating.
+              Instructions: Take with lunch. Do not crush or chew.
             </p>
           </div>
 
@@ -98,21 +120,33 @@ export default function ElderlyDashboard() {
           <div className="grid sm:grid-cols-2 gap-4 pt-2">
             <button
               type="button"
-              onClick={() => handleMarkTaken(nextDose.id)}
-              className="w-full touch-target-elderly bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-black text-2xl py-5 px-6 rounded-2xl shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-3 transition-all"
+              disabled={!canModifyDoses}
+              onClick={() => handleMarkTaken(nextDose)}
+              className="w-full touch-target-elderly bg-emerald-600 hover:bg-emerald-700 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed text-white font-black text-xl sm:text-2xl py-5 px-6 rounded-2xl shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-3 transition-all focus-visible:ring-4 focus-visible:ring-emerald-500 focus-visible:outline-none"
             >
-              <CheckCircle2 className="w-8 h-8" />
+              <CheckCircle2 className="w-8 h-8 shrink-0" />
               <span>I HAVE TAKEN THIS</span>
             </button>
 
             <button
               type="button"
+              disabled={!canModifyDoses}
               onClick={() => handleOpenSkipModal(nextDose)}
-              className="w-full touch-target-elderly bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-lg py-5 px-6 rounded-2xl border-2 border-slate-300 flex items-center justify-center gap-2 transition-all"
+              className="w-full touch-target-elderly bg-slate-100 hover:bg-slate-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed text-slate-700 font-bold text-lg py-5 px-6 rounded-2xl border-2 border-slate-300 flex items-center justify-center gap-2 transition-all focus-visible:ring-4 focus-visible:ring-slate-400 focus-visible:outline-none"
             >
               <span>Skip / Could Not Take</span>
             </button>
           </div>
+        </div>
+      ) : (
+        <div className="bg-emerald-50 border-2 border-emerald-300 rounded-3xl p-8 text-center space-y-2">
+          <div className="w-14 h-14 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center mx-auto mb-2">
+            <CheckCircle2 className="w-8 h-8" />
+          </div>
+          <h2 className="text-2xl font-black text-emerald-900">All Scheduled Doses Completed!</h2>
+          <p className="text-base text-emerald-800 font-medium max-w-md mx-auto">
+            You have successfully completed all your prescribed medications for today. Rest well!
+          </p>
         </div>
       )}
 
@@ -139,16 +173,16 @@ export default function ElderlyDashboard() {
                 }`}
               >
                 <div className="space-y-1">
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 flex-wrap">
                     <span className="text-xl font-black text-slate-900">{dose.med_name}</span>
                     <Badge doseStatus={dose.status} size="lg" />
                   </div>
                   <p className="text-base font-semibold text-slate-600">
-                    {dose.dosage} • Time: {dose.scheduled_time}
+                    {dose.dosage} • Scheduled: {formatTimeTo12Hour(dose.scheduled_time)}
                   </p>
                   {isTaken && dose.recorded_at && (
                     <p className="text-sm font-bold text-emerald-800">
-                      ✓ Taken at {new Date(dose.recorded_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      ✓ Taken at {formatTimeTo12Hour(dose.recorded_at)}
                     </p>
                   )}
                   {dose.notes && (
@@ -156,12 +190,12 @@ export default function ElderlyDashboard() {
                   )}
                 </div>
 
-                {!isTaken && (
+                {!isTaken && canModifyDoses && (
                   <div className="flex items-center gap-3 w-full sm:w-auto">
                     <button
                       type="button"
-                      onClick={() => handleMarkTaken(dose.id)}
-                      className="flex-1 sm:flex-initial bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-base px-6 py-3.5 rounded-xl shadow-md min-h-[50px] flex items-center justify-center gap-2"
+                      onClick={() => handleMarkTaken(dose)}
+                      className="flex-1 sm:flex-initial bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-base px-6 py-3.5 rounded-xl shadow-md min-h-[50px] flex items-center justify-center gap-2 focus-visible:ring-4 focus-visible:ring-emerald-500 focus-visible:outline-none"
                     >
                       <CheckCircle2 className="w-5 h-5" />
                       <span>Take</span>
@@ -169,7 +203,7 @@ export default function ElderlyDashboard() {
                     <button
                       type="button"
                       onClick={() => handleOpenSkipModal(dose)}
-                      className="px-4 py-3.5 rounded-xl border border-slate-300 bg-white text-slate-700 font-semibold text-sm hover:bg-slate-50"
+                      className="px-4 py-3.5 rounded-xl border border-slate-300 bg-white text-slate-700 font-semibold text-sm hover:bg-slate-50 min-h-[50px] focus-visible:ring-4 focus-visible:ring-slate-400 focus-visible:outline-none"
                     >
                       Skip
                     </button>
@@ -195,13 +229,7 @@ export default function ElderlyDashboard() {
                 {upcomingAppointment.specialty} • {upcomingAppointment.clinic_or_hospital}
               </p>
               <p className="text-sm font-bold text-teal-900 mt-1">
-                {new Date(upcomingAppointment.appointment_time).toLocaleDateString('en-IN', {
-                  weekday: 'short',
-                  month: 'short',
-                  day: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
+                {formatDateTimeToReadable(upcomingAppointment.appointment_time)}
               </p>
             </div>
           </div>
@@ -215,7 +243,7 @@ export default function ElderlyDashboard() {
           <p className="text-lg font-bold text-slate-900">{elderlyProfile?.emergency_contact_name}</p>
           <a
             href={`tel:${elderlyProfile?.emergency_contact_phone}`}
-            className="text-teal-700 font-bold text-base hover:underline flex items-center gap-1.5 mt-1"
+            className="text-teal-700 font-bold text-base hover:underline flex items-center gap-1.5 mt-1 focus-visible:ring-2 focus-visible:ring-teal-500"
           >
             <Phone className="w-4 h-4" />
             <span>{elderlyProfile?.emergency_contact_phone}</span>
@@ -226,7 +254,7 @@ export default function ElderlyDashboard() {
           <p className="text-lg font-bold text-slate-900">{elderlyProfile?.primary_doctor_name}</p>
           <a
             href={`tel:${elderlyProfile?.primary_doctor_phone}`}
-            className="text-teal-700 font-bold text-base hover:underline flex items-center gap-1.5 mt-1"
+            className="text-teal-700 font-bold text-base hover:underline flex items-center gap-1.5 mt-1 focus-visible:ring-2 focus-visible:ring-teal-500"
           >
             <Phone className="w-4 h-4" />
             <span>{elderlyProfile?.primary_doctor_phone}</span>
@@ -280,13 +308,26 @@ export default function ElderlyDashboard() {
               variant="primary"
               size="lg"
               onClick={handleConfirmSkip}
-              className="flex-1 bg-amber-600 hover:bg-amber-700 border-amber-800"
+              className="flex-1 bg-amber-600 hover:bg-amber-700 border-amber-800 text-white"
             >
               Confirm Skip
             </Button>
           </div>
         </div>
       </Modal>
+
+      {/* Premature Early Dose Confirmation Modal */}
+      <EarlyDoseModal
+        isOpen={earlyModalOpen}
+        onClose={() => {
+          setEarlyModalOpen(false);
+          setEarlyDoseTarget(null);
+        }}
+        onConfirm={handleConfirmEarlyDose}
+        dose={earlyDoseTarget}
+        minutesAhead={earlyMinutesAhead}
+        isElderly={true}
+      />
     </div>
   );
 }

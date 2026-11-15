@@ -3,6 +3,7 @@ import { Pill, Plus, Clock, Archive, CheckCircle2, AlertCircle } from 'lucide-re
 import { useCareCircle } from '../context/CareCircleContext';
 import { useAuth } from '../context/AuthContext';
 import { MEDICATION_FORMS } from '../lib/constants';
+import { formatTimeTo12Hour } from '../lib/dateUtils';
 import Button from '../components/common/Button';
 import Badge from '../components/common/Badge';
 import Card from '../components/common/Card';
@@ -12,7 +13,7 @@ import ConfirmDialog from '../components/common/ConfirmDialog';
 
 export default function MedicationsPage() {
   const { profile } = useAuth();
-  const { medications, addMedication, elderlyProfile } = useCareCircle();
+  const { medications, addMedication, elderlyProfile, canModifyDoses, isReadOnly } = useCareCircle();
 
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [name, setName] = useState('');
@@ -59,14 +60,21 @@ export default function MedicationsPage() {
           </p>
         </div>
 
-        <Button
-          variant="primary"
-          size="md"
-          icon={Plus}
-          onClick={() => setAddModalOpen(true)}
-        >
-          Add Medication
-        </Button>
+        {canModifyDoses && (
+          <Button
+            variant="primary"
+            size="md"
+            icon={Plus}
+            onClick={() => setAddModalOpen(true)}
+          >
+            Add Medication
+          </Button>
+        )}
+        {isReadOnly && (
+          <Badge variant="warning" size="md">
+            Read-Only (Modification Restricted)
+          </Badge>
+        )}
       </div>
 
       {/* Medication List */}
@@ -93,7 +101,7 @@ export default function MedicationsPage() {
                   <span className="text-slate-400">Schedule:</span>
                   <span className="font-semibold text-slate-700 flex items-center gap-1">
                     <Clock className="w-3.5 h-3.5 text-teal-600" />
-                    <span>{med.scheduled_time || 'Daily 08:00 AM'}</span>
+                    <span>{formatTimeTo12Hour(med.scheduled_time)} Daily</span>
                   </span>
                 </div>
               </div>
