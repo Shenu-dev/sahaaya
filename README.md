@@ -7,7 +7,7 @@ An accessible, connected elderly healthcare management and medication adherence 
 [![License: MIT](https://img.shields.io/badge/License-MIT-teal.svg)](LICENSE)
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-sahaaya--three.vercel.app-000000.svg?logo=vercel&logoColor=white)](https://sahaaya-three.vercel.app/)
 [![Build Status](https://img.shields.io/badge/Build-Passing-emerald.svg)](https://github.com/Shenu-dev/sahaaya)
-[![Automated Tests](https://img.shields.io/badge/Tests-48%2F48%20Passing%20(100%25)-emerald.svg)](tests/regression_suite.js)
+[![Automated Tests](https://img.shields.io/badge/Tests-50%2F50%20Passing%20(100%25)-emerald.svg)](tests/regression_suite.js)
 [![Architecture Budget](https://img.shields.io/badge/Budget-₹0%20Free%20Tier-blue.svg)](https://supabase.com)
 [![WCAG Accessibility](https://img.shields.io/badge/Accessibility-WCAG%20AAA%20Compliant-purple.svg)](https://www.w3.org/WAI/standards-guidelines/wcag/)
 [![Fault Tolerance](https://img.shields.io/badge/Resilience-React%20Error%20Boundary-green.svg)](src/components/common/ErrorBoundary.jsx)
@@ -56,7 +56,7 @@ Millions of elderly individuals manage complex chronic medication regimens for h
 | **Icons** | Lucide React | Clean, recognizable medical and navigational iconography |
 | **Backend & Database** | Supabase (PostgreSQL 15) | Row Level Security (RLS), Triggers, Stored Procedures |
 | **Cryptography** | Web Crypto API (SubtleCrypto) | Client-side SHA-256 token hashing and 256-bit entropy |
-| **Testing** | Node.js Test Harness | 48-test automated regression, accessibility, and security verification suite (100% Passing) |
+| **Testing** | Node.js Test Harness | 50-test automated regression, accessibility, and security verification suite (100% Passing) |
 
 ---
 

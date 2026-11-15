@@ -695,6 +695,8 @@ export function CareCircleProvider({ children }) {
       full_name: circleData.elderlyName,
       emergency_contact_name: circleData.emergencyName,
       emergency_contact_phone: circleData.emergencyPhone,
+      primary_doctor_name: circleData.doctorName || 'Not assigned',
+      primary_doctor_phone: circleData.doctorPhone || '',
       allergies: circleData.allergies || 'None reported',
       medical_conditions: circleData.medicalConditions || 'None reported',
       timezone: circleData.timezone || 'Asia/Kolkata',
@@ -711,6 +713,68 @@ export function CareCircleProvider({ children }) {
     setElderlyProfile(newElderly);
     setMembers([creatorMember]);
     setHasCareCircle(true);
+    return { success: true };
+  };
+
+  // Update Care Circle Details & Clinical Profiles
+  const updateCareCircle = async (updatedData) => {
+    const actorName = profile?.full_name || 'Care Circle Admin';
+
+    if (isRealDbActive && careCircle?.id && elderlyProfile?.id) {
+      try {
+        if (updatedData.circleName && updatedData.circleName !== careCircle.name) {
+          const { error: circleErr } = await supabase
+            .from('care_circles')
+            .update({ name: updatedData.circleName })
+            .eq('id', careCircle.id);
+          if (circleErr) throw circleErr;
+        }
+
+        const { error: elderlyErr } = await supabase
+          .from('elderly_profiles')
+          .update({
+            full_name: updatedData.elderlyName || elderlyProfile.full_name,
+            emergency_contact_name: updatedData.emergencyName || elderlyProfile.emergency_contact_name,
+            emergency_contact_phone: updatedData.emergencyPhone || elderlyProfile.emergency_contact_phone,
+            primary_doctor_name: updatedData.doctorName !== undefined ? updatedData.doctorName : elderlyProfile.primary_doctor_name,
+            primary_doctor_phone: updatedData.doctorPhone !== undefined ? updatedData.doctorPhone : elderlyProfile.primary_doctor_phone,
+            allergies: updatedData.allergies !== undefined ? updatedData.allergies : elderlyProfile.allergies,
+            medical_conditions: updatedData.medicalConditions !== undefined ? updatedData.medicalConditions : elderlyProfile.medical_conditions,
+          })
+          .eq('id', elderlyProfile.id);
+
+        if (elderlyErr) throw elderlyErr;
+
+        await fetchCircleData();
+        return { success: true };
+      } catch (err) {
+        return { success: false, error: err.message };
+      }
+    }
+
+    // Local / Demo state update
+    if (updatedData.circleName) {
+      setCareCircle((prev) => ({ ...prev, name: updatedData.circleName }));
+    }
+    setElderlyProfile((prev) => ({
+      ...prev,
+      full_name: updatedData.elderlyName || prev?.full_name,
+      emergency_contact_name: updatedData.emergencyName || prev?.emergency_contact_name,
+      emergency_contact_phone: updatedData.emergencyPhone || prev?.emergency_contact_phone,
+      primary_doctor_name: updatedData.doctorName !== undefined ? updatedData.doctorName : prev?.primary_doctor_name,
+      primary_doctor_phone: updatedData.doctorPhone !== undefined ? updatedData.doctorPhone : prev?.primary_doctor_phone,
+      allergies: updatedData.allergies !== undefined ? updatedData.allergies : prev?.allergies,
+      medical_conditions: updatedData.medicalConditions !== undefined ? updatedData.medicalConditions : prev?.medical_conditions,
+    }));
+
+    const newLog = {
+      id: `act-${Date.now()}`,
+      action_type: 'circle_updated',
+      description: `${actorName} updated Care Circle details and primary clinical contacts.`,
+      created_at: new Date().toISOString(),
+    };
+    setActivityLogs((prev) => [newLog, ...prev]);
+
     return { success: true };
   };
 
@@ -863,6 +927,7 @@ export function CareCircleProvider({ children }) {
     addAppointment,
     updateAppointmentStatus,
     createCareCircle,
+    updateCareCircle,
     acceptInvitation,
     resetDemoData,
     refreshData: fetchCircleData,

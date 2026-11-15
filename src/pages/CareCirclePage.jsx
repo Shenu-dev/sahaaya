@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Users, UserPlus, Shield, Check, Copy, KeyRound, Plus } from 'lucide-react';
+import { Users, UserPlus, Shield, Check, Copy, KeyRound, Plus, Settings2, Phone, HeartPulse } from 'lucide-react';
 import { useCareCircle } from '../context/CareCircleContext';
 import { useAuth } from '../context/AuthContext';
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
@@ -9,6 +9,7 @@ import Card from '../components/common/Card';
 import Modal from '../components/common/Modal';
 import Input from '../components/common/Input';
 import CreateCircleModal from '../components/common/CreateCircleModal';
+import EditCircleModal from '../components/common/EditCircleModal';
 
 export default function CareCirclePage() {
   const { profile } = useAuth();
@@ -16,6 +17,7 @@ export default function CareCirclePage() {
   const canInvite = currentPermissions === 'admin' || profile?.role === 'elderly';
 
   const [createCircleModalOpen, setCreateCircleModalOpen] = useState(false);
+  const [editCircleModalOpen, setEditCircleModalOpen] = useState(false);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteRole, setInviteRole] = useState('family');
@@ -94,7 +96,17 @@ export default function CareCirclePage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex items-center gap-2.5 flex-wrap">
+          <Button
+            variant="pill-outline"
+            size="md"
+            icon={Settings2}
+            onClick={() => setEditCircleModalOpen(true)}
+            className="text-xs font-bold uppercase tracking-wider"
+          >
+            Edit Circle
+          </Button>
+
           <Button
             variant="pill-outline"
             size="md"
@@ -170,8 +182,72 @@ export default function CareCirclePage() {
           </div>
         </div>
 
-        {/* Right 5 Cols: Permission Matrix & Security Notice */}
+        {/* Right 5 Cols: Clinical Profile & Permission Matrix */}
         <div className="lg:col-span-5 space-y-6">
+          {/* Patient & Attending Doctor Overview Card */}
+          <div className="bg-white p-6 sm:p-7 rounded-[32px] border border-slate-200/90 shadow-subtle space-y-5">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <HeartPulse className="w-5 h-5 text-indigo-600" />
+                <h3 className="font-bold text-slate-900 text-base">Patient & Clinical Contacts</h3>
+              </div>
+              <button
+                onClick={() => setEditCircleModalOpen(true)}
+                className="text-xs font-bold text-indigo-600 hover:text-indigo-800 hover:underline flex items-center gap-1"
+              >
+                <Settings2 className="w-3.5 h-3.5" />
+                <span>Edit</span>
+              </button>
+            </div>
+
+            <div className="space-y-4 text-xs">
+              <div className="p-3.5 bg-slate-50 rounded-2xl space-y-1">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Central Senior Patient</span>
+                <span className="font-extrabold text-sm text-slate-900 block">{elderlyProfile?.full_name || 'Senior'}</span>
+              </div>
+
+              {/* Primary Attending Doctor Card */}
+              <div className="p-4 bg-blue-50/70 border border-blue-100 rounded-2xl space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold text-blue-900 uppercase tracking-wider block">Primary Attending Doctor</span>
+                  <Badge variant="info" size="sm">Clinical Lead</Badge>
+                </div>
+                <p className="font-black text-slate-950 text-sm">{elderlyProfile?.primary_doctor_name || 'Not assigned yet'}</p>
+                {elderlyProfile?.primary_doctor_phone ? (
+                  <a
+                    href={`tel:${elderlyProfile.primary_doctor_phone}`}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white text-blue-700 hover:bg-blue-600 hover:text-white border border-blue-200 font-bold transition-all shadow-2xs text-xs"
+                    title="Dial doctor phone directly"
+                  >
+                    <Phone className="w-3.5 h-3.5" />
+                    <span>{elderlyProfile.primary_doctor_phone}</span>
+                  </a>
+                ) : (
+                  <button
+                    onClick={() => setEditCircleModalOpen(true)}
+                    className="text-xs text-blue-600 font-bold hover:underline block"
+                  >
+                    + Add Doctor Direct Phone Number
+                  </button>
+                )}
+              </div>
+
+              <div className="p-3.5 bg-slate-50 rounded-2xl space-y-1">
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Primary Emergency Contact</span>
+                <p className="font-bold text-slate-900">{elderlyProfile?.emergency_contact_name || 'Emergency Contact'}</p>
+                {elderlyProfile?.emergency_contact_phone && (
+                  <a
+                    href={`tel:${elderlyProfile.emergency_contact_phone}`}
+                    className="inline-flex items-center gap-1 text-slate-600 hover:text-slate-950 font-semibold"
+                  >
+                    <Phone className="w-3 h-3 text-slate-400" />
+                    <span>{elderlyProfile.emergency_contact_phone}</span>
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+
           <Card className="space-y-4">
             <div className="flex items-center gap-2.5 pb-3 border-b border-slate-100">
               <Shield className="w-5 h-5 text-teal-600" />
@@ -303,6 +379,12 @@ export default function CareCirclePage() {
       <CreateCircleModal
         isOpen={createCircleModalOpen}
         onClose={() => setCreateCircleModalOpen(false)}
+      />
+
+      {/* Edit Care Circle & Clinical Profile Modal */}
+      <EditCircleModal
+        isOpen={editCircleModalOpen}
+        onClose={() => setEditCircleModalOpen(false)}
       />
     </div>
   );

@@ -12,6 +12,7 @@ export default function CreateCircleModal({ isOpen, onClose }) {
   const [emergencyName, setEmergencyName] = useState('');
   const [emergencyPhone, setEmergencyPhone] = useState('');
   const [doctorName, setDoctorName] = useState('');
+  const [doctorPhone, setDoctorPhone] = useState('');
   const [allergies, setAllergies] = useState('');
   const [medicalConditions, setMedicalConditions] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -34,6 +35,7 @@ export default function CreateCircleModal({ isOpen, onClose }) {
         emergencyName,
         emergencyPhone,
         doctorName,
+        doctorPhone,
         allergies,
         medicalConditions,
       });
@@ -98,12 +100,20 @@ export default function CreateCircleModal({ isOpen, onClose }) {
           />
         </div>
 
-        <Input
-          label="Primary Attending Doctor"
-          placeholder="e.g. Dr. Rajiv Verma (Cardiologist)"
-          value={doctorName}
-          onChange={(e) => setDoctorName(e.target.value)}
-        />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Input
+            label="Primary Attending Doctor"
+            placeholder="e.g. Dr. Rajiv Verma (Cardiologist)"
+            value={doctorName}
+            onChange={(e) => setDoctorName(e.target.value)}
+          />
+          <Input
+            label="Doctor Direct Phone Number"
+            placeholder="e.g. +91 98111 22334"
+            value={doctorPhone}
+            onChange={(e) => setDoctorPhone(e.target.value)}
+          />
+        </div>
 
         <Input
           label="Known Allergies"

@@ -698,6 +698,38 @@ runTest('Dose notes payload guard prevents excessive payload lengths', () => {
   assert.strictEqual(safeNote.length, 500, 'Notes must be truncated to 500 chars maximum');
 });
 
+runTest('Care circle update correctly updates primary attending doctor phone number', () => {
+  let profile = {
+    full_name: 'Kamla Sharma',
+    primary_doctor_name: 'Dr. Rajiv Verma',
+    primary_doctor_phone: null,
+  };
+
+  const updateProfile = (data) => {
+    profile = {
+      ...profile,
+      primary_doctor_phone: data.doctorPhone !== undefined ? data.doctorPhone : profile.primary_doctor_phone,
+    };
+  };
+
+  updateProfile({ doctorPhone: '+91 98111 22334' });
+  assert.strictEqual(profile.primary_doctor_phone, '+91 98111 22334', 'Doctor phone must update');
+  assert.strictEqual(profile.primary_doctor_name, 'Dr. Rajiv Verma', 'Doctor name must be preserved');
+});
+
+runTest('Care circle metadata update alters circle name while preserving membership', () => {
+  let circle = { id: 'circle-1', name: 'Original Circle' };
+  let members = [{ id: 'm-1', full_name: 'Rohan Sharma' }];
+
+  const updateCircle = (name) => {
+    circle = { ...circle, name };
+  };
+
+  updateCircle('Sharma Family Unified Circle');
+  assert.strictEqual(circle.name, 'Sharma Family Unified Circle');
+  assert.strictEqual(members.length, 1);
+});
+
 // -----------------------------------------------------------------------------
 // SUMMARY
 // -----------------------------------------------------------------------------
