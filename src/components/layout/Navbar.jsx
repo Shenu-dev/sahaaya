@@ -31,12 +31,6 @@ export default function Navbar({ activeTab, onTabChange }) {
                 </span>
               </div>
             </button>
-
-            {careCircle?.is_demo && (
-              <Badge variant="demo" size="sm" className="hidden xl:inline-flex ml-1">
-                Demo
-              </Badge>
-            )}
           </div>
 
           {/* Center Navigation Links */}
@@ -187,9 +181,9 @@ export default function Navbar({ activeTab, onTabChange }) {
           </button>
         </div>
 
-        {/* Mobile Demo Persona Quick Switcher */}
+        {/* Mobile Persona Quick Switcher */}
         <div className="sm:hidden flex items-center justify-between px-2 py-1.5 bg-teal-50/80 border-t border-teal-100 text-[11px]">
-          <span className="font-bold text-teal-900">Demo Persona:</span>
+          <span className="font-bold text-teal-900">Switch Role:</span>
           <div className="flex items-center gap-1">
             <button
               onClick={() => signInAsDemo('elderly')}

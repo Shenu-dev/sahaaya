@@ -102,7 +102,6 @@ export default function FamilyDashboard({ onNavigateTab }) {
         <div>
           <div className="flex items-center gap-2.5 flex-wrap">
             <span className="text-xs font-bold text-teal-700 uppercase tracking-wider">Family Care Oversight</span>
-            {careCircle?.is_demo && <Badge variant="demo" size="sm">Demo Environment</Badge>}
             {isReadOnly && <Badge variant="warning" size="sm">Read-Only Observer</Badge>}
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1.5 tracking-tight">

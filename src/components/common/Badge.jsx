@@ -21,7 +21,7 @@ export default function Badge({
     warning: 'bg-amber-50 text-amber-700 border border-amber-200',
     danger: 'bg-red-50 text-red-700 border border-red-200',
     info: 'bg-blue-50 text-blue-700 border border-blue-200',
-    demo: 'bg-purple-100 text-purple-800 border border-purple-300 font-bold tracking-wide uppercase',
+    admin: 'bg-purple-100 text-purple-800 border border-purple-300 font-bold tracking-wide uppercase',
   };
 
   if (doseStatus && DOSE_STATUS_CONFIG[doseStatus]) {

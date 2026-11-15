@@ -121,7 +121,7 @@ export default function CareCirclePage() {
                   <Badge variant={member.role === 'elderly' ? 'primary' : 'default'} size="sm">
                     {member.role === 'elderly' ? 'Elderly Individual' : member.role === 'family' ? 'Family Member' : 'Caregiver'}
                   </Badge>
-                  <Badge variant={member.permissions === 'admin' ? 'demo' : member.permissions === 'write' ? 'info' : 'warning'} size="sm">
+                  <Badge variant={member.permissions === 'admin' ? 'admin' : member.permissions === 'write' ? 'info' : 'warning'} size="sm">
                     {member.permissions === 'admin' ? 'Admin' : member.permissions === 'write' ? 'Write' : 'Read Only'}
                   </Badge>
                 </div>

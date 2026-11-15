@@ -76,10 +76,7 @@ export default function CaregiverDashboard() {
       {/* Header Bar */}
       <div className="bg-white p-6 sm:p-7 rounded-2xl border border-slate-200 shadow-subtle flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
         <div>
-          <div className="flex items-center gap-2.5 flex-wrap">
-            <span className="text-xs font-bold text-teal-700 uppercase tracking-wider">Clinical Caregiver Portal</span>
-            {careCircle?.is_demo && <Badge variant="demo" size="sm">Demo Environment</Badge>}
-          </div>
+          <span className="text-xs font-bold text-teal-700 uppercase tracking-wider">Clinical Caregiver Portal</span>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1.5 tracking-tight">
             Shift Management • {profile?.full_name || 'Caregiver'}
           </h1>

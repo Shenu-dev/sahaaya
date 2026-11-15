@@ -116,7 +116,6 @@ export default function LandingPage({ onNavigate, onDemoLogin }) {
                     <span className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse" />
                     <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">Elderly View • Live Preview</span>
                   </div>
-                  <Badge variant="demo" size="sm">Demo Persona</Badge>
                 </div>
 
                 {/* Simulated Senior UI Card */}

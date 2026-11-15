@@ -105,7 +105,6 @@ export default function LoginPage({ onNavigate }) {
               <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
                 Judge 1-Click Demo Logins
               </span>
-              <Badge variant="demo" size="sm">Pre-seeded</Badge>
             </div>
 
             <div className="grid gap-2.5">
