@@ -269,7 +269,7 @@ export default function LandingPage({ onNavigate, onDemoLogin }) {
             <span className="text-lg font-bold text-white">Saarthi</span>
           </div>
           <p className="text-xs text-slate-500 text-center sm:text-right">
-            Built for ₹0 on Supabase & Vercel Free Tiers. Designed with love for elderly care & family wellness.
+            Empowering elderly healthcare management & family wellness.
           </p>
         </div>
       </footer>
