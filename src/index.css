@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+    scroll-behavior: smooth;
+  }
+
+  /* High-contrast focus rings for accessibility */
+  :focus-visible {
+    outline: 3px solid #0D9488;
+    outline-offset: 2px;
+  }
+}
+
+/* Custom accessible utility classes */
+@layer utilities {
+  .touch-target-elderly {
+    min-height: 56px;
+    min-width: 56px;
+  }
+  
+  .touch-target-standard {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
