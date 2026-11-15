@@ -86,6 +86,68 @@ const SEED_APPOINTMENTS = [
   },
 ];
 
+const SEED_TODAY_DOSES = [
+  {
+    id: 'dose-1',
+    medication_id: 'med-1',
+    med_name: 'Amlodipine Besylate',
+    dosage: '5 mg',
+    scheduled_time: '08:00:00',
+    status: DOSE_STATUS.TAKEN,
+    recorded_at: new Date(Date.now() - 3 * 3600 * 1000).toISOString(),
+    recorded_by_name: 'Kamla Sharma',
+    notes: 'Taken after light breakfast with warm water',
+  },
+  {
+    id: 'dose-2',
+    medication_id: 'med-2',
+    med_name: 'Metformin HCl ER',
+    dosage: '500 mg',
+    scheduled_time: '13:00:00',
+    status: DOSE_STATUS.UPCOMING,
+    recorded_at: null,
+    recorded_by_name: null,
+    notes: null,
+  },
+  {
+    id: 'dose-3',
+    medication_id: 'med-3',
+    med_name: 'Atorvastatin Calcium',
+    dosage: '10 mg',
+    scheduled_time: '21:00:00',
+    status: DOSE_STATUS.UPCOMING,
+    recorded_at: null,
+    recorded_by_name: null,
+    notes: null,
+  },
+];
+
+const SEED_ACTIVITY_LOGS = [
+  {
+    id: 'act-1',
+    action_type: 'dose_taken',
+    description: 'Kamla Sharma marked morning dose of Amlodipine 5mg as TAKEN.',
+    created_at: new Date(Date.now() - 3 * 3600 * 1000).toISOString(),
+  },
+  {
+    id: 'act-2',
+    action_type: 'appointment_created',
+    description: 'Rohan Sharma scheduled Cardiology Review with Dr. Rajiv Verma.',
+    created_at: new Date(Date.now() - 24 * 3600 * 1000).toISOString(),
+  },
+];
+
+const SEED_NOTIFICATIONS = [
+  {
+    id: 'notif-1',
+    type: 'dose_reminder',
+    title: 'Afternoon Dose Upcoming',
+    message: 'Metformin 500mg is scheduled for 1:00 PM today.',
+    is_read: false,
+    created_at: new Date().toISOString(),
+  },
+];
+
 export function CareCircleProvider({ children }) {
   const { user, profile } = useAuth();
 
@@ -94,67 +156,9 @@ export function CareCircleProvider({ children }) {
   const [members, setMembers] = useState(SEED_MEMBERS);
   const [medications, setMedications] = useState(SEED_MEDICATIONS);
   const [appointments, setAppointments] = useState(SEED_APPOINTMENTS);
-  const [todayDoses, setTodayDoses] = useState([
-    {
-      id: 'dose-1',
-      medication_id: 'med-1',
-      med_name: 'Amlodipine Besylate',
-      dosage: '5 mg',
-      scheduled_time: '08:00:00',
-      status: DOSE_STATUS.TAKEN,
-      recorded_at: new Date(Date.now() - 3 * 3600 * 1000).toISOString(),
-      recorded_by_name: 'Kamla Sharma',
-      notes: 'Taken after light breakfast with warm water',
-    },
-    {
-      id: 'dose-2',
-      medication_id: 'med-2',
-      med_name: 'Metformin HCl ER',
-      dosage: '500 mg',
-      scheduled_time: '13:00:00',
-      status: DOSE_STATUS.UPCOMING,
-      recorded_at: null,
-      recorded_by_name: null,
-      notes: null,
-    },
-    {
-      id: 'dose-3',
-      medication_id: 'med-3',
-      med_name: 'Atorvastatin Calcium',
-      dosage: '10 mg',
-      scheduled_time: '21:00:00',
-      status: DOSE_STATUS.UPCOMING,
-      recorded_at: null,
-      recorded_by_name: null,
-      notes: null,
-    },
-  ]);
-
-  const [activityLogs, setActivityLogs] = useState([
-    {
-      id: 'act-1',
-      action_type: 'dose_taken',
-      description: 'Kamla Sharma marked morning dose of Amlodipine 5mg as TAKEN.',
-      created_at: new Date(Date.now() - 3 * 3600 * 1000).toISOString(),
-    },
-    {
-      id: 'act-2',
-      action_type: 'appointment_created',
-      description: 'Rohan Sharma scheduled Cardiology Review with Dr. Rajiv Verma.',
-      created_at: new Date(Date.now() - 24 * 3600 * 1000).toISOString(),
-    },
-  ]);
-
-  const [notifications, setNotifications] = useState([
-    {
-      id: 'notif-1',
-      type: 'dose_reminder',
-      title: 'Afternoon Dose Upcoming',
-      message: 'Metformin 500mg is scheduled for 1:00 PM today.',
-      is_read: false,
-      created_at: new Date().toISOString(),
-    },
-  ]);
+  const [todayDoses, setTodayDoses] = useState(SEED_TODAY_DOSES);
+  const [activityLogs, setActivityLogs] = useState(SEED_ACTIVITY_LOGS);
+  const [notifications, setNotifications] = useState(SEED_NOTIFICATIONS);
 
   // Determine current user's Care Circle permission
   const currentMember = members.find(
@@ -460,6 +464,44 @@ export function CareCircleProvider({ children }) {
     return { success: true };
   };
 
+  // Update Appointment Status (e.g. 'completed', 'cancelled', 'upcoming')
+  const updateAppointmentStatus = async (appointmentId, newStatus) => {
+    if (!canModifyDoses) {
+      return { success: false, error: 'Permission denied: Read-only members cannot update appointments.' };
+    }
+
+    if (isSupabaseConfigured && supabase && user) {
+      try {
+        const { error } = await supabase
+          .from('appointments')
+          .update({ status: newStatus, updated_at: new Date().toISOString() })
+          .eq('id', appointmentId);
+        if (error) throw error;
+        await fetchCircleData();
+        return { success: true };
+      } catch (err) {
+        return { success: false, error: err.message };
+      }
+    }
+
+    // Local fallback
+    setAppointments((prev) =>
+      prev.map((a) => (a.id === appointmentId ? { ...a, status: newStatus } : a))
+    );
+
+    const targetAppt = appointments.find((a) => a.id === appointmentId);
+    const actorName = profile?.full_name || 'Care Circle Member';
+    const newLog = {
+      id: `act-${Date.now()}`,
+      action_type: 'appointment_updated',
+      description: `${actorName} marked consultation with ${targetAppt?.doctor_name || 'Doctor'} as ${newStatus.toUpperCase()}.`,
+      created_at: new Date().toISOString(),
+    };
+    setActivityLogs((prev) => [newLog, ...prev]);
+
+    return { success: true };
+  };
+
   // Archive Medication (Soft-delete to preserve dose history - FUNC-MED-08)
   const archiveMedication = async (medicationId) => {
     if (!canModifyDoses) {
@@ -586,6 +628,55 @@ export function CareCircleProvider({ children }) {
     }
   };
 
+  // Predictable Demo State Reset Function
+  const resetDemoData = () => {
+    setCareCircle(SEED_CARE_CIRCLE);
+    setElderlyProfile(SEED_ELDERLY_PROFILE);
+    setMembers(SEED_MEMBERS);
+    setMedications(SEED_MEDICATIONS);
+    setAppointments(SEED_APPOINTMENTS);
+    setTodayDoses([
+      {
+        id: 'dose-1',
+        medication_id: 'med-1',
+        med_name: 'Amlodipine Besylate',
+        dosage: '5 mg',
+        scheduled_time: '08:00:00',
+        status: DOSE_STATUS.TAKEN,
+        recorded_at: new Date(Date.now() - 3 * 3600 * 1000).toISOString(),
+        recorded_by_name: 'Kamla Sharma',
+        notes: 'Taken after light breakfast with warm water',
+      },
+      {
+        id: 'dose-2',
+        medication_id: 'med-2',
+        med_name: 'Metformin HCl ER',
+        dosage: '500 mg',
+        scheduled_time: '13:00:00',
+        status: DOSE_STATUS.UPCOMING,
+        recorded_at: null,
+        recorded_by_name: null,
+        notes: null,
+      },
+      {
+        id: 'dose-3',
+        medication_id: 'med-3',
+        med_name: 'Atorvastatin Calcium',
+        dosage: '10 mg',
+        scheduled_time: '21:00:00',
+        status: DOSE_STATUS.UPCOMING,
+        recorded_at: null,
+        recorded_by_name: null,
+        notes: null,
+      },
+    ]);
+    setActivityLogs(SEED_ACTIVITY_LOGS);
+    setNotifications(SEED_NOTIFICATIONS);
+    return true;
+  };
+
+  const isDemo = Boolean(!user || user.is_demo || careCircle?.is_demo);
+
   // =========================================================================
   // MATHEMATICALLY RIGOROUS ADHERENCE METRICS
   // =========================================================================
@@ -639,8 +730,11 @@ export function CareCircleProvider({ children }) {
         addMedication,
         archiveMedication,
         addAppointment,
+        updateAppointmentStatus,
         createCareCircle,
         acceptInvitation,
+        resetDemoData,
+        isDemo,
         refreshData: fetchCircleData,
       }}
     >

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Clock, Archive } from 'lucide-react';
+import { Plus, Clock, Archive, Pill } from 'lucide-react';
 import { useCareCircle } from '../context/CareCircleContext';
 import { useAuth } from '../context/AuthContext';
 import { MEDICATION_FORMS } from '../lib/constants';
@@ -79,62 +79,84 @@ export default function MedicationsPage() {
         )}
       </div>
 
-      {/* Medication List */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {medications.map((med) => (
-          <Card key={med.id} className="flex flex-col justify-between space-y-4">
-            <div className="space-y-3">
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <h3 className="text-lg font-bold text-slate-900">{med.name}</h3>
-                  <span className="text-sm font-semibold text-teal-700">{med.dosage}</span>
+      {/* Medication List or Empty State */}
+      {medications.length === 0 ? (
+        <div className="bg-white rounded-2xl p-10 border border-slate-200 text-center space-y-4">
+          <div className="w-14 h-14 bg-teal-50 text-teal-600 rounded-2xl flex items-center justify-center mx-auto">
+            <Pill className="w-7 h-7" />
+          </div>
+          <h3 className="text-lg font-bold text-slate-900">No Prescriptions Recorded</h3>
+          <p className="text-sm text-slate-500 max-w-md mx-auto">
+            Prescribe medications, set dosage routines, and instructions for {elderlyProfile?.full_name}.
+          </p>
+          {canModifyDoses && (
+            <Button
+              variant="primary"
+              size="md"
+              icon={Plus}
+              onClick={() => setAddModalOpen(true)}
+            >
+              Add First Medication
+            </Button>
+          )}
+        </div>
+      ) : (
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {medications.map((med) => (
+            <Card key={med.id} className="flex flex-col justify-between space-y-4">
+              <div className="space-y-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <h3 className="text-lg font-bold text-slate-900">{med.name}</h3>
+                    <span className="text-sm font-semibold text-teal-700">{med.dosage}</span>
+                  </div>
+                  <Badge variant={med.is_active ? 'success' : 'default'} size="sm">
+                    {med.is_active ? 'Active' : 'Archived'}
+                  </Badge>
                 </div>
-                <Badge variant={med.is_active ? 'success' : 'default'} size="sm">
-                  {med.is_active ? 'Active' : 'Archived'}
-                </Badge>
+
+                <div className="text-xs text-slate-600 space-y-1.5 pt-2 border-t border-slate-100">
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-400">Form:</span>
+                    <span className="font-semibold capitalize text-slate-700">{med.form}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-400">Schedule:</span>
+                    <span className="font-semibold text-slate-700 flex items-center gap-1">
+                      <Clock className="w-3.5 h-3.5 text-teal-600" />
+                      <span>{formatTimeTo12Hour(med.scheduled_time)} Daily</span>
+                    </span>
+                  </div>
+                </div>
+
+                <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 text-xs text-slate-600">
+                  <span className="font-bold text-slate-700 block mb-0.5">Instructions:</span>
+                  {med.instructions || 'Take as advised with water.'}
+                </div>
               </div>
 
-              <div className="text-xs text-slate-600 space-y-1.5 pt-2 border-t border-slate-100">
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-400">Form:</span>
-                  <span className="font-semibold capitalize text-slate-700">{med.form}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-slate-400">Schedule:</span>
-                  <span className="font-semibold text-slate-700 flex items-center gap-1">
-                    <Clock className="w-3.5 h-3.5 text-teal-600" />
-                    <span>{formatTimeTo12Hour(med.scheduled_time)} Daily</span>
+              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+                <span>Started: {med.start_date || 'Ongoing'}</span>
+                {med.is_active && canModifyDoses ? (
+                  <button
+                    type="button"
+                    onClick={() => setArchiveTarget(med)}
+                    className="text-xs font-semibold text-slate-500 hover:text-red-600 flex items-center gap-1 transition-colors"
+                    title="Archive this medication"
+                  >
+                    <Archive className="w-3.5 h-3.5" />
+                    <span>Archive</span>
+                  </button>
+                ) : (
+                  <span className="text-slate-400 font-medium">
+                    {med.is_active ? 'Daily Dosing' : 'Archived'}
                   </span>
-                </div>
+                )}
               </div>
-
-              <div className="bg-slate-50 p-3 rounded-xl border border-slate-100 text-xs text-slate-600">
-                <span className="font-bold text-slate-700 block mb-0.5">Instructions:</span>
-                {med.instructions || 'Take as advised with water.'}
-              </div>
-            </div>
-
-            <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
-              <span>Started: {med.start_date || 'Ongoing'}</span>
-              {med.is_active && canModifyDoses ? (
-                <button
-                  type="button"
-                  onClick={() => setArchiveTarget(med)}
-                  className="text-xs font-semibold text-slate-500 hover:text-red-600 flex items-center gap-1 transition-colors"
-                  title="Archive this medication"
-                >
-                  <Archive className="w-3.5 h-3.5" />
-                  <span>Archive</span>
-                </button>
-              ) : (
-                <span className="text-slate-400 font-medium">
-                  {med.is_active ? 'Daily Dosing' : 'Archived'}
-                </span>
-              )}
-            </div>
-          </Card>
-        ))}
-      </div>
+            </Card>
+          ))}
+        </div>
+      )}
 
       {/* Add Medication Modal */}
       <Modal

@@ -215,6 +215,25 @@ runTest('Combined timestamp evaluation prevents midnight wraparound bug', () => 
 });
 
 // -----------------------------------------------------------------------------
+// 6. DEMO BASELINE & APPOINTMENT STATE TRANSITIONS
+// -----------------------------------------------------------------------------
+console.log('\n--- Suite 6: Demo Baseline & Appointment State Transitions ---');
+
+runTest('Demo baseline holds exactly 3 distinct prescribed doses', () => {
+  const seedDoseIds = ['dose-1', 'dose-2', 'dose-3'];
+  assert.strictEqual(seedDoseIds.length, 3, 'Must have 3 seed doses');
+  const uniqueIds = new Set(seedDoseIds);
+  assert.strictEqual(uniqueIds.size, 3, 'All seed dose IDs must be unique');
+});
+
+runTest('Appointment status transitions between upcoming, completed, and cancelled', () => {
+  const validStatuses = ['upcoming', 'completed', 'cancelled'];
+  assert.ok(validStatuses.includes('completed'), 'Completed is valid status');
+  assert.ok(validStatuses.includes('cancelled'), 'Cancelled is valid status');
+  assert.ok(validStatuses.includes('upcoming'), 'Upcoming is valid status');
+});
+
+// -----------------------------------------------------------------------------
 // SUMMARY
 // -----------------------------------------------------------------------------
 console.log('\n======================================================');

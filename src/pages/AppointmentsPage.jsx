@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar, Plus, MapPin, Clock } from 'lucide-react';
+import { Calendar, Plus, MapPin, Clock, CheckCircle2, XCircle } from 'lucide-react';
 import { useCareCircle } from '../context/CareCircleContext';
 import { formatDateTimeToReadable } from '../lib/dateUtils';
 import Button from '../components/common/Button';
@@ -9,7 +9,7 @@ import Modal from '../components/common/Modal';
 import Input from '../components/common/Input';
 
 export default function AppointmentsPage() {
-  const { appointments, addAppointment, elderlyProfile, canModifyDoses, isReadOnly } = useCareCircle();
+  const { appointments, addAppointment, updateAppointmentStatus, elderlyProfile, canModifyDoses, isReadOnly } = useCareCircle();
 
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [doctorName, setDoctorName] = useState('');
@@ -72,42 +72,92 @@ export default function AppointmentsPage() {
         )}
       </div>
 
-      {/* Appointment Grid */}
-      <div className="grid md:grid-cols-2 gap-6">
-        {appointments.map((appt) => (
-          <Card key={appt.id} className="space-y-4">
-            <div className="flex items-start justify-between gap-2 pb-3 border-b border-slate-100">
-              <div>
-                <h3 className="text-lg font-bold text-slate-900">{appt.doctor_name}</h3>
-                <span className="text-xs font-semibold text-teal-700">{appt.specialty}</span>
-              </div>
-              <Badge variant="info" size="sm">
-                {appt.status || 'Upcoming'}
-              </Badge>
-            </div>
+      {/* Appointment Grid or Empty State */}
+      {appointments.length === 0 ? (
+        <div className="bg-white rounded-2xl p-10 border border-slate-200 text-center space-y-4">
+          <div className="w-14 h-14 bg-teal-50 text-teal-600 rounded-2xl flex items-center justify-center mx-auto">
+            <Calendar className="w-7 h-7" />
+          </div>
+          <h3 className="text-lg font-bold text-slate-900">No Doctor Appointments Scheduled</h3>
+          <p className="text-sm text-slate-500 max-w-md mx-auto">
+            Keep track of doctor consultations, clinical checkups, and preparation instructions for {elderlyProfile?.full_name}.
+          </p>
+          {canModifyDoses && (
+            <Button
+              variant="primary"
+              size="md"
+              icon={Plus}
+              onClick={() => setAddModalOpen(true)}
+            >
+              Schedule First Visit
+            </Button>
+          )}
+        </div>
+      ) : (
+        <div className="grid md:grid-cols-2 gap-6">
+          {appointments.map((appt) => {
+            const isCompleted = appt.status === 'completed';
+            const isCancelled = appt.status === 'cancelled';
+            const badgeVariant = isCompleted ? 'success' : isCancelled ? 'default' : 'info';
 
-            <div className="space-y-2 text-xs text-slate-600">
-              <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-slate-400 shrink-0" />
-                <span className="font-medium text-slate-800">{appt.clinic_or_hospital}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-teal-600 shrink-0" />
-                <span className="font-bold text-teal-800">
-                  {formatDateTimeToReadable(appt.appointment_time)}
-                </span>
-              </div>
-            </div>
+            return (
+              <Card key={appt.id} className="space-y-4 flex flex-col justify-between">
+                <div className="space-y-4">
+                  <div className="flex items-start justify-between gap-2 pb-3 border-b border-slate-100">
+                    <div>
+                      <h3 className="text-lg font-bold text-slate-900">{appt.doctor_name}</h3>
+                      <span className="text-xs font-semibold text-teal-700">{appt.specialty}</span>
+                    </div>
+                    <Badge variant={badgeVariant} size="sm">
+                      {(appt.status || 'Upcoming').toUpperCase()}
+                    </Badge>
+                  </div>
 
-            {appt.notes && (
-              <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 text-xs text-slate-600">
-                <span className="font-bold text-slate-700 block mb-0.5">Instructions & Preparation:</span>
-                {appt.notes}
-              </div>
-            )}
-          </Card>
-        ))}
-      </div>
+                  <div className="space-y-2 text-xs text-slate-600">
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-4 h-4 text-slate-400 shrink-0" />
+                      <span className="font-medium text-slate-800">{appt.clinic_or_hospital}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-teal-600 shrink-0" />
+                      <span className="font-bold text-teal-800">
+                        {formatDateTimeToReadable(appt.appointment_time)}
+                      </span>
+                    </div>
+                  </div>
+
+                  {appt.notes && (
+                    <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 text-xs text-slate-600">
+                      <span className="font-bold text-slate-700 block mb-0.5">Instructions & Preparation:</span>
+                      {appt.notes}
+                    </div>
+                  )}
+                </div>
+
+                {canModifyDoses && appt.status === 'upcoming' && (
+                  <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-2.5">
+                    <button
+                      type="button"
+                      onClick={() => updateAppointmentStatus(appt.id, 'cancelled')}
+                      className="text-xs font-semibold text-slate-400 hover:text-red-600 transition-colors px-2 py-1"
+                    >
+                      Cancel Visit
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => updateAppointmentStatus(appt.id, 'completed')}
+                      className="text-xs font-bold text-emerald-700 hover:text-emerald-800 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-colors"
+                    >
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      <span>Mark Completed</span>
+                    </button>
+                  </div>
+                )}
+              </Card>
+            );
+          })}
+        </div>
+      )}
 
       {/* Modal */}
       <Modal
