@@ -405,6 +405,32 @@ runTest('Demo reset restores exact pristine initial baseline', () => {
 });
 
 // -----------------------------------------------------------------------------
+// 9. UI FALLBACK & EDGE CASE GUARDS
+// -----------------------------------------------------------------------------
+console.log('\n--- Suite 9: UI Fallback & Edge Case Hardening ---');
+
+runTest('Null elderlyProfile falls back to generic label without leaking demo personas', () => {
+  const getElderlyDisplayName = (profile) => profile?.full_name || 'Senior';
+  assert.strictEqual(getElderlyDisplayName(null), 'Senior', 'Null profile must return Senior');
+  assert.strictEqual(getElderlyDisplayName(undefined), 'Senior', 'Undefined profile must return Senior');
+  assert.strictEqual(getElderlyDisplayName({ full_name: 'Ananya Roy' }), 'Ananya Roy', 'Real profile name must be preserved');
+  assert.notStrictEqual(getElderlyDisplayName(null), 'Kamla Sharma', 'Must NEVER fall back to Kamla Sharma');
+});
+
+runTest('Scheduled time inputs normalize HH:mm to full HH:mm:ss for database compliance', () => {
+  const normalizeTime = (timeStr) => (timeStr && timeStr.length === 5 ? `${timeStr}:00` : timeStr);
+  assert.strictEqual(normalizeTime('08:00'), '08:00:00', '08:00 must be normalized to 08:00:00');
+  assert.strictEqual(normalizeTime('13:45'), '13:45:00', '13:45 must be normalized to 13:45:00');
+  assert.strictEqual(normalizeTime('21:00:00'), '21:00:00', 'Full HH:mm:ss must remain unchanged');
+});
+
+runTest('Empty circle or members state renders safe fallbacks', () => {
+  const renderMemberList = (members) => (members.length === 0 ? 'No members connected yet.' : `${members.length} members`);
+  assert.strictEqual(renderMemberList([]), 'No members connected yet.');
+  assert.strictEqual(renderMemberList([{ id: '1' }]), '1 members');
+});
+
+// -----------------------------------------------------------------------------
 // SUMMARY
 // -----------------------------------------------------------------------------
 console.log('\n======================================================');

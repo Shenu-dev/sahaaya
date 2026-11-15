@@ -60,10 +60,15 @@ export default function CaregiverDashboard() {
   const handleConfirmAdminister = async (status) => {
     if (!selectedDose) return;
     setIsSubmitting(true);
-    await markDose(selectedDose.id, status, caregiverNotes, true);
-    setIsSubmitting(false);
-    setAdministerModalOpen(false);
-    setSelectedDose(null);
+    try {
+      await markDose(selectedDose.id, status, caregiverNotes, true);
+      setAdministerModalOpen(false);
+      setSelectedDose(null);
+    } catch (err) {
+      console.error('Error administering dose:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -76,7 +81,7 @@ export default function CaregiverDashboard() {
             Shift Management • {profile?.full_name || 'Caregiver'}
           </h1>
           <p className="text-sm text-slate-500 mt-1">
-            Assigned patient: <span className="font-bold text-slate-800">{elderlyProfile?.full_name}</span> (Care Circle: {careCircle?.name})
+            Assigned patient: <span className="font-bold text-slate-800">{elderlyProfile?.full_name || 'Senior'}</span> (Care Circle: {careCircle?.name || 'Care Circle'})
           </p>
         </div>
 
@@ -104,47 +109,54 @@ export default function CaregiverDashboard() {
             </div>
 
             <div className="space-y-3.5">
-              {todayDoses.map((dose) => {
-                const isTaken = dose.status === DOSE_STATUS.TAKEN;
+              {todayDoses.length === 0 ? (
+                <div className="p-8 text-center bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+                  <p className="text-sm font-semibold text-slate-700">No medication doses scheduled for today.</p>
+                  <p className="text-xs text-slate-500">All prescribed regimens for this shift are up to date.</p>
+                </div>
+              ) : (
+                todayDoses.map((dose) => {
+                  const isTaken = dose.status === DOSE_STATUS.TAKEN;
 
-                return (
-                  <div
-                    key={dose.id}
-                    className={`p-5 rounded-xl border transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${
-                      isTaken ? 'bg-emerald-50/50 border-emerald-200' : 'bg-slate-50/60 border-slate-200'
-                    }`}
-                  >
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2.5 flex-wrap">
-                        <span className="font-bold text-slate-900 text-base">{dose.med_name}</span>
-                        <Badge doseStatus={dose.status} size="sm" />
-                      </div>
-                      <p className="text-xs text-slate-600 font-medium">
-                        Dose: {dose.dosage} • Scheduled: <span className="font-bold text-slate-800">{formatTimeTo12Hour(dose.scheduled_time)}</span>
-                      </p>
-                      {dose.recorded_at && (
-                        <p className="text-xs text-emerald-800 font-semibold">
-                          Recorded at: <span className="font-bold">{formatTimeTo12Hour(dose.recorded_at)}</span> by {dose.recorded_by_name || 'Caregiver'}
+                  return (
+                    <div
+                      key={dose.id}
+                      className={`p-5 rounded-xl border transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${
+                        isTaken ? 'bg-emerald-50/50 border-emerald-200' : 'bg-slate-50/60 border-slate-200'
+                      }`}
+                    >
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2.5 flex-wrap">
+                          <span className="font-bold text-slate-900 text-base">{dose.med_name}</span>
+                          <Badge doseStatus={dose.status} size="sm" />
+                        </div>
+                        <p className="text-xs text-slate-600 font-medium">
+                          Dose: {dose.dosage} • Scheduled: <span className="font-bold text-slate-800">{formatTimeTo12Hour(dose.scheduled_time)}</span>
                         </p>
-                      )}
-                      {dose.notes && (
-                        <p className="text-xs italic text-slate-500">Observation: "{dose.notes}"</p>
+                        {dose.recorded_at && (
+                          <p className="text-xs text-emerald-800 font-semibold">
+                            Recorded at: <span className="font-bold">{formatTimeTo12Hour(dose.recorded_at)}</span> by {dose.recorded_by_name || 'Caregiver'}
+                          </p>
+                        )}
+                        {dose.notes && (
+                          <p className="text-xs italic text-slate-500">Observation: "{dose.notes}"</p>
+                        )}
+                      </div>
+
+                      {!isTaken && canModifyDoses && (
+                        <Button
+                          variant="primary"
+                          size="md"
+                          icon={CheckCircle2}
+                          onClick={() => handleOpenAdminister(dose)}
+                        >
+                          Record Administration
+                        </Button>
                       )}
                     </div>
-
-                    {!isTaken && canModifyDoses && (
-                      <Button
-                        variant="primary"
-                        size="md"
-                        icon={CheckCircle2}
-                        onClick={() => handleOpenAdminister(dose)}
-                      >
-                        Record Administration
-                      </Button>
-                    )}
-                  </div>
-                );
-              })}
+                  );
+                })
+              )}
             </div>
           </div>
 
@@ -156,16 +168,22 @@ export default function CaregiverDashboard() {
             </h3>
 
             <div className="space-y-3">
-              {activityLogs.slice(0, 5).map((log) => (
-                <div key={log.id} className="p-3.5 rounded-xl bg-slate-50 border border-slate-100 flex items-start justify-between text-xs gap-4">
-                  <div className="space-y-0.5">
-                    <p className="font-semibold text-slate-800">{log.description}</p>
-                    <span className="text-slate-400">
-                      {formatDateTimeToReadable(log.created_at)}
-                    </span>
-                  </div>
+              {activityLogs.length === 0 ? (
+                <div className="p-4 text-center bg-slate-50 border border-slate-100 rounded-xl">
+                  <p className="text-xs text-slate-500 font-medium">No shift activity recorded yet.</p>
                 </div>
-              ))}
+              ) : (
+                activityLogs.slice(0, 5).map((log) => (
+                  <div key={log.id} className="p-3.5 rounded-xl bg-slate-50 border border-slate-100 flex items-start justify-between text-xs gap-4">
+                    <div className="space-y-0.5">
+                      <p className="font-semibold text-slate-800">{log.description}</p>
+                      <span className="text-slate-400">
+                        {formatDateTimeToReadable(log.created_at)}
+                      </span>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>
@@ -181,7 +199,7 @@ export default function CaregiverDashboard() {
             <div className="space-y-3 text-sm">
               <div>
                 <span className="text-xs text-slate-400 block font-medium">Full Name</span>
-                <span className="font-bold text-slate-900">{elderlyProfile?.full_name}</span>
+                <span className="font-bold text-slate-900">{elderlyProfile?.full_name || 'Senior'}</span>
               </div>
               <div>
                 <span className="text-xs text-slate-400 block font-medium">Critical Allergies</span>
@@ -197,13 +215,17 @@ export default function CaregiverDashboard() {
               </div>
               <div>
                 <span className="text-xs text-slate-400 block font-medium">Emergency Family Contact</span>
-                <span className="font-semibold text-slate-900 block">{elderlyProfile?.emergency_contact_name}</span>
-                <span className="text-xs text-slate-500">{elderlyProfile?.emergency_contact_phone}</span>
+                <span className="font-semibold text-slate-900 block">{elderlyProfile?.emergency_contact_name || 'Not assigned'}</span>
+                {elderlyProfile?.emergency_contact_phone && (
+                  <span className="text-xs text-slate-500">{elderlyProfile.emergency_contact_phone}</span>
+                )}
               </div>
               <div>
                 <span className="text-xs text-slate-400 block font-medium">Attending Doctor</span>
-                <span className="font-semibold text-slate-900 block">{elderlyProfile?.primary_doctor_name}</span>
-                <span className="text-xs text-slate-500">{elderlyProfile?.primary_doctor_phone}</span>
+                <span className="font-semibold text-slate-900 block">{elderlyProfile?.primary_doctor_name || 'Not assigned'}</span>
+                {elderlyProfile?.primary_doctor_phone && (
+                  <span className="text-xs text-slate-500">{elderlyProfile.primary_doctor_phone}</span>
+                )}
               </div>
             </div>
           </Card>
@@ -213,15 +235,21 @@ export default function CaregiverDashboard() {
             <h4 className="font-bold text-slate-900 text-base pb-2 border-b border-slate-100">
               Upcoming Medical Consultations
             </h4>
-            {appointments.map((appt) => (
-              <div key={appt.id} className="p-3 bg-slate-50 rounded-xl border border-slate-100 text-xs space-y-1">
-                <span className="font-bold text-slate-900 block">{appt.doctor_name}</span>
-                <span className="text-slate-600 block">{appt.specialty}</span>
-                <span className="text-teal-800 font-bold block">
-                  {formatDateTimeToReadable(appt.appointment_time)}
-                </span>
+            {appointments.length === 0 ? (
+              <div className="p-4 text-center bg-slate-50 border border-slate-100 rounded-xl">
+                <p className="text-xs text-slate-500 font-medium">No upcoming consultations.</p>
               </div>
-            ))}
+            ) : (
+              appointments.map((appt) => (
+                <div key={appt.id} className="p-3 bg-slate-50 rounded-xl border border-slate-100 text-xs space-y-1">
+                  <span className="font-bold text-slate-900 block">{appt.doctor_name}</span>
+                  <span className="text-slate-600 block">{appt.specialty}</span>
+                  <span className="text-teal-800 font-bold block">
+                    {formatDateTimeToReadable(appt.appointment_time)}
+                  </span>
+                </div>
+              ))
+            )}
           </Card>
         </div>
       </div>
@@ -231,7 +259,7 @@ export default function CaregiverDashboard() {
         isOpen={administerModalOpen}
         onClose={() => setAdministerModalOpen(false)}
         title="Record Medication Administration"
-        subtitle={`Administering ${selectedDose?.med_name} (${selectedDose?.dosage}) to ${elderlyProfile?.full_name}. Scheduled: ${formatTimeTo12Hour(selectedDose?.scheduled_time)}.`}
+        subtitle={`Administering ${selectedDose?.med_name} (${selectedDose?.dosage}) to ${elderlyProfile?.full_name || 'Senior'}. Scheduled: ${formatTimeTo12Hour(selectedDose?.scheduled_time)}.`}
       >
         <div className="space-y-4">
           <Input

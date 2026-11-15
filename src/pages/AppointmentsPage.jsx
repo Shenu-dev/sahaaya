@@ -24,21 +24,26 @@ export default function AppointmentsPage() {
     if (!doctorName || !clinic || !apptTime) return;
 
     setIsSubmitting(true);
-    await addAppointment({
-      doctorName,
-      specialty: specialty || 'General Physician',
-      clinicOrHospital: clinic,
-      appointmentTime: apptTime,
-      notes,
-    });
-    setIsSubmitting(false);
-    setAddModalOpen(false);
+    try {
+      await addAppointment({
+        doctorName,
+        specialty: specialty || 'General Physician',
+        clinicOrHospital: clinic,
+        appointmentTime: apptTime,
+        notes,
+      });
+      setAddModalOpen(false);
 
-    setDoctorName('');
-    setSpecialty('');
-    setClinic('');
-    setApptTime('');
-    setNotes('');
+      setDoctorName('');
+      setSpecialty('');
+      setClinic('');
+      setApptTime('');
+      setNotes('');
+    } catch (err) {
+      console.error('Error adding appointment:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -51,7 +56,7 @@ export default function AppointmentsPage() {
             Doctor Appointments
           </h1>
           <p className="text-sm text-slate-500 mt-1">
-            Scheduled visits and preparation instructions for {elderlyProfile?.full_name}.
+            Scheduled visits and preparation instructions for {elderlyProfile?.full_name || 'Senior'}.
           </p>
         </div>
 
@@ -80,7 +85,7 @@ export default function AppointmentsPage() {
           </div>
           <h3 className="text-lg font-bold text-slate-900">No Doctor Appointments Scheduled</h3>
           <p className="text-sm text-slate-500 max-w-md mx-auto">
-            Keep track of doctor consultations, clinical checkups, and preparation instructions for {elderlyProfile?.full_name}.
+            Keep track of doctor consultations, clinical checkups, and preparation instructions for {elderlyProfile?.full_name || 'Senior'}.
           </p>
           {canModifyDoses && (
             <Button
@@ -164,7 +169,7 @@ export default function AppointmentsPage() {
         isOpen={addModalOpen}
         onClose={() => setAddModalOpen(false)}
         title="Schedule Doctor Visit"
-        subtitle={`Book an appointment for ${elderlyProfile?.full_name}.`}
+        subtitle={`Book an appointment for ${elderlyProfile?.full_name || 'Senior'}.`}
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input

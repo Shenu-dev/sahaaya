@@ -90,7 +90,7 @@ export default function CareCirclePage() {
             {careCircle?.name || 'Care Circle'}
           </h1>
           <p className="text-sm text-slate-500 mt-1">
-            Central patient: <span className="font-bold text-slate-800">{elderlyProfile?.full_name}</span>. Access strictly governed by PostgreSQL Row Level Security.
+            Central patient: <span className="font-bold text-slate-800">{elderlyProfile?.full_name || 'Senior'}</span>. Access strictly governed by PostgreSQL Row Level Security.
           </p>
         </div>
 
@@ -133,31 +133,38 @@ export default function CareCirclePage() {
           </h2>
 
           <div className="space-y-3">
-            {members.map((member) => (
-              <div
-                key={member.id}
-                className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-subtle flex items-center justify-between gap-4"
-              >
-                <div className="flex items-center gap-3.5">
-                  <div className="w-11 h-11 rounded-xl bg-teal-50 border border-teal-200 text-teal-800 flex items-center justify-center font-bold text-sm">
-                    {member.full_name?.substring(0, 2).toUpperCase() || 'ME'}
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-slate-900 text-base">{member.full_name}</h3>
-                    <p className="text-xs text-slate-500 font-medium">{member.relationship_label}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2 flex-wrap justify-end">
-                  <Badge variant={member.role === 'elderly' ? 'primary' : 'default'} size="sm">
-                    {member.role === 'elderly' ? 'Elderly Individual' : member.role === 'family' ? 'Family Member' : 'Caregiver'}
-                  </Badge>
-                  <Badge variant={member.permissions === 'admin' ? 'admin' : member.permissions === 'write' ? 'info' : 'warning'} size="sm">
-                    {member.permissions === 'admin' ? 'Admin' : member.permissions === 'write' ? 'Write' : 'Read Only'}
-                  </Badge>
-                </div>
+            {members.length === 0 ? (
+              <div className="bg-white p-8 rounded-2xl border border-slate-200/90 text-center space-y-2">
+                <p className="text-sm font-semibold text-slate-600">No members connected yet.</p>
+                <p className="text-xs text-slate-400">Invite family members or caregivers to collaborate on care.</p>
               </div>
-            ))}
+            ) : (
+              members.map((member) => (
+                <div
+                  key={member.id}
+                  className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-subtle flex items-center justify-between gap-4"
+                >
+                  <div className="flex items-center gap-3.5">
+                    <div className="w-11 h-11 rounded-xl bg-teal-50 border border-teal-200 text-teal-800 flex items-center justify-center font-bold text-sm">
+                      {member.full_name?.substring(0, 2).toUpperCase() || 'ME'}
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-slate-900 text-base">{member.full_name || 'Member'}</h3>
+                      <p className="text-xs text-slate-500 font-medium">{member.relationship_label || 'Care Partner'}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 flex-wrap justify-end">
+                    <Badge variant={member.role === 'elderly' ? 'primary' : 'default'} size="sm">
+                      {member.role === 'elderly' ? 'Elderly Individual' : member.role === 'family' ? 'Family Member' : 'Caregiver'}
+                    </Badge>
+                    <Badge variant={member.permissions === 'admin' ? 'admin' : member.permissions === 'write' ? 'info' : 'warning'} size="sm">
+                      {member.permissions === 'admin' ? 'Admin' : member.permissions === 'write' ? 'Write' : 'Read Only'}
+                    </Badge>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
 
@@ -199,7 +206,7 @@ export default function CareCirclePage() {
         isOpen={inviteModalOpen}
         onClose={() => setInviteModalOpen(false)}
         title="Invite to Care Circle"
-        subtitle={`Generate a cryptographically secure, single-use invite link for ${careCircle?.name}.`}
+        subtitle={`Generate a cryptographically secure, single-use invite link for ${careCircle?.name || 'Care Circle'}.`}
       >
         {!generatedInviteLink ? (
           <form onSubmit={handleGenerateInvite} className="space-y-4">

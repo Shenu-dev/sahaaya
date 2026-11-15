@@ -72,7 +72,7 @@ export default function ElderlyDashboard() {
               <span>Namaste & Welcome Back</span>
             </div>
             <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
-              {elderlyProfile?.full_name || 'Kamla Sharma'}
+              {elderlyProfile?.full_name || 'Senior'}
             </h1>
             <p className="text-lg text-teal-100 mt-1 font-medium">{todayFormatted}</p>
           </div>

@@ -235,7 +235,7 @@ export default function Navbar({ activeTab, onTabChange }) {
         )}
 
         {/* Mobile Persona / View Switcher */}
-        <div className="sm:hidden flex items-center justify-between px-3 py-2 bg-teal-50/80 border-t border-teal-100 text-[11px]">
+        <div className="md:hidden flex items-center justify-between px-3 py-2 bg-teal-50/80 border-t border-teal-100 text-[11px]">
           <div className="flex items-center gap-1.5">
             <span className="font-bold text-teal-900">{isDemo ? 'Persona:' : 'View:'}</span>
             {isDemo && (

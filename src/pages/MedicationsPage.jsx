@@ -30,22 +30,27 @@ export default function MedicationsPage() {
     if (!name || !dosage) return;
 
     setIsSubmitting(true);
-    await addMedication({
-      name,
-      dosage,
-      form,
-      instructions,
-      scheduledTime,
-    });
-    setIsSubmitting(false);
-    setAddModalOpen(false);
+    try {
+      await addMedication({
+        name,
+        dosage,
+        form,
+        instructions,
+        scheduledTime: scheduledTime.length === 5 ? `${scheduledTime}:00` : scheduledTime,
+      });
+      setAddModalOpen(false);
 
-    // Reset Form
-    setName('');
-    setDosage('');
-    setForm('tablet');
-    setInstructions('');
-    setScheduledTime('08:00:00');
+      // Reset Form
+      setName('');
+      setDosage('');
+      setForm('tablet');
+      setInstructions('');
+      setScheduledTime('08:00:00');
+    } catch (err) {
+      console.error('Error adding medication:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -55,7 +60,7 @@ export default function MedicationsPage() {
         <div>
           <span className="text-xs font-bold text-teal-700 uppercase tracking-wider">Prescriptions & Regimen</span>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1.5 tracking-tight">
-            Medications for {elderlyProfile?.full_name}
+            Medications for {elderlyProfile?.full_name || 'Senior'}
           </h1>
           <p className="text-sm text-slate-500 mt-1">
             Preserved history: active medications with dose history are archived rather than deleted.
@@ -87,7 +92,7 @@ export default function MedicationsPage() {
           </div>
           <h3 className="text-lg font-bold text-slate-900">No Prescriptions Recorded</h3>
           <p className="text-sm text-slate-500 max-w-md mx-auto">
-            Prescribe medications, set dosage routines, and instructions for {elderlyProfile?.full_name}.
+            Prescribe medications, set dosage routines, and instructions for {elderlyProfile?.full_name || 'Senior'}.
           </p>
           {canModifyDoses && (
             <Button
@@ -163,7 +168,7 @@ export default function MedicationsPage() {
         isOpen={addModalOpen}
         onClose={() => setAddModalOpen(false)}
         title="Add New Medication"
-        subtitle={`Prescribe a new medication for ${elderlyProfile?.full_name}.`}
+        subtitle={`Prescribe a new medication for ${elderlyProfile?.full_name || 'Senior'}.`}
       >
         <form onSubmit={handleCreateMedication} className="space-y-4">
           <Input

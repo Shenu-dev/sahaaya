@@ -327,6 +327,21 @@ export function CareCircleProvider({ children }) {
 
   // Synchronize persona mode changes (switching between real account and demo)
   useEffect(() => {
+    if (!user) {
+      setActiveViewRole(null);
+      setHasCareCircle(false);
+      setCareCircle(null);
+      setElderlyProfile(null);
+      setMedications([]);
+      setTodayDoses([]);
+      setAppointments([]);
+      setMembers([]);
+      setActivityLogs([]);
+      setNotifications([]);
+      setCircleLoading(false);
+      return;
+    }
+
     if (isDemo) {
       setCareCircle(SEED_CARE_CIRCLE);
       setElderlyProfile(SEED_ELDERLY_PROFILE);
@@ -641,6 +656,7 @@ export function CareCircleProvider({ children }) {
         });
 
         if (error) throw error;
+        setActiveViewRole(null);
         await fetchCircleData();
         return { success: true, data };
       } catch (err) {
@@ -649,6 +665,7 @@ export function CareCircleProvider({ children }) {
     }
 
     // Local demo fallback
+    setActiveViewRole(null);
     const newCircle = { id: `circle-${Date.now()}`, name: circleData.circleName, is_demo: false };
     const newElderly = {
       id: `elderly-${Date.now()}`,

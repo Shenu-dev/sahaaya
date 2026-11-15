@@ -70,21 +70,26 @@ export default function FamilyDashboard({ onNavigateTab }) {
     if (!newDoctorName || !newApptTime || !newClinic) return;
 
     setIsSubmitting(true);
-    await addAppointment({
-      doctorName: newDoctorName,
-      specialty: newSpecialty || 'General Physician',
-      clinicOrHospital: newClinic,
-      appointmentTime: newApptTime,
-      notes: newApptNotes,
-    });
-    setIsSubmitting(false);
-    setApptModalOpen(false);
-    // Reset form
-    setNewDoctorName('');
-    setNewSpecialty('');
-    setNewClinic('');
-    setNewApptTime('');
-    setNewApptNotes('');
+    try {
+      await addAppointment({
+        doctorName: newDoctorName,
+        specialty: newSpecialty || 'General Physician',
+        clinicOrHospital: newClinic,
+        appointmentTime: newApptTime,
+        notes: newApptNotes,
+      });
+      setApptModalOpen(false);
+      // Reset form
+      setNewDoctorName('');
+      setNewSpecialty('');
+      setNewClinic('');
+      setNewApptTime('');
+      setNewApptNotes('');
+    } catch (err) {
+      console.error('Error creating appointment:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -135,7 +140,7 @@ export default function FamilyDashboard({ onNavigateTab }) {
           <div className="space-y-1">
             <h3 className="text-base font-bold">Missed Dose Alert Detected</h3>
             <p className="text-xs sm:text-sm text-red-700">
-              {missedDoses.map((d) => `${d.med_name} (Scheduled: ${formatTimeTo12Hour(d.scheduled_time)})`).join(', ')} was missed or overdue. Please check in with {elderlyProfile?.full_name}.
+              {missedDoses.map((d) => `${d.med_name} (Scheduled: ${formatTimeTo12Hour(d.scheduled_time)})`).join(', ')} was missed or overdue. Please check in with {elderlyProfile?.full_name || 'your loved one'}.
             </p>
           </div>
         </div>
@@ -311,17 +316,23 @@ export default function FamilyDashboard({ onNavigateTab }) {
             </h3>
 
             <div className="space-y-3">
-              {activityLogs.map((log) => (
-                <div key={log.id} className="p-4 rounded-xl bg-slate-50 border border-slate-100 flex items-start justify-between text-xs gap-4">
-                  <div className="space-y-1">
-                    <p className="font-semibold text-slate-800 leading-relaxed">{log.description}</p>
-                    <span className="text-slate-400 block">
-                      {formatDateTimeToReadable(log.created_at)}
-                    </span>
-                  </div>
-                  <Badge variant="default" size="sm" className="shrink-0">Audit Log</Badge>
+              {activityLogs.length === 0 ? (
+                <div className="p-6 text-center bg-slate-50 border border-slate-100 rounded-xl">
+                  <p className="text-xs text-slate-500 font-medium">No recent care activity recorded yet.</p>
                 </div>
-              ))}
+              ) : (
+                activityLogs.map((log) => (
+                  <div key={log.id} className="p-4 rounded-xl bg-slate-50 border border-slate-100 flex items-start justify-between text-xs gap-4">
+                    <div className="space-y-1">
+                      <p className="font-semibold text-slate-800 leading-relaxed">{log.description}</p>
+                      <span className="text-slate-400 block">
+                        {formatDateTimeToReadable(log.created_at)}
+                      </span>
+                    </div>
+                    <Badge variant="default" size="sm" className="shrink-0">Audit Log</Badge>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>
@@ -355,16 +366,22 @@ export default function FamilyDashboard({ onNavigateTab }) {
               <div>
                 <span className="text-xs text-slate-400 font-medium block">Emergency Contact</span>
                 <span className="font-semibold text-slate-900 block">
-                  {elderlyProfile?.emergency_contact_name} ({elderlyProfile?.emergency_contact_relation})
+                  {elderlyProfile?.emergency_contact_name
+                    ? `${elderlyProfile.emergency_contact_name} (${elderlyProfile.emergency_contact_relation || 'Contact'})`
+                    : 'Not assigned'}
                 </span>
-                <a href={`tel:${elderlyProfile?.emergency_contact_phone}`} className="text-teal-700 text-xs font-bold hover:underline">
-                  {elderlyProfile?.emergency_contact_phone}
-                </a>
+                {elderlyProfile?.emergency_contact_phone && (
+                  <a href={`tel:${elderlyProfile.emergency_contact_phone}`} className="text-teal-700 text-xs font-bold hover:underline">
+                    {elderlyProfile.emergency_contact_phone}
+                  </a>
+                )}
               </div>
               <div>
                 <span className="text-xs text-slate-400 font-medium block">Primary Doctor</span>
-                <span className="font-semibold text-slate-900 block">{elderlyProfile?.primary_doctor_name}</span>
-                <span className="text-xs text-slate-500">{elderlyProfile?.primary_doctor_phone}</span>
+                <span className="font-semibold text-slate-900 block">{elderlyProfile?.primary_doctor_name || 'Not assigned'}</span>
+                {elderlyProfile?.primary_doctor_phone && (
+                  <span className="text-xs text-slate-500">{elderlyProfile.primary_doctor_phone}</span>
+                )}
               </div>
             </div>
           </Card>
@@ -385,18 +402,24 @@ export default function FamilyDashboard({ onNavigateTab }) {
             </div>
 
             <div className="space-y-3">
-              {appointments.slice(0, 3).map((appt) => (
-                <div key={appt.id} className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1">
-                  <div className="flex items-center justify-between">
-                    <span className="font-bold text-slate-900 text-sm">{appt.doctor_name}</span>
-                    <Badge variant="info" size="sm">Scheduled</Badge>
-                  </div>
-                  <p className="text-xs text-slate-600 font-medium">{appt.specialty} • {appt.clinic_or_hospital}</p>
-                  <p className="text-xs font-bold text-teal-800">
-                    {formatDateTimeToReadable(appt.appointment_time)}
-                  </p>
+              {appointments.length === 0 ? (
+                <div className="p-4 text-center bg-slate-50 border border-slate-100 rounded-xl">
+                  <p className="text-xs text-slate-500 font-medium">No doctor visits scheduled.</p>
                 </div>
-              ))}
+              ) : (
+                appointments.slice(0, 3).map((appt) => (
+                  <div key={appt.id} className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-slate-900 text-sm">{appt.doctor_name}</span>
+                      <Badge variant="info" size="sm">Scheduled</Badge>
+                    </div>
+                    <p className="text-xs text-slate-600 font-medium">{appt.specialty} • {appt.clinic_or_hospital}</p>
+                    <p className="text-xs font-bold text-teal-800">
+                      {formatDateTimeToReadable(appt.appointment_time)}
+                    </p>
+                  </div>
+                ))
+              )}
             </div>
           </Card>
         </div>
@@ -407,7 +430,7 @@ export default function FamilyDashboard({ onNavigateTab }) {
         isOpen={apptModalOpen}
         onClose={() => setApptModalOpen(false)}
         title="Schedule Doctor Appointment"
-        subtitle={`Add a new healthcare visit for ${elderlyProfile?.full_name}.`}
+        subtitle={`Add a new healthcare visit for ${elderlyProfile?.full_name || 'Senior'}.`}
       >
         <form onSubmit={handleCreateAppointment} className="space-y-4">
           <Input
