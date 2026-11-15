@@ -1,13 +1,8 @@
 import React, { useState } from 'react';
 import { 
-  UserCheck, 
   Pill, 
   CheckCircle2, 
-  AlertCircle, 
-  Calendar, 
   FileText, 
-  Clock, 
-  Activity,
   HeartHandshake
 } from 'lucide-react';
 import { useCareCircle } from '../context/CareCircleContext';

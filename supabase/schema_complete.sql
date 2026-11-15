@@ -566,8 +566,7 @@ DECLARE
   v_user_id UUID;
   v_circle_id UUID;
   v_tz TEXT;
-  v_today DATE;
-  v_now_time TIME;
+  v_current_tz_timestamp TIMESTAMP;
   v_updated_count INT := 0;
   r_dose RECORD;
 BEGIN
@@ -591,19 +590,18 @@ BEGIN
   END IF;
 
   IF v_tz IS NULL THEN v_tz := 'Asia/Kolkata'; END IF;
-  v_today := (NOW() AT TIME ZONE v_tz)::DATE;
-  v_now_time := (NOW() AT TIME ZONE v_tz)::TIME;
+  
+  -- Current timestamp localized to patient's timezone
+  v_current_tz_timestamp := (NOW() AT TIME ZONE v_tz);
 
+  -- Safe timestamp comparison permanently prevents midnight wraparound bug (SEC-CRIT-01)
   FOR r_dose IN 
-    SELECT d.id, d.elderly_id, m.name AS med_name, d.scheduled_time
+    SELECT d.id, d.elderly_id, m.name AS med_name, d.scheduled_time, d.dose_date
     FROM public.medication_doses d
     JOIN public.medications m ON m.id = d.medication_id
     WHERE d.elderly_id = p_elderly_id
       AND d.status = 'upcoming'
-      AND (
-        d.dose_date < v_today OR 
-        (d.dose_date = v_today AND d.scheduled_time < (v_now_time - INTERVAL '60 minutes'))
-      )
+      AND (d.dose_date + d.scheduled_time) < (v_current_tz_timestamp - INTERVAL '60 minutes')
   LOOP
     UPDATE public.medication_doses
     SET status = 'missed', updated_at = NOW()
@@ -615,7 +613,7 @@ BEGIN
       p_elderly_id,
       'dose_missed',
       'Missed Medication Alert',
-      r_dose.med_name || ' scheduled for ' || r_dose.scheduled_time || ' was marked as missed.'
+      r_dose.med_name || ' scheduled for ' || r_dose.scheduled_time || ' on ' || r_dose.dose_date || ' was marked as missed.'
     FROM public.care_circle_members ccm
     WHERE ccm.care_circle_id = v_circle_id;
 

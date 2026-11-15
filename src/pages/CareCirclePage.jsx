@@ -1,18 +1,21 @@
 import React, { useState } from 'react';
-import { Users, UserPlus, Shield, Check, Copy, KeyRound, Clock, HeartHandshake, CheckCircle2 } from 'lucide-react';
+import { Users, UserPlus, Shield, Check, Copy, KeyRound, Plus } from 'lucide-react';
 import { useCareCircle } from '../context/CareCircleContext';
 import { useAuth } from '../context/AuthContext';
+import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 import Button from '../components/common/Button';
 import Badge from '../components/common/Badge';
 import Card from '../components/common/Card';
 import Modal from '../components/common/Modal';
 import Input from '../components/common/Input';
+import CreateCircleModal from '../components/common/CreateCircleModal';
 
 export default function CareCirclePage() {
   const { profile } = useAuth();
   const { careCircle, members, elderlyProfile, activityLogs, currentPermissions } = useCareCircle();
   const canInvite = currentPermissions === 'admin' || profile?.role === 'elderly';
 
+  const [createCircleModalOpen, setCreateCircleModalOpen] = useState(false);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteRole, setInviteRole] = useState('family');
@@ -44,7 +47,24 @@ export default function CareCirclePage() {
       const hashArray = Array.from(new Uint8Array(hashBuffer));
       const tokenHash = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
 
-      // 3. Construct shareable link with RAW token (DB stores ONLY tokenHash)
+      // 3. Persist cryptographically hashed invitation to database (FUNC-HIGH-02)
+      if (isSupabaseConfigured && supabase && profile?.id && careCircle?.id) {
+        const expiresAt = new Date(Date.now() + 72 * 3600 * 1000).toISOString();
+        const { error: inviteError } = await supabase.from('care_circle_invitations').insert({
+          care_circle_id: careCircle.id,
+          invited_email: inviteEmail.trim().toLowerCase(),
+          token_hash: tokenHash,
+          member_role: inviteRole,
+          permissions: invitePermission,
+          relationship_label: inviteRelation,
+          expires_at: expiresAt,
+          created_by: profile.id,
+        });
+
+        if (inviteError) throw inviteError;
+      }
+
+      // 4. Construct shareable link with RAW token (DB stores ONLY tokenHash)
       const link = `${window.location.origin}/join?token=${rawToken}`;
       setGeneratedInviteLink(link);
     } catch (err) {
@@ -74,23 +94,34 @@ export default function CareCirclePage() {
           </p>
         </div>
 
-        {canInvite ? (
+        <div className="flex items-center gap-3 flex-wrap">
           <Button
-            variant="primary"
+            variant="outline"
             size="md"
-            icon={UserPlus}
-            onClick={() => {
-              setGeneratedInviteLink('');
-              setInviteModalOpen(true);
-            }}
+            icon={Plus}
+            onClick={() => setCreateCircleModalOpen(true)}
           >
-            Invite Member
+            New Circle
           </Button>
-        ) : (
-          <Badge variant="warning" size="md">
-            Admin Required to Invite
-          </Badge>
-        )}
+
+          {canInvite ? (
+            <Button
+              variant="primary"
+              size="md"
+              icon={UserPlus}
+              onClick={() => {
+                setGeneratedInviteLink('');
+                setInviteModalOpen(true);
+              }}
+            >
+              Invite Member
+            </Button>
+          ) : (
+            <Badge variant="warning" size="md">
+              Admin Required to Invite
+            </Badge>
+          )}
+        </div>
       </div>
 
       <div className="grid lg:grid-cols-12 gap-8">
@@ -258,6 +289,12 @@ export default function CareCirclePage() {
           </div>
         )}
       </Modal>
+
+      {/* Create Care Circle Modal (FUNC-HIGH-06) */}
+      <CreateCircleModal
+        isOpen={createCircleModalOpen}
+        onClose={() => setCreateCircleModalOpen(false)}
+      />
     </div>
   );
 }

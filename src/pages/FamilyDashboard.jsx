@@ -1,18 +1,10 @@
 import React, { useState } from 'react';
 import { 
-  Activity, 
   AlertTriangle, 
-  CheckCircle2, 
-  Clock, 
   Calendar, 
   Plus, 
-  Users, 
   Pill, 
-  ShieldAlert, 
-  UserCheck, 
-  Phone,
-  FileText,
-  HelpCircle
+  FileText 
 } from 'lucide-react';
 import { useCareCircle } from '../context/CareCircleContext';
 import { useAuth } from '../context/AuthContext';

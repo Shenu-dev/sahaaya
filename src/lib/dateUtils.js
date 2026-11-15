@@ -1,7 +1,53 @@
 /**
  * Date and Time utilities for Saarthi
- * Standardizes 12-hour AM/PM formats, readable dates, and premature dose detection.
+ * Standardizes 12-hour AM/PM formats, timezone-safe date extraction, and premature dose detection.
  */
+
+/**
+ * Returns YYYY-MM-DD string for a given date in a specific timezone (defaults to Asia/Kolkata).
+ * Eliminates UTC midnight boundary desynchronization (DATA-HIGH-04).
+ */
+export function getLocalDateString(date = new Date(), timezone = 'Asia/Kolkata') {
+  try {
+    const formatter = new Intl.DateTimeFormat('en-CA', {
+      timeZone: timezone,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    });
+    return formatter.format(date);
+  } catch (err) {
+    const d = new Date(date);
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+}
+
+/**
+ * Safely parses a "YYYY-MM-DD" date string in local calendar time (LOGIC-MED-09).
+ */
+export function parseLocalDate(dateStr) {
+  if (!dateStr) return new Date();
+  if (dateStr.includes('T')) return new Date(dateStr);
+  const parts = dateStr.split('-');
+  if (parts.length === 3) {
+    const [y, m, d] = parts.map((s) => parseInt(s, 10));
+    return new Date(y, m - 1, d);
+  }
+  return new Date(dateStr);
+}
+
+/**
+ * Converts a datetime input string (e.g. from HTML5 datetime-local) to ISO string.
+ * Prevents UTC offset shift on appointment storage (DATA-HIGH-05).
+ */
+export function toISOStringSafe(datetimeStr) {
+  if (!datetimeStr) return null;
+  const d = new Date(datetimeStr);
+  return isNaN(d.getTime()) ? datetimeStr : d.toISOString();
+}
 
 export function formatTimeTo12Hour(timeStr) {
   if (!timeStr) return '--:--';
@@ -70,7 +116,8 @@ export function checkIsFutureDose(scheduledTimeStr, doseDateStr) {
   const now = new Date();
   const [hours, minutes] = scheduledTimeStr.split(':').map((s) => parseInt(s, 10));
 
-  const scheduledDate = doseDateStr ? new Date(doseDateStr) : new Date();
+  // Safely construct local date without UTC boundary bugs
+  const scheduledDate = doseDateStr ? parseLocalDate(doseDateStr) : new Date();
   scheduledDate.setHours(hours || 0, minutes || 0, 0, 0);
 
   const diffMs = scheduledDate.getTime() - now.getTime();

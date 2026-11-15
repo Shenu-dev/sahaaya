@@ -12,11 +12,22 @@ import AppointmentsPage from './pages/AppointmentsPage';
 import CareCirclePage from './pages/CareCirclePage';
 import Navbar from './components/layout/Navbar';
 import LoadingSpinner from './components/common/LoadingSpinner';
+import AcceptInvitationModal from './components/common/AcceptInvitationModal';
 
 function MainApp() {
   const { user, profile, loading, signInAsDemo } = useAuth();
   const [authPage, setAuthPage] = useState('landing'); // 'landing' | 'login' | 'register'
   const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard' | 'medications' | 'appointments' | 'circle'
+  
+  // Detect invitation token in URL (FUNC-HIGH-03)
+  const [inviteToken, setInviteToken] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('token');
+    }
+    return null;
+  });
+  const [showInviteModal, setShowInviteModal] = useState(Boolean(inviteToken));
 
   if (loading) {
     return (
@@ -69,6 +80,15 @@ function MainApp() {
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans text-slate-900 selection:bg-teal-500 selection:text-white">
       <Navbar activeTab={activeTab} onTabChange={setActiveTab} />
       <main className="flex-1 pb-16">{renderContent()}</main>
+
+      {/* Cryptographic Care Circle Invitation Acceptance Modal (FUNC-HIGH-03) */}
+      {inviteToken && (
+        <AcceptInvitationModal
+          isOpen={showInviteModal}
+          onClose={() => setShowInviteModal(false)}
+          token={inviteToken}
+        />
+      )}
     </div>
   );
 }

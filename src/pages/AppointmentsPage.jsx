@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar, Plus, MapPin, Clock, FileText, CheckCircle2 } from 'lucide-react';
+import { Calendar, Plus, MapPin, Clock } from 'lucide-react';
 import { useCareCircle } from '../context/CareCircleContext';
 import { formatDateTimeToReadable } from '../lib/dateUtils';
 import Button from '../components/common/Button';

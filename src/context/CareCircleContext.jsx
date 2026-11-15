@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
 import { DOSE_STATUS } from '../lib/constants';
-import { formatTimeTo12Hour, checkIsFutureDose } from '../lib/dateUtils';
+import { formatTimeTo12Hour, checkIsFutureDose, getLocalDateString, toISOStringSafe } from '../lib/dateUtils';
 
 const CareCircleContext = createContext(null);
 
@@ -189,7 +189,8 @@ export function CareCircleProvider({ children }) {
           if (elderlyData) {
             setElderlyProfile(elderlyData);
 
-            const todayStr = new Date().toISOString().split('T')[0];
+            // Timezone-safe local date string eliminates UTC midnight boundary desync (DATA-HIGH-04)
+            const todayStr = getLocalDateString(new Date(), elderlyData.timezone || 'Asia/Kolkata');
             await supabase.rpc('generate_daily_doses', {
               p_elderly_id: elderlyData.id,
               p_target_date: todayStr,
@@ -206,9 +207,10 @@ export function CareCircleProvider({ children }) {
               .eq('is_active', true);
             if (medsData) setMedications(medsData);
 
+            // Include instructions to eliminate hardcoded instruction bug (UI-MED-07)
             const { data: dosesData } = await supabase
               .from('medication_doses')
-              .select('*, medications(name, dosage, form)')
+              .select('*, medications(name, dosage, form, instructions)')
               .eq('elderly_id', elderlyData.id)
               .eq('dose_date', todayStr)
               .order('scheduled_time', { ascending: true });
@@ -219,6 +221,7 @@ export function CareCircleProvider({ children }) {
                   ...d,
                   med_name: d.medications?.name || 'Medication',
                   dosage: d.medications?.dosage || '',
+                  instructions: d.medications?.instructions || '',
                 }))
               );
             }
@@ -412,8 +415,9 @@ export function CareCircleProvider({ children }) {
     return { success: true };
   };
 
-  // Add Doctor Appointment
+  // Add Doctor Appointment (Safely converts localized datetime to ISO - DATA-HIGH-05)
   const addAppointment = async (apptData) => {
+    const isoAppointmentTime = toISOStringSafe(apptData.appointmentTime);
     if (isSupabaseConfigured && supabase && elderlyProfile?.id && user) {
       try {
         const { error } = await supabase.from('appointments').insert({
@@ -421,7 +425,7 @@ export function CareCircleProvider({ children }) {
           doctor_name: apptData.doctorName,
           specialty: apptData.specialty,
           clinic_or_hospital: apptData.clinicOrHospital,
-          appointment_time: apptData.appointmentTime,
+          appointment_time: isoAppointmentTime,
           notes: apptData.notes,
           created_by: user.id,
         });
@@ -438,7 +442,7 @@ export function CareCircleProvider({ children }) {
       doctor_name: apptData.doctorName,
       specialty: apptData.specialty,
       clinic_or_hospital: apptData.clinicOrHospital,
-      appointment_time: apptData.appointmentTime,
+      appointment_time: isoAppointmentTime,
       notes: apptData.notes,
       status: 'upcoming',
     };
@@ -454,6 +458,132 @@ export function CareCircleProvider({ children }) {
     setActivityLogs((prev) => [newLog, ...prev]);
 
     return { success: true };
+  };
+
+  // Archive Medication (Soft-delete to preserve dose history - FUNC-MED-08)
+  const archiveMedication = async (medicationId) => {
+    if (!canModifyDoses) {
+      return { success: false, error: 'Permission denied: Read-only members cannot archive medications.' };
+    }
+
+    if (isSupabaseConfigured && supabase && user) {
+      try {
+        const { error } = await supabase
+          .from('medications')
+          .update({
+            is_active: false,
+            archived_at: new Date().toISOString(),
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', medicationId);
+
+        if (error) throw error;
+        await fetchCircleData();
+        return { success: true };
+      } catch (err) {
+        return { success: false, error: err.message };
+      }
+    }
+
+    // Local fallback update
+    setMedications((prev) =>
+      prev.map((m) =>
+        m.id === medicationId ? { ...m, is_active: false, archived_at: new Date().toISOString() } : m
+      )
+    );
+
+    const targetMed = medications.find((m) => m.id === medicationId);
+    const actorName = profile?.full_name || 'Care Circle Member';
+    const newLog = {
+      id: `act-${Date.now()}`,
+      action_type: 'medication_archived',
+      description: `${actorName} archived medication ${targetMed?.name || 'prescription'}.`,
+      created_at: new Date().toISOString(),
+    };
+    setActivityLogs((prev) => [newLog, ...prev]);
+
+    return { success: true };
+  };
+
+  // Atomic Care Circle Creation for New Users (FUNC-HIGH-06)
+  const createCareCircle = async (circleData) => {
+    if (isSupabaseConfigured && supabase && user) {
+      try {
+        const { data, error } = await supabase.rpc('create_care_circle_atomic', {
+          p_circle_name: circleData.circleName,
+          p_elderly_name: circleData.elderlyName,
+          p_date_of_birth: circleData.dateOfBirth || null,
+          p_gender: circleData.gender || 'Not specified',
+          p_blood_group: circleData.bloodGroup || 'Unknown',
+          p_allergies: circleData.allergies || 'None reported',
+          p_medical_conditions: circleData.medicalConditions || 'None reported',
+          p_emergency_name: circleData.emergencyName,
+          p_emergency_phone: circleData.emergencyPhone,
+          p_emergency_relation: circleData.emergencyRelation || 'Family',
+          p_doctor_name: circleData.doctorName || null,
+          p_doctor_phone: circleData.doctorPhone || null,
+          p_timezone: circleData.timezone || 'Asia/Kolkata',
+          p_user_role: profile?.role || 'elderly',
+        });
+
+        if (error) throw error;
+        await fetchCircleData();
+        return { success: true, data };
+      } catch (err) {
+        return { success: false, error: err.message };
+      }
+    }
+
+    // Local fallback
+    const newCircle = { id: `circle-${Date.now()}`, name: circleData.circleName, is_demo: false };
+    const newElderly = {
+      id: `elderly-${Date.now()}`,
+      full_name: circleData.elderlyName,
+      emergency_contact_name: circleData.emergencyName,
+      emergency_contact_phone: circleData.emergencyPhone,
+      allergies: circleData.allergies || 'None reported',
+      medical_conditions: circleData.medicalConditions || 'None reported',
+      timezone: circleData.timezone || 'Asia/Kolkata',
+    };
+    setCareCircle(newCircle);
+    setElderlyProfile(newElderly);
+    return { success: true };
+  };
+
+  // Accept Cryptographic Invitation (FUNC-HIGH-03)
+  const acceptInvitation = async (rawToken) => {
+    try {
+      // 1. Compute SHA-256 hash using Web Crypto API
+      const encoder = new TextEncoder();
+      const data = encoder.encode(rawToken);
+      const hashBuffer = await window.crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const tokenHash = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+
+      if (isSupabaseConfigured && supabase && user) {
+        const { data: resData, error } = await supabase.rpc('accept_care_circle_invitation', {
+          p_token_hash: tokenHash,
+        });
+
+        if (error) throw error;
+        await fetchCircleData();
+        return { success: true, data: resData };
+      }
+
+      // Local fallback
+      const actorName = profile?.full_name || 'New Member';
+      const newMember = {
+        id: `mem-${Date.now()}`,
+        full_name: actorName,
+        role: 'family',
+        permissions: 'write',
+        relationship_label: 'Care Circle Member',
+      };
+      setMembers((prev) => [...prev, newMember]);
+      return { success: true };
+    } catch (err) {
+      return { success: false, error: err.message || 'Invalid or expired invitation token.' };
+    }
   };
 
   // =========================================================================
@@ -507,7 +637,10 @@ export function CareCircleProvider({ children }) {
         },
         markDose,
         addMedication,
+        archiveMedication,
         addAppointment,
+        createCareCircle,
+        acceptInvitation,
         refreshData: fetchCircleData,
       }}
     >

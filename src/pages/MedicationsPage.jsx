@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Pill, Plus, Clock, Archive, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Plus, Clock, Archive } from 'lucide-react';
 import { useCareCircle } from '../context/CareCircleContext';
 import { useAuth } from '../context/AuthContext';
 import { MEDICATION_FORMS } from '../lib/constants';
@@ -13,9 +13,11 @@ import ConfirmDialog from '../components/common/ConfirmDialog';
 
 export default function MedicationsPage() {
   const { profile } = useAuth();
-  const { medications, addMedication, elderlyProfile, canModifyDoses, isReadOnly } = useCareCircle();
+  const { medications, addMedication, archiveMedication, elderlyProfile, canModifyDoses, isReadOnly } = useCareCircle();
 
   const [addModalOpen, setAddModalOpen] = useState(false);
+  const [archiveTarget, setArchiveTarget] = useState(null);
+  const [isArchiving, setIsArchiving] = useState(false);
   const [name, setName] = useState('');
   const [dosage, setDosage] = useState('');
   const [form, setForm] = useState('tablet');
@@ -114,7 +116,21 @@ export default function MedicationsPage() {
 
             <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
               <span>Started: {med.start_date || 'Ongoing'}</span>
-              <span className="text-teal-700 font-medium">Daily Dosing</span>
+              {med.is_active && canModifyDoses ? (
+                <button
+                  type="button"
+                  onClick={() => setArchiveTarget(med)}
+                  className="text-xs font-semibold text-slate-500 hover:text-red-600 flex items-center gap-1 transition-colors"
+                  title="Archive this medication"
+                >
+                  <Archive className="w-3.5 h-3.5" />
+                  <span>Archive</span>
+                </button>
+              ) : (
+                <span className="text-slate-400 font-medium">
+                  {med.is_active ? 'Daily Dosing' : 'Archived'}
+                </span>
+              )}
             </div>
           </Card>
         ))}
@@ -192,6 +208,25 @@ export default function MedicationsPage() {
           </div>
         </form>
       </Modal>
+
+      {/* Soft-delete Medication Archiving Dialog (FUNC-MED-08) */}
+      <ConfirmDialog
+        isOpen={Boolean(archiveTarget)}
+        onClose={() => setArchiveTarget(null)}
+        onConfirm={async () => {
+          if (archiveTarget) {
+            setIsArchiving(true);
+            await archiveMedication(archiveTarget.id);
+            setIsArchiving(false);
+            setArchiveTarget(null);
+          }
+        }}
+        title="Archive Medication"
+        message={`Are you sure you want to archive ${archiveTarget?.name}? Its dose schedule and clinical history will be preserved, but no new daily doses will be generated.`}
+        confirmLabel="Archive Prescription"
+        isDestructive={true}
+        isLoading={isArchiving}
+      />
     </div>
   );
 }

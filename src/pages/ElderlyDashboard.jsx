@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CheckCircle2, Clock, Phone, AlertCircle, Calendar, ShieldCheck, Heart, Sparkles, UserCheck } from 'lucide-react';
+import { CheckCircle2, Clock, Phone, Calendar, Sparkles } from 'lucide-react';
 import { useCareCircle } from '../context/CareCircleContext';
 import { DOSE_STATUS } from '../lib/constants';
 import { formatTimeTo12Hour, formatDateTimeToReadable } from '../lib/dateUtils';
@@ -112,7 +112,7 @@ export default function ElderlyDashboard() {
               Dosage: {nextDose.dosage}
             </p>
             <p className="text-base sm:text-lg text-slate-600 mt-3 font-medium bg-slate-50 p-4 rounded-xl border border-slate-200">
-              Instructions: Take with lunch. Do not crush or chew.
+              Instructions: {nextDose.instructions || 'Take as advised with water.'}
             </p>
           </div>
 
