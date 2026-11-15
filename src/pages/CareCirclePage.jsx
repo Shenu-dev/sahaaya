@@ -63,13 +63,13 @@ export default function CareCirclePage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-subtle">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-6 sm:p-7 rounded-2xl border border-slate-200/90 shadow-subtle">
         <div>
           <span className="text-xs font-bold text-teal-700 uppercase tracking-wider">Unified Care Ecosystem</span>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1.5 tracking-tight">
             {careCircle?.name || 'Care Circle'}
           </h1>
-          <p className="text-sm text-slate-500 mt-0.5">
+          <p className="text-sm text-slate-500 mt-1">
             Central patient: <span className="font-bold text-slate-800">{elderlyProfile?.full_name}</span>. Access strictly governed by PostgreSQL Row Level Security.
           </p>
         </div>
@@ -108,7 +108,7 @@ export default function CareCirclePage() {
                 className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-subtle flex items-center justify-between gap-4"
               >
                 <div className="flex items-center gap-3.5">
-                  <div className="w-11 h-11 rounded-2xl bg-teal-50 border border-teal-200 text-teal-800 flex items-center justify-center font-bold text-sm">
+                  <div className="w-11 h-11 rounded-xl bg-teal-50 border border-teal-200 text-teal-800 flex items-center justify-center font-bold text-sm">
                     {member.full_name?.substring(0, 2).toUpperCase() || 'ME'}
                   </div>
                   <div>
@@ -190,7 +190,7 @@ export default function CareCirclePage() {
                 <select
                   value={inviteRole}
                   onChange={(e) => setInviteRole(e.target.value)}
-                  className="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm bg-white focus:ring-2 focus:ring-teal-500"
+                  className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all"
                 >
                   <option value="family">Family Member</option>
                   <option value="caregiver">Caregiver / Nurse</option>
@@ -204,7 +204,7 @@ export default function CareCirclePage() {
                 <select
                   value={invitePermission}
                   onChange={(e) => setInvitePermission(e.target.value)}
-                  className="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm bg-white focus:ring-2 focus:ring-teal-500"
+                  className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all"
                 >
                   <option value="write">Write & Administer</option>
                   <option value="read">Read Only (Observer)</option>

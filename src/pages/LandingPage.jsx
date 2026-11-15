@@ -23,8 +23,8 @@ export default function LandingPage({ onNavigate, onDemoLogin }) {
       <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200/80">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-2xl bg-teal-600 flex items-center justify-center text-white shadow-md shadow-teal-600/20">
-              <Heart className="w-6 h-6 fill-white" />
+            <div className="w-10 h-10 rounded-xl bg-teal-600 flex items-center justify-center text-white shadow-md shadow-teal-600/20">
+              <Heart className="w-5 h-5 fill-white" />
             </div>
             <div>
               <span className="text-2xl font-black tracking-tight text-slate-900">Saarthi</span>
@@ -109,7 +109,7 @@ export default function LandingPage({ onNavigate, onDemoLogin }) {
 
             {/* Right Column: Dual Interface Preview Showcase */}
             <div className="lg:col-span-5 relative">
-              <div className="relative mx-auto max-w-md bg-white rounded-3xl p-6 shadow-2xl border border-slate-200/90 ring-1 ring-slate-100">
+              <div className="relative mx-auto max-w-md bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-7 shadow-2xl border border-slate-200/90 ring-1 ring-slate-100">
                 {/* Header Badge */}
                 <div className="flex items-center justify-between pb-4 border-b border-slate-100">
                   <div className="flex items-center gap-2">
@@ -194,8 +194,8 @@ export default function LandingPage({ onNavigate, onDemoLogin }) {
 
           <div className="grid md:grid-cols-3 gap-8">
             {/* Elderly Individual */}
-            <div className="bg-slate-50 rounded-3xl p-8 border border-slate-200/80 hover:border-teal-300 transition-all shadow-subtle hover:shadow-card">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center mb-6">
+            <div className="bg-slate-50 rounded-2xl sm:rounded-3xl p-7 sm:p-8 border border-slate-200/80 hover:border-teal-300 transition-all shadow-subtle hover:shadow-card">
+              <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center mb-6">
                 <Smile className="w-6 h-6" />
               </div>
               <h3 className="text-xl font-bold text-slate-900">Elderly Independence</h3>
@@ -219,8 +219,8 @@ export default function LandingPage({ onNavigate, onDemoLogin }) {
             </div>
 
             {/* Family Members */}
-            <div className="bg-slate-50 rounded-3xl p-8 border border-slate-200/80 hover:border-teal-300 transition-all shadow-subtle hover:shadow-card">
-              <div className="w-12 h-12 rounded-2xl bg-teal-100 text-teal-700 flex items-center justify-center mb-6">
+            <div className="bg-slate-50 rounded-2xl sm:rounded-3xl p-7 sm:p-8 border border-slate-200/80 hover:border-teal-300 transition-all shadow-subtle hover:shadow-card">
+              <div className="w-12 h-12 rounded-xl bg-teal-100 text-teal-700 flex items-center justify-center mb-6">
                 <Activity className="w-6 h-6" />
               </div>
               <h3 className="text-xl font-bold text-slate-900">Family Peace of Mind</h3>
@@ -244,8 +244,8 @@ export default function LandingPage({ onNavigate, onDemoLogin }) {
             </div>
 
             {/* Caregivers */}
-            <div className="bg-slate-50 rounded-3xl p-8 border border-slate-200/80 hover:border-teal-300 transition-all shadow-subtle hover:shadow-card">
-              <div className="w-12 h-12 rounded-2xl bg-blue-100 text-blue-700 flex items-center justify-center mb-6">
+            <div className="bg-slate-50 rounded-2xl sm:rounded-3xl p-7 sm:p-8 border border-slate-200/80 hover:border-teal-300 transition-all shadow-subtle hover:shadow-card">
+              <div className="w-12 h-12 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center mb-6">
                 <Users className="w-6 h-6" />
               </div>
               <h3 className="text-xl font-bold text-slate-900">Caregiver Precision</h3>

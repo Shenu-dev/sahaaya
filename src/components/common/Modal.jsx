@@ -39,18 +39,18 @@ export default function Modal({
 
       {/* Modal Dialog */}
       <div
-        className={`relative w-full ${maxWidth} bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden z-10 transform transition-all duration-200 animate-in fade-in zoom-in-95`}
+        className={`relative w-full ${maxWidth} bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-100 overflow-hidden z-10 transform transition-all duration-200 animate-in fade-in zoom-in-95`}
         role="dialog"
         aria-modal="true"
       >
         {/* Header */}
-        <div className={`flex items-start justify-between border-b border-slate-100 ${isElderly ? 'p-6 sm:p-8 bg-teal-50/50' : 'p-5 sm:p-6'}`}>
-          <div>
-            <h3 className={`font-bold text-slate-900 ${isElderly ? 'text-2xl sm:text-3xl' : 'text-lg sm:text-xl'}`}>
+        <div className={`flex items-start justify-between border-b border-slate-100 ${isElderly ? 'p-6 sm:p-8 bg-teal-50/60' : 'p-6 sm:p-7'}`}>
+          <div className="pr-4">
+            <h3 className={`font-bold text-slate-900 tracking-tight ${isElderly ? 'text-2xl sm:text-3xl' : 'text-lg sm:text-xl'}`}>
               {title}
             </h3>
             {subtitle && (
-              <p className={`mt-1 text-slate-600 ${isElderly ? 'text-lg' : 'text-sm'}`}>
+              <p className={`mt-1.5 text-slate-600 ${isElderly ? 'text-base sm:text-lg' : 'text-xs sm:text-sm'}`}>
                 {subtitle}
               </p>
             )}
@@ -58,7 +58,7 @@ export default function Modal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-xl p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500"
+            className="rounded-xl p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 shrink-0"
             aria-label="Close dialog"
           >
             <X className="w-5 h-5" />
@@ -66,7 +66,7 @@ export default function Modal({
         </div>
 
         {/* Content */}
-        <div className={isElderly ? 'p-6 sm:p-8' : 'p-5 sm:p-6'}>
+        <div className={isElderly ? 'p-6 sm:p-8' : 'p-6 sm:p-7'}>
           {children}
         </div>
       </div>

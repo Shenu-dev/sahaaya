@@ -64,14 +64,14 @@ export default function ElderlyDashboard() {
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-10 space-y-8">
       {/* Elderly Greeting Banner */}
-      <div className="bg-gradient-to-r from-teal-700 to-teal-800 rounded-3xl p-6 sm:p-10 text-white shadow-elevated">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="bg-gradient-to-r from-teal-700 to-teal-800 rounded-2xl p-6 sm:p-9 text-white shadow-card">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
           <div>
-            <div className="inline-flex items-center gap-2 bg-teal-600/60 px-3 py-1 rounded-full text-xs font-semibold text-teal-100 mb-2">
+            <div className="inline-flex items-center gap-2 bg-teal-600/70 px-3.5 py-1 rounded-full text-xs font-semibold text-teal-100 mb-2.5">
               <Sparkles className="w-3.5 h-3.5" />
               <span>Namaste & Welcome Back</span>
             </div>
-            <h1 className="text-3xl sm:text-4xl font-black tracking-tight">
+            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
               {elderlyProfile?.full_name || 'Kamla Sharma'}
             </h1>
             <p className="text-lg text-teal-100 mt-1 font-medium">{todayFormatted}</p>
@@ -81,7 +81,7 @@ export default function ElderlyDashboard() {
           {elderlyProfile?.emergency_contact_phone && (
             <a
               href={`tel:${elderlyProfile.emergency_contact_phone}`}
-              className="inline-flex items-center gap-3 bg-red-600 hover:bg-red-700 text-white font-extrabold text-lg px-6 py-4 rounded-2xl shadow-lg border-2 border-red-400 touch-target-elderly transition-transform active:scale-95 focus-visible:ring-4 focus-visible:ring-red-400 focus-visible:outline-none"
+              className="inline-flex items-center gap-3 bg-red-600 hover:bg-red-700 text-white font-extrabold text-lg px-6 py-4 rounded-xl shadow-md border-2 border-red-400 touch-target-elderly transition-transform active:scale-95 focus-visible:ring-4 focus-visible:ring-red-400 focus-visible:outline-none shrink-0"
               aria-label="Call emergency contact now"
             >
               <Phone className="w-6 h-6 fill-white" />
@@ -93,25 +93,25 @@ export default function ElderlyDashboard() {
 
       {/* Immediate Next Dose Hero (Prominent Single-Action Center) */}
       {nextDose ? (
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border-3 border-teal-500 shadow-xl space-y-6">
-          <div className="flex items-center justify-between flex-wrap gap-2">
-            <span className="text-sm font-bold text-teal-800 bg-teal-100 px-3.5 py-1.5 rounded-full uppercase tracking-wider">
+        <div className="bg-white rounded-2xl p-6 sm:p-8 border-2 border-teal-500 shadow-card space-y-6">
+          <div className="flex items-center justify-between flex-wrap gap-3">
+            <span className="text-xs sm:text-sm font-bold text-teal-800 bg-teal-50 border border-teal-200 px-3.5 py-1.5 rounded-full uppercase tracking-wider">
               YOUR NEXT MEDICATION
             </span>
-            <span className="text-lg font-bold text-slate-700 flex items-center gap-1.5">
+            <span className="text-base sm:text-lg font-bold text-slate-700 flex items-center gap-2">
               <Clock className="w-5 h-5 text-teal-600" />
               <span>Scheduled: {formatTimeTo12Hour(nextDose.scheduled_time)}</span>
             </span>
           </div>
 
           <div>
-            <h2 className="text-3xl sm:text-4xl font-black text-slate-950">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-950">
               {nextDose.med_name}
             </h2>
-            <p className="text-xl font-bold text-teal-700 mt-1">
+            <p className="text-xl font-bold text-teal-700 mt-1.5">
               Dosage: {nextDose.dosage}
             </p>
-            <p className="text-lg text-slate-600 mt-2 font-medium bg-slate-50 p-4 rounded-2xl border border-slate-200">
+            <p className="text-base sm:text-lg text-slate-600 mt-3 font-medium bg-slate-50 p-4 rounded-xl border border-slate-200">
               Instructions: Take with lunch. Do not crush or chew.
             </p>
           </div>
@@ -122,9 +122,9 @@ export default function ElderlyDashboard() {
               type="button"
               disabled={!canModifyDoses}
               onClick={() => handleMarkTaken(nextDose)}
-              className="w-full touch-target-elderly bg-emerald-600 hover:bg-emerald-700 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed text-white font-black text-xl sm:text-2xl py-5 px-6 rounded-2xl shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-3 transition-all focus-visible:ring-4 focus-visible:ring-emerald-500 focus-visible:outline-none"
+              className="w-full touch-target-elderly bg-emerald-600 hover:bg-emerald-700 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed text-white font-black text-xl sm:text-2xl py-4.5 px-6 rounded-xl shadow-md shadow-emerald-600/30 flex items-center justify-center gap-3 transition-all focus-visible:ring-4 focus-visible:ring-emerald-500 focus-visible:outline-none"
             >
-              <CheckCircle2 className="w-8 h-8 shrink-0" />
+              <CheckCircle2 className="w-7 h-7 shrink-0" />
               <span>I HAVE TAKEN THIS</span>
             </button>
 
@@ -132,14 +132,14 @@ export default function ElderlyDashboard() {
               type="button"
               disabled={!canModifyDoses}
               onClick={() => handleOpenSkipModal(nextDose)}
-              className="w-full touch-target-elderly bg-slate-100 hover:bg-slate-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed text-slate-700 font-bold text-lg py-5 px-6 rounded-2xl border-2 border-slate-300 flex items-center justify-center gap-2 transition-all focus-visible:ring-4 focus-visible:ring-slate-400 focus-visible:outline-none"
+              className="w-full touch-target-elderly bg-slate-100 hover:bg-slate-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed text-slate-700 font-bold text-lg py-4.5 px-6 rounded-xl border border-slate-300 flex items-center justify-center gap-2 transition-all focus-visible:ring-4 focus-visible:ring-slate-400 focus-visible:outline-none"
             >
               <span>Skip / Could Not Take</span>
             </button>
           </div>
         </div>
       ) : (
-        <div className="bg-emerald-50 border-2 border-emerald-300 rounded-3xl p-8 text-center space-y-2">
+        <div className="bg-emerald-50 border-2 border-emerald-300 rounded-2xl p-8 text-center space-y-2">
           <div className="w-14 h-14 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center mx-auto mb-2">
             <CheckCircle2 className="w-8 h-8" />
           </div>

@@ -98,17 +98,17 @@ export default function FamilyDashboard({ onNavigateTab }) {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Top Welcome Bar */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-subtle">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 bg-white p-6 sm:p-7 rounded-2xl border border-slate-200 shadow-subtle">
         <div>
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-2.5 flex-wrap">
             <span className="text-xs font-bold text-teal-700 uppercase tracking-wider">Family Care Oversight</span>
             {careCircle?.is_demo && <Badge variant="demo" size="sm">Demo Environment</Badge>}
             {isReadOnly && <Badge variant="warning" size="sm">Read-Only Observer</Badge>}
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1.5 tracking-tight">
             Care Dashboard for {elderlyProfile?.full_name || 'Elderly Member'}
           </h1>
-          <p className="text-sm text-slate-500 mt-0.5">
+          <p className="text-sm text-slate-500 mt-1">
             Logged in as {profile?.full_name || 'Family Member'} ({profile?.role === 'elderly' ? 'Elderly Owner' : 'Care Circle Member'})
           </p>
         </div>
@@ -137,13 +137,13 @@ export default function FamilyDashboard({ onNavigateTab }) {
 
       {/* Urgent Missed Dose Alert (If any) */}
       {missedDoses.length > 0 && (
-        <div className="bg-red-50 border-2 border-red-300 rounded-3xl p-6 text-red-900 shadow-sm flex items-start gap-4">
-          <div className="p-3 bg-red-600 text-white rounded-2xl shrink-0">
-            <AlertTriangle className="w-6 h-6" />
+        <div className="bg-red-50 border border-red-300 rounded-2xl p-5 sm:p-6 text-red-900 shadow-sm flex items-start gap-4">
+          <div className="p-2.5 bg-red-600 text-white rounded-xl shrink-0 mt-0.5">
+            <AlertTriangle className="w-5 h-5" />
           </div>
           <div className="space-y-1">
-            <h3 className="text-lg font-bold">Missed Dose Alert Detected</h3>
-            <p className="text-sm text-red-700">
+            <h3 className="text-base font-bold">Missed Dose Alert Detected</h3>
+            <p className="text-xs sm:text-sm text-red-700">
               {missedDoses.map((d) => `${d.med_name} (Scheduled: ${formatTimeTo12Hour(d.scheduled_time)})`).join(', ')} was missed or overdue. Please check in with {elderlyProfile?.full_name}.
             </p>
           </div>
@@ -240,10 +240,10 @@ export default function FamilyDashboard({ onNavigateTab }) {
       <div className="grid lg:grid-cols-12 gap-8">
         {/* Left 8 Cols: Today's Medication Timeline */}
         <div className="lg:col-span-8 space-y-6">
-          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-subtle space-y-6">
+          <div className="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200 shadow-subtle space-y-6">
             <div className="flex items-center justify-between pb-4 border-b border-slate-100 flex-wrap gap-2">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-teal-50 text-teal-700 rounded-xl">
+                <div className="p-2.5 bg-teal-50 text-teal-700 rounded-xl shrink-0">
                   <Pill className="w-5 h-5" />
                 </div>
                 <div>
@@ -254,11 +254,11 @@ export default function FamilyDashboard({ onNavigateTab }) {
               <Badge variant="primary" size="sm">Strict Audit Trail</Badge>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-3.5">
               {todayDoses.map((dose) => (
                 <div
                   key={dose.id}
-                  className="p-4 sm:p-5 rounded-2xl border border-slate-200 bg-slate-50/50 hover:bg-white hover:border-slate-300 transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+                  className="p-5 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white hover:border-slate-300 transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
                 >
                   <div className="space-y-1">
                     <div className="flex items-center gap-2.5 flex-wrap">
@@ -279,7 +279,7 @@ export default function FamilyDashboard({ onNavigateTab }) {
                   </div>
 
                   {dose.status === DOSE_STATUS.UPCOMING && canModifyDoses && (
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2.5">
                       <Button
                         variant="secondary"
                         size="sm"
@@ -302,22 +302,22 @@ export default function FamilyDashboard({ onNavigateTab }) {
           </div>
 
           {/* Activity Feed */}
-          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-subtle space-y-4">
+          <div className="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200 shadow-subtle space-y-4">
             <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-              <FileText className="w-5 h-5 text-teal-600" />
+              <FileText className="w-5 h-5 text-teal-600 shrink-0" />
               <span>Recent Care Circle Activity</span>
             </h3>
 
             <div className="space-y-3">
               {activityLogs.map((log) => (
-                <div key={log.id} className="p-3.5 rounded-xl bg-slate-50 border border-slate-100 flex items-start justify-between text-xs gap-4">
-                  <div className="space-y-0.5">
-                    <p className="font-semibold text-slate-800">{log.description}</p>
-                    <span className="text-slate-400">
+                <div key={log.id} className="p-4 rounded-xl bg-slate-50 border border-slate-100 flex items-start justify-between text-xs gap-4">
+                  <div className="space-y-1">
+                    <p className="font-semibold text-slate-800 leading-relaxed">{log.description}</p>
+                    <span className="text-slate-400 block">
                       {formatDateTimeToReadable(log.created_at)}
                     </span>
                   </div>
-                  <Badge variant="default" size="sm">Audit Log</Badge>
+                  <Badge variant="default" size="sm" className="shrink-0">Audit Log</Badge>
                 </div>
               ))}
             </div>

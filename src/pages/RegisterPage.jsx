@@ -41,8 +41,8 @@ export default function RegisterPage({ onNavigate }) {
           onClick={() => onNavigate('landing')}
           className="inline-flex items-center gap-3 focus:outline-none group mb-4"
         >
-          <div className="w-12 h-12 rounded-2xl bg-teal-600 flex items-center justify-center text-white shadow-md shadow-teal-600/20 group-hover:bg-teal-700 transition-colors">
-            <Heart className="w-7 h-7 fill-white" />
+          <div className="w-11 h-11 rounded-xl bg-teal-600 flex items-center justify-center text-white shadow-md shadow-teal-600/20 group-hover:bg-teal-700 transition-colors">
+            <Heart className="w-6 h-6 fill-white" />
           </div>
           <span className="text-3xl font-black tracking-tight text-slate-900">Saarthi</span>
         </button>
@@ -53,7 +53,7 @@ export default function RegisterPage({ onNavigate }) {
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-6 shadow-card rounded-3xl border border-slate-200/90 sm:px-10 space-y-6">
+        <div className="bg-white py-8 px-6 shadow-card rounded-2xl sm:rounded-3xl border border-slate-200/90 sm:px-10 space-y-6">
           {error && (
             <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-xs font-semibold text-red-700">
               {error}
@@ -111,14 +111,14 @@ export default function RegisterPage({ onNavigate }) {
                 <label className="block text-sm font-medium text-slate-700 mb-1.5">
                   I am registering as:
                 </label>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-3 gap-3">
                   <button
                     type="button"
                     onClick={() => setRole(ROLES.ELDERLY)}
                     className={`p-3 rounded-xl border text-center transition-all ${
                       role === ROLES.ELDERLY
-                        ? 'border-teal-600 bg-teal-50 text-teal-800 font-bold'
-                        : 'border-slate-200 bg-white text-slate-600'
+                        ? 'border-teal-600 bg-teal-50 text-teal-800 font-bold shadow-sm'
+                        : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
                     }`}
                   >
                     <span className="text-xl block mb-1">👵</span>
@@ -130,8 +130,8 @@ export default function RegisterPage({ onNavigate }) {
                     onClick={() => setRole(ROLES.FAMILY)}
                     className={`p-3 rounded-xl border text-center transition-all ${
                       role === ROLES.FAMILY
-                        ? 'border-teal-600 bg-teal-50 text-teal-800 font-bold'
-                        : 'border-slate-200 bg-white text-slate-600'
+                        ? 'border-teal-600 bg-teal-50 text-teal-800 font-bold shadow-sm'
+                        : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
                     }`}
                   >
                     <span className="text-xl block mb-1">👨‍👦</span>
@@ -143,8 +143,8 @@ export default function RegisterPage({ onNavigate }) {
                     onClick={() => setRole(ROLES.CAREGIVER)}
                     className={`p-3 rounded-xl border text-center transition-all ${
                       role === ROLES.CAREGIVER
-                        ? 'border-teal-600 bg-teal-50 text-teal-800 font-bold'
-                        : 'border-slate-200 bg-white text-slate-600'
+                        ? 'border-teal-600 bg-teal-50 text-teal-800 font-bold shadow-sm'
+                        : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
                     }`}
                   >
                     <span className="text-xl block mb-1">👩‍⚕️</span>

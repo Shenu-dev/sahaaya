@@ -50,8 +50,8 @@ export default function LoginPage({ onNavigate }) {
           onClick={() => onNavigate('landing')}
           className="inline-flex items-center gap-3 focus:outline-none group mb-4"
         >
-          <div className="w-12 h-12 rounded-2xl bg-teal-600 flex items-center justify-center text-white shadow-md shadow-teal-600/20 group-hover:bg-teal-700 transition-colors">
-            <Heart className="w-7 h-7 fill-white" />
+          <div className="w-11 h-11 rounded-xl bg-teal-600 flex items-center justify-center text-white shadow-md shadow-teal-600/20 group-hover:bg-teal-700 transition-colors">
+            <Heart className="w-6 h-6 fill-white" />
           </div>
           <span className="text-3xl font-black tracking-tight text-slate-900">Saarthi</span>
         </button>
@@ -62,7 +62,7 @@ export default function LoginPage({ onNavigate }) {
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-6 shadow-card rounded-3xl border border-slate-200/90 sm:px-10 space-y-6">
+        <div className="bg-white py-8 px-6 shadow-card rounded-2xl sm:rounded-3xl border border-slate-200/90 sm:px-10 space-y-6">
           {error && (
             <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-xs font-semibold text-red-700">
               {error}
@@ -108,11 +108,11 @@ export default function LoginPage({ onNavigate }) {
               <Badge variant="demo" size="sm">Pre-seeded</Badge>
             </div>
 
-            <div className="grid gap-2">
+            <div className="grid gap-2.5">
               <button
                 type="button"
                 onClick={() => handleDemoClick('elderly')}
-                className="w-full flex items-center justify-between p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-teal-50/70 hover:border-teal-300 transition-all text-left group"
+                className="w-full flex items-center justify-between p-3.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-teal-50/70 hover:border-teal-300 transition-all text-left group"
               >
                 <div>
                   <span className="text-xs font-bold text-slate-900 block group-hover:text-teal-900">
@@ -126,7 +126,7 @@ export default function LoginPage({ onNavigate }) {
               <button
                 type="button"
                 onClick={() => handleDemoClick('family')}
-                className="w-full flex items-center justify-between p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-teal-50/70 hover:border-teal-300 transition-all text-left group"
+                className="w-full flex items-center justify-between p-3.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-teal-50/70 hover:border-teal-300 transition-all text-left group"
               >
                 <div>
                   <span className="text-xs font-bold text-slate-900 block group-hover:text-teal-900">
@@ -140,7 +140,7 @@ export default function LoginPage({ onNavigate }) {
               <button
                 type="button"
                 onClick={() => handleDemoClick('caregiver')}
-                className="w-full flex items-center justify-between p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-teal-50/70 hover:border-teal-300 transition-all text-left group"
+                className="w-full flex items-center justify-between p-3.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-teal-50/70 hover:border-teal-300 transition-all text-left group"
               >
                 <div>
                   <span className="text-xs font-bold text-slate-900 block group-hover:text-teal-900">

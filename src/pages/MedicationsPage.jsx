@@ -49,13 +49,13 @@ export default function MedicationsPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Page Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-subtle">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 bg-white p-6 sm:p-7 rounded-2xl border border-slate-200 shadow-subtle">
         <div>
           <span className="text-xs font-bold text-teal-700 uppercase tracking-wider">Prescriptions & Regimen</span>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1.5 tracking-tight">
             Medications for {elderlyProfile?.full_name}
           </h1>
-          <p className="text-sm text-slate-500 mt-0.5">
+          <p className="text-sm text-slate-500 mt-1">
             Preserved history: active medications with dose history are archived rather than deleted.
           </p>
         </div>
@@ -151,7 +151,7 @@ export default function MedicationsPage() {
               <select
                 value={form}
                 onChange={(e) => setForm(e.target.value)}
-                className="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm bg-white focus:ring-2 focus:ring-teal-500"
+                className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all"
               >
                 {MEDICATION_FORMS.map((f) => (
                   <option key={f.value} value={f.value}>
@@ -171,7 +171,7 @@ export default function MedicationsPage() {
               value={scheduledTime}
               onChange={(e) => setScheduledTime(e.target.value)}
               required
-              className="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm bg-white focus:ring-2 focus:ring-teal-500"
+              className="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition-all"
             />
           </div>
 

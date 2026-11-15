@@ -74,16 +74,16 @@ export default function CaregiverDashboard() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Header Bar */}
-      <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-subtle flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div className="bg-white p-6 sm:p-7 rounded-2xl border border-slate-200 shadow-subtle flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
         <div>
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-2.5 flex-wrap">
             <span className="text-xs font-bold text-teal-700 uppercase tracking-wider">Clinical Caregiver Portal</span>
             {careCircle?.is_demo && <Badge variant="demo" size="sm">Demo Environment</Badge>}
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1.5 tracking-tight">
             Shift Management • {profile?.full_name || 'Caregiver'}
           </h1>
-          <p className="text-sm text-slate-500 mt-0.5">
+          <p className="text-sm text-slate-500 mt-1">
             Assigned patient: <span className="font-bold text-slate-800">{elderlyProfile?.full_name}</span> (Care Circle: {careCircle?.name})
           </p>
         </div>
@@ -97,10 +97,10 @@ export default function CaregiverDashboard() {
       <div className="grid lg:grid-cols-12 gap-8">
         {/* Left 8 Cols: Shift Medication Administration Checklist */}
         <div className="lg:col-span-8 space-y-6">
-          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-subtle space-y-6">
+          <div className="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200 shadow-subtle space-y-6">
             <div className="flex items-center justify-between pb-4 border-b border-slate-100 flex-wrap gap-2">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-blue-50 text-blue-700 rounded-xl">
+                <div className="p-2.5 bg-blue-50 text-blue-700 rounded-xl shrink-0">
                   <Pill className="w-5 h-5" />
                 </div>
                 <div>
@@ -111,14 +111,14 @@ export default function CaregiverDashboard() {
               <Badge variant="info" size="sm">Verified Recording</Badge>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-3.5">
               {todayDoses.map((dose) => {
                 const isTaken = dose.status === DOSE_STATUS.TAKEN;
 
                 return (
                   <div
                     key={dose.id}
-                    className={`p-5 rounded-2xl border transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${
+                    className={`p-5 rounded-xl border transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${
                       isTaken ? 'bg-emerald-50/50 border-emerald-200' : 'bg-slate-50/60 border-slate-200'
                     }`}
                   >
@@ -157,7 +157,7 @@ export default function CaregiverDashboard() {
           </div>
 
           {/* Caregiver Shift Logs */}
-          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-subtle space-y-4">
+          <div className="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200 shadow-subtle space-y-4">
             <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
               <FileText className="w-5 h-5 text-teal-600" />
               <span>Shift Activity History</span>

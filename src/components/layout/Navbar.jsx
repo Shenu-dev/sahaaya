@@ -12,38 +12,38 @@ export default function Navbar({ activeTab, onTabChange }) {
   const unreadCount = notifications.filter((n) => !n.is_read).length;
 
   return (
-    <header className="sticky top-0 z-40 bg-white border-b border-slate-200/90 shadow-sm">
+    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
+        <div className="flex items-center justify-between h-20 gap-4">
           {/* Logo & Care Circle Identifier */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3.5 shrink-0">
             <button
               onClick={() => onTabChange('dashboard')}
-              className="flex items-center gap-3 text-left focus:outline-none"
+              className="flex items-center gap-3 text-left focus:outline-none focus-visible:ring-3 focus-visible:ring-teal-500/30 rounded-xl"
             >
-              <div className="w-11 h-11 rounded-2xl bg-teal-600 flex items-center justify-center text-white shadow-md shadow-teal-600/20">
-                <Heart className="w-6 h-6 fill-white" />
+              <div className="w-10 h-10 rounded-xl bg-teal-600 flex items-center justify-center text-white shadow-sm shadow-teal-600/30">
+                <Heart className="w-5 h-5 fill-white" />
               </div>
               <div>
-                <span className="text-xl font-black tracking-tight text-slate-900 block leading-tight">Saarthi</span>
-                <span className="text-xs font-semibold text-teal-700 truncate max-w-[150px] sm:max-w-xs block">
+                <span className="text-xl font-extrabold tracking-tight text-slate-900 block leading-tight">Saarthi</span>
+                <span className="text-xs font-semibold text-teal-700 truncate max-w-[130px] sm:max-w-[180px] block">
                   {careCircle?.name || 'Care Ecosystem'}
                 </span>
               </div>
             </button>
 
             {careCircle?.is_demo && (
-              <Badge variant="demo" size="sm" className="hidden md:inline-flex">
-                Judge Demo Environment
+              <Badge variant="demo" size="sm" className="hidden xl:inline-flex ml-1">
+                Demo
               </Badge>
             )}
           </div>
 
-          {/* Center Navigation Links (Adjusted for Elderly vs Standard) */}
-          <nav className="hidden lg:flex items-center gap-1.5 bg-slate-100/80 p-1.5 rounded-2xl border border-slate-200/60">
+          {/* Center Navigation Links */}
+          <nav className="hidden lg:flex items-center gap-1.5 bg-slate-100/90 p-1.5 rounded-xl border border-slate-200/80">
             <button
               onClick={() => onTabChange('dashboard')}
-              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+              className={`px-3.5 py-2 rounded-lg text-sm font-semibold transition-all whitespace-nowrap ${
                 activeTab === 'dashboard'
                   ? 'bg-white text-teal-800 shadow-sm'
                   : 'text-slate-600 hover:text-slate-900'
@@ -53,48 +53,50 @@ export default function Navbar({ activeTab, onTabChange }) {
             </button>
             <button
               onClick={() => onTabChange('medications')}
-              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-1.5 ${
+              className={`px-3.5 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 whitespace-nowrap ${
                 activeTab === 'medications'
                   ? 'bg-white text-teal-800 shadow-sm'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              <Pill className="w-4 h-4" />
+              <Pill className="w-4 h-4 text-slate-400 group-hover:text-slate-600" />
               <span>Medications</span>
             </button>
             <button
               onClick={() => onTabChange('appointments')}
-              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-1.5 ${
+              className={`px-3.5 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 whitespace-nowrap ${
                 activeTab === 'appointments'
                   ? 'bg-white text-teal-800 shadow-sm'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              <Calendar className="w-4 h-4" />
+              <Calendar className="w-4 h-4 text-slate-400 group-hover:text-slate-600" />
               <span>Appointments</span>
             </button>
             <button
               onClick={() => onTabChange('circle')}
-              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all flex items-center gap-1.5 ${
+              className={`px-3.5 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 whitespace-nowrap ${
                 activeTab === 'circle'
                   ? 'bg-white text-teal-800 shadow-sm'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              <Users className="w-4 h-4" />
+              <Users className="w-4 h-4 text-slate-400 group-hover:text-slate-600" />
               <span>Care Circle</span>
             </button>
           </nav>
 
           {/* Right Action Bar */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-3 shrink-0">
             {/* Persona Switcher Dropdown / Quick Switch for Judges */}
-            <div className="hidden sm:flex items-center gap-1.5 bg-teal-50/80 border border-teal-200/80 px-2.5 py-1 rounded-xl text-xs">
-              <span className="font-semibold text-teal-800">Demo Persona:</span>
+            <div className="hidden md:flex items-center gap-1.5 bg-slate-50 border border-slate-200/90 px-3 py-1.5 rounded-xl text-xs">
+              <span className="font-semibold text-slate-500 mr-0.5">Persona:</span>
               <button
                 onClick={() => signInAsDemo('elderly')}
-                className={`px-2 py-0.5 rounded font-bold transition-all ${
-                  profile?.role === 'elderly' ? 'bg-teal-700 text-white shadow-xs' : 'text-teal-700 hover:bg-teal-100'
+                className={`px-2.5 py-1 rounded-md font-bold transition-all ${
+                  profile?.role === 'elderly'
+                    ? 'bg-teal-700 text-white shadow-xs'
+                    : 'text-slate-700 hover:bg-slate-200/70'
                 }`}
                 title="Switch to Elderly individual view"
               >
@@ -102,8 +104,10 @@ export default function Navbar({ activeTab, onTabChange }) {
               </button>
               <button
                 onClick={() => signInAsDemo('family')}
-                className={`px-2 py-0.5 rounded font-bold transition-all ${
-                  profile?.role === 'family' ? 'bg-teal-700 text-white shadow-xs' : 'text-teal-700 hover:bg-teal-100'
+                className={`px-2.5 py-1 rounded-md font-bold transition-all ${
+                  profile?.role === 'family'
+                    ? 'bg-teal-700 text-white shadow-xs'
+                    : 'text-slate-700 hover:bg-slate-200/70'
                 }`}
                 title="Switch to Family member view"
               >
@@ -111,8 +115,10 @@ export default function Navbar({ activeTab, onTabChange }) {
               </button>
               <button
                 onClick={() => signInAsDemo('caregiver')}
-                className={`px-2 py-0.5 rounded font-bold transition-all ${
-                  profile?.role === 'caregiver' ? 'bg-teal-700 text-white shadow-xs' : 'text-teal-700 hover:bg-teal-100'
+                className={`px-2.5 py-1 rounded-md font-bold transition-all ${
+                  profile?.role === 'caregiver'
+                    ? 'bg-teal-700 text-white shadow-xs'
+                    : 'text-slate-700 hover:bg-slate-200/70'
                 }`}
                 title="Switch to Caregiver view"
               >
@@ -121,12 +127,12 @@ export default function Navbar({ activeTab, onTabChange }) {
             </div>
 
             {/* Profile Pill */}
-            <div className="flex items-center gap-2.5 pl-2 border-l border-slate-200">
-              <div className="w-9 h-9 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700 font-bold text-xs uppercase">
+            <div className="flex items-center gap-2.5 pl-3 border-l border-slate-200">
+              <div className="w-9 h-9 rounded-xl bg-teal-50 border border-teal-200 text-teal-800 flex items-center justify-center font-bold text-xs uppercase shrink-0">
                 {profile?.full_name?.substring(0, 2) || 'ME'}
               </div>
               <div className="hidden xl:block text-left text-xs">
-                <span className="font-bold text-slate-900 block truncate max-w-[120px]">
+                <span className="font-bold text-slate-900 block truncate max-w-[110px]">
                   {profile?.full_name || 'Member'}
                 </span>
                 <span className="text-slate-500 capitalize">{profile?.role || 'User'}</span>
@@ -136,7 +142,7 @@ export default function Navbar({ activeTab, onTabChange }) {
             {/* Sign Out */}
             <button
               onClick={signOut}
-              className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors"
+              className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:outline-none"
               title="Sign Out"
               aria-label="Sign Out"
             >

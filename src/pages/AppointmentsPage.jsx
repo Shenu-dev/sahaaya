@@ -44,13 +44,13 @@ export default function AppointmentsPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-6 rounded-3xl border border-slate-200 shadow-subtle">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 bg-white p-6 sm:p-7 rounded-2xl border border-slate-200 shadow-subtle">
         <div>
           <span className="text-xs font-bold text-teal-700 uppercase tracking-wider">Clinical Consultations</span>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1.5 tracking-tight">
             Doctor Appointments
           </h1>
-          <p className="text-sm text-slate-500 mt-0.5">
+          <p className="text-sm text-slate-500 mt-1">
             Scheduled visits and preparation instructions for {elderlyProfile?.full_name}.
           </p>
         </div>
