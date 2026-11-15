@@ -7,6 +7,21 @@ export default {
   theme: {
     extend: {
       colors: {
+        bento: {
+          canvas: '#F5F5F9',
+          lavender: '#DDE1FD',
+          'lavender-border': '#C7D0FC',
+          mint: '#E8F6E6',
+          'mint-border': '#C5E9C2',
+          peach: '#FDF1E6',
+          'peach-border': '#F8DAC3',
+          cornflower: '#7484EC',
+          'cornflower-dark': '#5E70E2',
+          lime: '#D4F853',
+          'lime-hover': '#C3EB3C',
+          coral: '#FF6E5A',
+          'coral-hover': '#F05B46',
+        },
         sahaaya: {
           50: '#F0FDFA',
           100: '#CCFBF1',

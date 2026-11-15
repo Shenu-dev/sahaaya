@@ -6,44 +6,58 @@ import {
   Users, 
   Calendar, 
   CheckCircle2, 
-  ArrowRight, 
+  ArrowUpRight, 
   Sparkles,
   PhoneCall,
-  Bell,
   Activity,
-  Smile
+  Smile,
+  Pill,
+  Star,
+  ChevronRight
 } from 'lucide-react';
 import Button from '../components/common/Button';
-import Badge from '../components/common/Badge';
 
 export default function LandingPage({ onNavigate, onDemoLogin }) {
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col selection:bg-teal-500 selection:text-white">
-      {/* Top Navigation */}
-      <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-200/80">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+    <div className="min-h-screen bg-[#F5F5F9] text-slate-900 selection:bg-bento-lime selection:text-slate-950">
+      {/* Top Floating Navigation */}
+      <header className="sticky top-0 z-40 bg-[#F5F5F9]/90 backdrop-blur-md pt-3 pb-2 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto bg-white/90 rounded-full border border-slate-200/80 shadow-subtle px-5 sm:px-7 py-3 flex items-center justify-between">
+          {/* Brand */}
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-teal-600 flex items-center justify-center text-white shadow-md shadow-teal-600/20">
-              <Heart className="w-5 h-5 fill-white" />
+            <div className="w-9 h-9 rounded-full bg-slate-900 flex items-center justify-center text-white shadow-sm">
+              <Heart className="w-4.5 h-4.5 fill-bento-lime text-bento-lime" />
             </div>
-            <div>
-              <span className="text-2xl font-black tracking-tight text-slate-900">Sahaaya</span>
-              <span className="block text-xs font-semibold text-teal-600 tracking-wider uppercase">Care Ecosystem</span>
-            </div>
+            <span className="text-xl font-black tracking-tight text-slate-900 font-sans">Sahaaya</span>
           </div>
 
-          <div className="flex items-center gap-3">
+          {/* Navigation Links */}
+          <nav className="hidden md:flex items-center gap-8 text-xs font-bold uppercase tracking-wider text-slate-500">
+            <a href="#features" className="hover:text-slate-950 transition-colors">Services</a>
+            <a href="#personas" className="hover:text-slate-950 transition-colors">Personas</a>
+            <a href="#about" className="hover:text-slate-950 transition-colors">About</a>
+          </nav>
+
+          {/* Right Action Buttons */}
+          <div className="flex items-center gap-2.5">
             <button
               onClick={() => onNavigate('login')}
-              className="text-sm font-semibold text-slate-700 hover:text-teal-700 px-4 py-2 rounded-xl transition-colors"
+              className="text-xs font-bold uppercase tracking-wider text-slate-700 hover:text-slate-950 px-4 py-2 rounded-full transition-colors"
             >
               Sign In
             </button>
+            <button
+              onClick={() => onDemoLogin('elderly')}
+              className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider border border-slate-300 bg-white/80 hover:bg-white text-slate-800 transition-all shadow-2xs"
+            >
+              <span>Explore Demo</span>
+              <ArrowUpRight className="w-3.5 h-3.5" />
+            </button>
             <Button
-              variant="primary"
-              size="md"
+              variant="electric"
+              size="sm"
               onClick={() => onNavigate('register')}
-              className="shadow-md shadow-teal-600/20"
+              className="text-xs px-5 py-2 font-bold shadow-sm"
             >
               Get Started
             </Button>
@@ -51,125 +65,215 @@ export default function LandingPage({ onNavigate, onDemoLogin }) {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="relative overflow-hidden pt-12 pb-20 sm:pt-20 sm:pb-28">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-12 gap-12 items-center">
-            {/* Left Column: Mission & Hook */}
-            <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-xs sm:text-sm font-semibold">
-                <Sparkles className="w-4 h-4 text-teal-600" />
-                <span>Care that connects generations</span>
+      {/* Main Bento Hero Grid */}
+      <section className="pt-6 pb-16 sm:pt-8 sm:pb-24 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto space-y-6">
+          {/* Top Hero Row: Main Lavender Card + Cornflower Service Module */}
+          <div className="grid lg:grid-cols-12 gap-6 items-stretch">
+            {/* Main Lavender Hero Card (Col 8) */}
+            <div className="lg:col-span-8 bg-bento-lavender rounded-[32px] sm:rounded-[40px] border border-bento-lavender-border p-7 sm:p-10 lg:p-12 relative overflow-hidden flex flex-col justify-between shadow-subtle min-h-[460px]">
+              {/* Organic Coral Glow Accents */}
+              <div className="absolute top-10 right-10 w-64 h-64 bg-bento-coral/25 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute -bottom-10 right-28 w-52 h-52 bg-bento-lime/30 rounded-full blur-2xl pointer-events-none" />
+
+              {/* Top Row: Floating Rating Badge + Content */}
+              <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+                <div className="max-w-xl space-y-6">
+                  <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-950 tracking-tight leading-[1.08] font-sans">
+                    Trusted Care & Medication for your loved ones
+                  </h1>
+
+                  <div className="pt-2">
+                    <button
+                      onClick={() => onNavigate('register')}
+                      className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-bento-lime text-slate-950 font-extrabold text-sm sm:text-base hover:bg-bento-lime-hover shadow-sm transition-all transform active:scale-95 group border border-lime-400"
+                    >
+                      <span>Get Started</span>
+                      <ArrowUpRight className="w-4.5 h-4.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Hero Photo & Floating Rating Card (Reference Inspiration) */}
+                <div className="relative shrink-0 self-center lg:self-auto">
+                  {/* Organic Coral Blob Behind Subject */}
+                  <div className="absolute -top-4 -right-4 w-52 h-52 bg-bento-coral rounded-full opacity-90 blur-xs" />
+                  <div className="absolute -bottom-6 -left-6 w-36 h-36 bg-bento-coral/80 rounded-full blur-xs" />
+
+                  {/* Rounded Subject Photo */}
+                  <div className="w-48 h-48 sm:w-56 sm:h-56 lg:w-60 lg:h-60 rounded-full overflow-hidden border-4 border-white shadow-card relative z-10 bg-slate-200">
+                    <img 
+                      src="/images/premium_photo-1663036976879-4baf18adfd5b.avif" 
+                      alt="Caregiver with senior loved one" 
+                      className="w-full h-full object-cover"
+                      loading="eager"
+                    />
+                  </div>
+
+                  {/* Floating 4.9 Rating Card Over Photo */}
+                  <div className="absolute -bottom-3 -left-4 z-20 bg-white/95 backdrop-blur-md border border-white/90 rounded-2xl p-3 shadow-card flex flex-col items-center">
+                    <div className="flex items-center gap-1 text-slate-950 font-black text-base">
+                      <span>4.9</span>
+                      <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                    </div>
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Family-Rated</span>
+                  </div>
+                </div>
               </div>
 
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-950 tracking-tight leading-[1.15]">
-                Dignity, simplicity, and <span className="text-teal-600 underline decoration-teal-300 decoration-wavy decoration-2">peace of mind</span> for the whole family.
-              </h1>
+              {/* Sub-hero divider & brand accreditation */}
+              <div className="relative z-10 pt-10 sm:pt-14 mt-auto">
+                <div className="h-px bg-slate-900/10 mb-6" />
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="flex items-center gap-4">
+                    <span className="text-xs font-black uppercase tracking-widest text-slate-900 underline underline-offset-4 decoration-slate-900/40">
+                      CARECIRCLE
+                    </span>
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-600 max-w-sm">
+                      Care that connects generations across families & caregivers
+                    </span>
+                  </div>
 
-              <p className="text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto lg:mx-0 font-normal leading-relaxed">
-                Sahaaya connects elderly individuals with their children and caregivers through a calm, high-contrast interface. Never miss a vital medication dose, doctor visit, or care alert again.
-              </p>
-
-              {/* Action Buttons */}
-              <div className="pt-2 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-                <Button
-                  variant="primary"
-                  size="lg"
-                  onClick={() => onNavigate('register')}
-                  icon={ArrowRight}
-                  className="w-full sm:w-auto shadow-lg shadow-teal-600/25"
-                >
-                  Create Your Free Care Circle
-                </Button>
-                <button
-                  type="button"
-                  onClick={() => onDemoLogin('elderly')}
-                  className="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 rounded-xl border border-slate-300 bg-white text-slate-800 font-semibold hover:bg-slate-50 transition-all shadow-sm"
-                >
-                  Explore Judge Demo (1-Click)
-                </button>
-              </div>
-
-              {/* Trust Indicators */}
-              <div className="pt-6 border-t border-slate-200/70 grid grid-cols-3 gap-4 text-left max-w-lg mx-auto lg:mx-0">
-                <div>
-                  <div className="text-xl sm:text-2xl font-bold text-slate-900">100% Free</div>
-                  <div className="text-xs text-slate-500 font-medium">₹0 cost to run</div>
-                </div>
-                <div>
-                  <div className="text-xl sm:text-2xl font-bold text-slate-900">WCAG AAA</div>
-                  <div className="text-xs text-slate-500 font-medium">Accessible for seniors</div>
-                </div>
-                <div>
-                  <div className="text-xl sm:text-2xl font-bold text-slate-900">Strict RLS</div>
-                  <div className="text-xs text-slate-500 font-medium">Secure patient data</div>
+                  {/* Trust Rating Pill with Avatar */}
+                  <div className="flex items-center gap-2 shrink-0">
+                    <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs font-bold ring-2 ring-white">
+                      KS
+                    </div>
+                    <div className="px-3 py-1 rounded-full bg-bento-lime text-slate-950 text-xs font-black border border-lime-400 shadow-2xs">
+                      5.0 ★
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Right Column: Dual Interface Preview Showcase */}
-            <div className="lg:col-span-5 relative">
-              <div className="relative mx-auto max-w-md bg-white rounded-2xl sm:rounded-3xl p-6 sm:p-7 shadow-2xl border border-slate-200/90 ring-1 ring-slate-100">
-                {/* Header Badge */}
-                <div className="flex items-center justify-between pb-4 border-b border-slate-100">
-                  <div className="flex items-center gap-2">
-                    <span className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse" />
-                    <span className="text-xs font-bold text-slate-600 uppercase tracking-wider">Elderly View • Live Preview</span>
-                  </div>
+            {/* Right Cornflower Regimen Module (Col 4) */}
+            <div className="lg:col-span-4 bg-bento-cornflower rounded-[32px] sm:rounded-[40px] border border-bento-cornflower-dark p-7 sm:p-8 text-white flex flex-col justify-between shadow-subtle min-h-[460px] relative overflow-hidden">
+              <div>
+                <div className="flex items-center justify-between pb-6">
+                  <span className="text-xs font-bold uppercase tracking-widest text-white/80">Our Services</span>
+                  <Sparkles className="w-4 h-4 text-bento-lime" />
                 </div>
 
-                {/* Simulated Senior UI Card */}
-                <div className="mt-5 space-y-4">
-                  {/* Previously Completed Morning Dose */}
-                  <div className="bg-emerald-50/60 rounded-xl px-3.5 py-2 border border-emerald-200 flex items-center justify-between text-xs">
-                    <span className="font-semibold text-emerald-900">
-                      ✓ Morning: Amlodipine Besylate 5mg
-                    </span>
-                    <span className="text-emerald-700 font-bold">Taken at 8:15 AM</span>
-                  </div>
+                <h3 className="text-2xl font-black text-white leading-tight mb-4">
+                  Elderly Care Regimen & Support
+                </h3>
+                <p className="text-xs text-white/80 leading-relaxed mb-6">
+                  Intelligent scheduling tailored for seniors, loved ones, and professional nurse shifts.
+                </p>
 
-                  {/* Immediate Next Dose */}
-                  <div className="bg-teal-50/80 rounded-2xl p-4 border border-teal-200">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-teal-800 uppercase tracking-wider">Next Due Medication</span>
-                      <span className="text-xs font-bold text-blue-700 bg-blue-100 px-2.5 py-0.5 rounded-full">Upcoming</span>
-                    </div>
-                    <h3 className="text-2xl font-black text-slate-900 mt-1">Metformin HCl ER 500mg</h3>
-                    <p className="text-sm font-medium text-slate-600 mt-0.5">Take with lunch. Do not crush or chew.</p>
-                    <div className="mt-3 flex items-center justify-between text-xs text-slate-600 font-medium pt-2 border-t border-teal-100">
-                      <span>Scheduled: <strong className="text-slate-900">1:00 PM</strong></span>
-                      <span className="text-slate-500">1 tablet oral</span>
-                    </div>
-                  </div>
+                {/* Tactile Floating Sticker Pills */}
+                <div className="flex flex-wrap gap-2.5 pt-2">
+                  <span className="px-3.5 py-1.5 rounded-full border border-white/70 bg-white/10 text-white text-xs font-semibold -rotate-2 hover:rotate-0 transition-transform cursor-default">
+                    Morning Blood Pressure
+                  </span>
+                  <span className="px-3.5 py-1.5 rounded-full border border-white/70 bg-white/10 text-white text-xs font-semibold rotate-2 hover:rotate-0 transition-transform cursor-default">
+                    Insulin at Lunch
+                  </span>
+                  <span className="px-3.5 py-1.5 rounded-full border border-white/70 bg-white/10 text-white text-xs font-semibold -rotate-1 hover:rotate-0 transition-transform cursor-default">
+                    Bedtime Statin
+                  </span>
+                  <span className="px-3.5 py-1.5 rounded-full border border-white/70 bg-white/10 text-white text-xs font-semibold rotate-3 hover:rotate-0 transition-transform cursor-default">
+                    Doctor Checkup
+                  </span>
+                  <span className="px-3.5 py-1.5 rounded-full border border-white/70 bg-white/10 text-white text-xs font-semibold -rotate-2 hover:rotate-0 transition-transform cursor-default">
+                    SOS Emergency Dial
+                  </span>
+                  <span className="px-4 py-1.5 rounded-full bg-white text-slate-950 text-xs font-black shadow-sm hover:scale-105 transition-transform cursor-default">
+                    More +
+                  </span>
+                </div>
+              </div>
 
-                  {/* Big High-Contrast Touch Target Button */}
-                  <div className="pt-1">
-                    <button
-                      type="button"
-                      className="w-full touch-target-elderly bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xl rounded-2xl shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-3 transition-transform active:scale-95"
-                    >
-                      <CheckCircle2 className="w-7 h-7" />
-                      <span>I HAVE TAKEN THIS</span>
-                    </button>
-                    <p className="text-center text-xs text-slate-500 mt-2 font-medium">
-                      Large 56px touch target • Clear confirmation
-                    </p>
-                  </div>
+              {/* Bottom Quick Trigger */}
+              <div className="pt-8 border-t border-white/20 mt-6 flex items-center justify-between">
+                <span className="text-xs font-medium text-white/90">Experience 1-click preview</span>
+                <button
+                  onClick={() => onDemoLogin('elderly')}
+                  className="w-9 h-9 rounded-full bg-bento-lime text-slate-950 flex items-center justify-center hover:scale-105 transition-transform shadow-sm"
+                  title="Launch Elderly Demo"
+                >
+                  <ArrowUpRight className="w-5 h-5 font-bold" />
+                </button>
+              </div>
+            </div>
+          </div>
 
-                  {/* Connected Family & Caregiver Mini Bar */}
-                  <div className="bg-slate-50 rounded-2xl p-3.5 border border-slate-200 flex items-center justify-between">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-full bg-teal-100 text-teal-800 flex items-center justify-center text-xs font-bold">
-                        RS
-                      </div>
-                      <div className="text-xs">
-                        <span className="font-bold text-slate-900 block">Rohan Sharma (Son)</span>
-                        <span className="text-slate-500">Care Circle Admin</span>
-                      </div>
-                    </div>
-                    <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-1 rounded-md border border-emerald-200">
-                      Connected
-                    </span>
+          {/* Bottom Bento Row: Split Mint Feature Card + Warm Peach Metric Card */}
+          <div className="grid lg:grid-cols-12 gap-6 items-stretch">
+            {/* Mint Dual-Column Split Card (Col 7) */}
+            <div className="lg:col-span-7 bg-bento-mint rounded-[32px] sm:rounded-[40px] border border-bento-mint-border p-7 sm:p-9 shadow-subtle">
+              <div className="grid sm:grid-cols-2 gap-8 divide-y sm:divide-y-0 sm:divide-x divide-slate-900/10">
+                {/* Column 1: Professional Care */}
+                <div className="space-y-3 sm:pr-4">
+                  <div className="w-11 h-11 rounded-full border border-slate-900/20 bg-white/60 flex items-center justify-center text-slate-900 mb-4">
+                    <Heart className="w-5 h-5" />
+                  </div>
+                  <h4 className="text-xl font-black text-slate-950 font-sans">
+                    Connected Family Care
+                  </h4>
+                  <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                    We understand the vital importance of entrusting your parent's well-being to capable, attentive hands — whether at home or miles away.
+                  </p>
+                </div>
+
+                {/* Column 2: Zero Missed Doses */}
+                <div className="space-y-3 pt-6 sm:pt-0 sm:pl-8">
+                  <div className="w-11 h-11 rounded-full border border-slate-900/20 bg-white/60 flex items-center justify-center text-slate-900 mb-4">
+                    <ShieldCheck className="w-5 h-5" />
+                  </div>
+                  <h4 className="text-xl font-black text-slate-950 font-sans">
+                    Zero-Cost, Accessible
+                  </h4>
+                  <p className="text-xs text-slate-600 leading-relaxed font-medium">
+                    We believe every senior deserves exceptional care management regardless of tech familiarity or budget constraints. 100% free forever.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Warm Peach Highlight Card (Col 5) */}
+            <div className="lg:col-span-5 bg-bento-peach rounded-[32px] sm:rounded-[40px] border border-bento-peach-border p-7 sm:p-9 flex flex-col justify-between shadow-subtle">
+              <div className="flex items-center justify-between">
+                <span className="px-3.5 py-1 rounded-full bg-bento-coral text-white text-xs font-bold tracking-wide shadow-2xs">
+                  Top Rated
+                </span>
+                <button
+                  onClick={() => onDemoLogin('family')}
+                  className="w-9 h-9 rounded-full bg-bento-lime text-slate-950 flex items-center justify-center hover:scale-105 transition-transform border border-lime-400 shadow-2xs"
+                  title="Explore Family Overview"
+                >
+                  <ArrowUpRight className="w-5 h-5 font-bold" />
+                </button>
+              </div>
+
+              {/* Decorative Rhythm Lines */}
+              <div className="py-8 space-y-2 opacity-30">
+                <div className="h-0.5 bg-slate-900/30 w-3/4 mx-auto rounded-full" />
+                <div className="h-0.5 bg-slate-900/30 w-1/2 mx-auto rounded-full" />
+              </div>
+
+              {/* Bottom Metrics with Avatars */}
+              <div className="flex items-end justify-between gap-4">
+                <div>
+                  <h4 className="text-2xl sm:text-3xl font-black text-slate-950 font-sans leading-tight">
+                    More Than 2k Doses Protected
+                  </h4>
+                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mt-1">
+                    Zero Missed Doses Logged
+                  </p>
+                </div>
+
+                {/* Stacked Circular Avatars */}
+                <div className="flex -space-x-2 shrink-0">
+                  <div className="w-9 h-9 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs font-bold ring-2 ring-white">
+                    KS
+                  </div>
+                  <div className="w-9 h-9 rounded-full bg-bento-coral text-white flex items-center justify-center text-xs font-bold ring-2 ring-white">
+                    RS
+                  </div>
+                  <div className="w-9 h-9 rounded-full bg-bento-cornflower text-white flex items-center justify-center text-xs font-bold ring-2 ring-white">
+                    PR
                   </div>
                 </div>
               </div>
@@ -178,109 +282,129 @@ export default function LandingPage({ onNavigate, onDemoLogin }) {
         </div>
       </section>
 
-      {/* Feature Pillars */}
-      <section className="py-16 bg-white border-y border-slate-200/80">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="text-xs font-bold text-teal-600 uppercase tracking-wider">Built for Real Life</span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mt-2">
-              Three tailored experiences, one shared circle
+      {/* 3 Interactive Personas Bento Showcase */}
+      <section id="personas" className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 border-t border-slate-200/80 bg-white">
+        <div className="max-w-7xl mx-auto space-y-12">
+          <div className="text-center max-w-3xl mx-auto space-y-3">
+            <span className="px-3.5 py-1 rounded-full bg-slate-100 text-slate-800 text-xs font-extrabold uppercase tracking-widest border border-slate-200">
+              Interactive Demonstrations
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-black text-slate-950 tracking-tight font-sans">
+              Three tailored perspectives, one shared Care Circle
             </h2>
-            <p className="text-base text-slate-600 mt-3">
-              Most health apps overwhelm seniors with small text and complicated charts. Sahaaya gives each member the exact view they need.
+            <p className="text-sm sm:text-base text-slate-600 leading-relaxed font-medium">
+              Click any persona below to immediately experience Sahaaya from their perspective with pre-populated medical regimens.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* Elderly Individual */}
-            <div className="bg-slate-50 rounded-2xl sm:rounded-3xl p-7 sm:p-8 border border-slate-200/80 hover:border-teal-300 transition-all shadow-subtle hover:shadow-card">
-              <div className="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center mb-6">
-                <Smile className="w-6 h-6" />
+          <div className="grid md:grid-cols-3 gap-6">
+            {/* Persona 1: Kamla Sharma (Elderly) */}
+            <div 
+              onClick={() => onDemoLogin('elderly')}
+              className="bg-bento-lavender rounded-[32px] p-7 sm:p-8 border border-bento-lavender-border hover:shadow-card transition-all cursor-pointer flex flex-col justify-between group"
+            >
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="px-3 py-1 rounded-full bg-white/80 text-slate-900 text-xs font-extrabold uppercase tracking-wider border border-white">
+                    Elderly Individual
+                  </span>
+                  <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center group-hover:bg-bento-lime group-hover:text-slate-950 transition-colors">
+                    <ArrowUpRight className="w-4 h-4 font-bold" />
+                  </div>
+                </div>
+
+                <div className="pt-2">
+                  <h3 className="text-2xl font-black text-slate-950">Kamla Sharma</h3>
+                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Age 74 • Hypertension & Type 2 Diabetes</p>
+                </div>
+
+                <p className="text-xs text-slate-700 leading-relaxed font-medium">
+                  Designed for independence. Massive 56px touch targets, distraction-free medication schedule, and single-tap dose confirmation.
+                </p>
               </div>
-              <h3 className="text-xl font-bold text-slate-900">Elderly Independence</h3>
-              <p className="text-sm text-slate-600 mt-2 leading-relaxed">
-                Large, high-contrast cards. Instant single-tap dose confirmation. Quick doctor visit reminders and emergency contacts at their fingertips.
-              </p>
-              <ul className="mt-4 space-y-2 text-xs font-semibold text-slate-700">
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                  <span>56px+ touch target buttons</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                  <span>Never auto-marks doses</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                  <span>One-tap emergency dialing</span>
-                </li>
-              </ul>
+
+              <div className="pt-6 border-t border-slate-900/10 mt-6 flex items-center justify-between text-xs font-bold text-slate-900">
+                <span>Try Senior View</span>
+                <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </div>
             </div>
 
-            {/* Family Members */}
-            <div className="bg-slate-50 rounded-2xl sm:rounded-3xl p-7 sm:p-8 border border-slate-200/80 hover:border-teal-300 transition-all shadow-subtle hover:shadow-card">
-              <div className="w-12 h-12 rounded-xl bg-teal-100 text-teal-700 flex items-center justify-center mb-6">
-                <Activity className="w-6 h-6" />
+            {/* Persona 2: Rohan Sharma (Family Admin) */}
+            <div 
+              onClick={() => onDemoLogin('family')}
+              className="bg-bento-peach rounded-[32px] p-7 sm:p-8 border border-bento-peach-border hover:shadow-card transition-all cursor-pointer flex flex-col justify-between group"
+            >
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="px-3 py-1 rounded-full bg-white/80 text-slate-900 text-xs font-extrabold uppercase tracking-wider border border-white">
+                    Family Member
+                  </span>
+                  <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center group-hover:bg-bento-lime group-hover:text-slate-950 transition-colors">
+                    <ArrowUpRight className="w-4 h-4 font-bold" />
+                  </div>
+                </div>
+
+                <div className="pt-2">
+                  <h3 className="text-2xl font-black text-slate-950">Rohan Sharma</h3>
+                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Son • Care Circle Administrator</p>
+                </div>
+
+                <p className="text-xs text-slate-700 leading-relaxed font-medium">
+                  Complete peace of mind. Daily adherence analytics, doctor consultations, missed-dose alerts, and member invitations.
+                </p>
               </div>
-              <h3 className="text-xl font-bold text-slate-900">Family Peace of Mind</h3>
-              <p className="text-sm text-slate-600 mt-2 leading-relaxed">
-                Stay confident even from miles away. Monitor daily adherence scores, get alerts for missed medications, and coordinate doctor visits.
-              </p>
-              <ul className="mt-4 space-y-2 text-xs font-semibold text-slate-700">
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-teal-600" />
-                  <span>Adherence trend analysis</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-teal-600" />
-                  <span>Missed dose alerts in real-time</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-teal-600" />
-                  <span>Complete audit log of care updates</span>
-                </li>
-              </ul>
+
+              <div className="pt-6 border-t border-slate-900/10 mt-6 flex items-center justify-between text-xs font-bold text-slate-900">
+                <span>Try Family Overview</span>
+                <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </div>
             </div>
 
-            {/* Caregivers */}
-            <div className="bg-slate-50 rounded-2xl sm:rounded-3xl p-7 sm:p-8 border border-slate-200/80 hover:border-teal-300 transition-all shadow-subtle hover:shadow-card">
-              <div className="w-12 h-12 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center mb-6">
-                <Users className="w-6 h-6" />
+            {/* Persona 3: Nurse Priya Rao (Caregiver) */}
+            <div 
+              onClick={() => onDemoLogin('caregiver')}
+              className="bg-bento-mint rounded-[32px] p-7 sm:p-8 border border-bento-mint-border hover:shadow-card transition-all cursor-pointer flex flex-col justify-between group"
+            >
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="px-3 py-1 rounded-full bg-white/80 text-slate-900 text-xs font-extrabold uppercase tracking-wider border border-white">
+                    Professional Caregiver
+                  </span>
+                  <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center group-hover:bg-bento-lime group-hover:text-slate-950 transition-colors">
+                    <ArrowUpRight className="w-4 h-4 font-bold" />
+                  </div>
+                </div>
+
+                <div className="pt-2">
+                  <h3 className="text-2xl font-black text-slate-950">Nurse Priya Rao</h3>
+                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Home Nurse • Shift Coordinator</p>
+                </div>
+
+                <p className="text-xs text-slate-700 leading-relaxed font-medium">
+                  Shift checklist precision. Clinical instructions, vitals tracking, and structured handover observations between care providers.
+                </p>
               </div>
-              <h3 className="text-xl font-bold text-slate-900">Caregiver Precision</h3>
-              <p className="text-sm text-slate-600 mt-2 leading-relaxed">
-                Assigned patient schedules, clinical instructions, and dose administration logging with custom notes for seamless handover between shifts.
-              </p>
-              <ul className="mt-4 space-y-2 text-xs font-semibold text-slate-700">
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-blue-600" />
-                  <span>Structured dose administration</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-blue-600" />
-                  <span>Shift notes & observations</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-blue-600" />
-                  <span>Strict permission boundaries</span>
-                </li>
-              </ul>
+
+              <div className="pt-6 border-t border-slate-900/10 mt-6 flex items-center justify-between text-xs font-bold text-slate-900">
+                <span>Try Caregiver Shift</span>
+                <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="mt-auto bg-slate-900 text-slate-400 py-12 border-t border-slate-800">
+      <footer className="mt-auto bg-slate-950 text-slate-400 py-12 border-t border-slate-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-teal-600 flex items-center justify-center text-white">
-              <Heart className="w-5 h-5 fill-white" />
+            <div className="w-8 h-8 rounded-full bg-bento-lime text-slate-950 flex items-center justify-center font-bold">
+              <Heart className="w-4 h-4 fill-slate-950" />
             </div>
-            <span className="text-lg font-bold text-white">Sahaaya</span>
+            <span className="text-lg font-black text-white">Sahaaya</span>
           </div>
-          <p className="text-xs text-slate-500 text-center sm:text-right">
-            Care that connects generations.
+          <p className="text-xs text-slate-500 text-center sm:text-right font-medium">
+            Care that connects generations. Built with dignity, privacy, and precision.
           </p>
         </div>
       </footer>

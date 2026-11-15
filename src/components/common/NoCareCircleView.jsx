@@ -39,63 +39,63 @@ export default function NoCareCircleView() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12 space-y-8">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12 space-y-8 font-sans">
       {/* Welcome Banner */}
-      <div className="bg-white rounded-2xl p-7 sm:p-9 border border-slate-200 shadow-card text-center space-y-3">
-        <div className="w-14 h-14 rounded-2xl bg-teal-50 text-teal-700 border border-teal-200 flex items-center justify-center mx-auto mb-2">
-          <HeartHandshake className="w-8 h-8" />
+      <div className="bg-white rounded-[32px] sm:rounded-[36px] p-8 sm:p-10 border border-slate-200/90 shadow-subtle text-center space-y-3">
+        <div className="w-14 h-14 rounded-full bg-slate-900 text-white flex items-center justify-center mx-auto mb-2 shadow-sm">
+          <HeartHandshake className="w-7 h-7 text-bento-lime" />
         </div>
-        <span className="inline-flex items-center gap-1.5 bg-teal-50 border border-teal-200 text-teal-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+        <span className="inline-flex items-center gap-1.5 bg-bento-mint text-emerald-950 border border-bento-mint-border text-xs font-black px-3.5 py-1 rounded-full uppercase tracking-wider">
           Authenticated Account
         </span>
-        <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
+        <h1 className="text-3xl font-black text-slate-950 tracking-tight">
           Welcome to Sahaaya, {displayName}
         </h1>
-        <p className="text-base text-slate-600 max-w-xl mx-auto">
+        <p className="text-sm text-slate-600 max-w-xl mx-auto font-medium leading-relaxed">
           You are successfully signed in, but you are not connected to any Care Circle yet.
           To protect patient confidentiality, all healthcare records, medications, and doses are strictly isolated per Care Circle.
         </p>
       </div>
 
-      {/* Action Cards Grid */}
+      {/* Action Cards Grid in Bento Aesthetics */}
       <div className="grid md:grid-cols-2 gap-6">
-        {/* Card 1: Create New Care Circle */}
-        <div className="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200 shadow-subtle flex flex-col justify-between space-y-5">
+        {/* Card 1: Create New Care Circle (Reference Bento Lavender) */}
+        <div className="bg-bento-lavender rounded-[32px] p-7 sm:p-8 border border-bento-lavender-border shadow-subtle flex flex-col justify-between space-y-5">
           <div className="space-y-3">
-            <div className="w-11 h-11 rounded-xl bg-teal-600 text-white flex items-center justify-center shadow-md shadow-teal-600/20">
-              <PlusCircle className="w-6 h-6" />
+            <div className="w-11 h-11 rounded-full bg-slate-900 text-white flex items-center justify-center shadow-sm">
+              <PlusCircle className="w-6 h-6 text-bento-lime" />
             </div>
-            <h2 className="text-xl font-bold text-slate-900">Create a Care Circle</h2>
-            <p className="text-sm text-slate-600 leading-relaxed">
+            <h2 className="text-xl font-black text-slate-950">Create a Care Circle</h2>
+            <p className="text-xs text-slate-700 leading-relaxed font-medium">
               Start a private, isolated circle for your elderly parent or loved one. You will become the primary administrator and can invite family members and caregivers.
             </p>
           </div>
 
           <Button
-            variant="primary"
+            variant="electric"
             size="lg"
-            className="w-full shadow-md shadow-teal-600/20"
+            className="w-full text-xs font-bold uppercase tracking-wider shadow-sm"
             onClick={() => setCreateModalOpen(true)}
           >
             + Create New Care Circle
           </Button>
         </div>
 
-        {/* Card 2: Join via Invitation Token */}
-        <div className="bg-white rounded-2xl p-6 sm:p-7 border border-slate-200 shadow-subtle flex flex-col justify-between space-y-5">
+        {/* Card 2: Join via Invitation Token (Reference Bento Peach) */}
+        <div className="bg-bento-peach rounded-[32px] p-7 sm:p-8 border border-bento-peach-border shadow-subtle flex flex-col justify-between space-y-5">
           <div className="space-y-3">
-            <div className="w-11 h-11 rounded-xl bg-blue-600 text-white flex items-center justify-center shadow-md shadow-blue-600/20">
-              <KeyRound className="w-6 h-6" />
+            <div className="w-11 h-11 rounded-full bg-slate-900 text-white flex items-center justify-center shadow-sm">
+              <KeyRound className="w-6 h-6 text-bento-lime" />
             </div>
-            <h2 className="text-xl font-bold text-slate-900">Join an Existing Circle</h2>
-            <p className="text-sm text-slate-600 leading-relaxed">
+            <h2 className="text-xl font-black text-slate-950">Join an Existing Circle</h2>
+            <p className="text-xs text-slate-700 leading-relaxed font-medium">
               Received an invitation code or token from a family member? Paste your single-use cryptographic token below to join their Care Circle.
             </p>
           </div>
 
           <form onSubmit={handleJoinWithToken} className="space-y-3">
             {tokenError && (
-              <div className="p-2.5 rounded-lg bg-red-50 border border-red-200 text-xs font-semibold text-red-700 flex items-center gap-2">
+              <div className="p-2.5 rounded-2xl bg-red-50 border border-red-200 text-xs font-semibold text-red-700 flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 shrink-0" />
                 <span>{tokenError}</span>
               </div>
@@ -105,13 +105,13 @@ export default function NoCareCircleView() {
               value={inviteToken}
               onChange={(e) => setInviteToken(e.target.value)}
               placeholder="Paste invite token here..."
-              className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-teal-500 font-mono"
+              className="w-full px-4 py-3 text-xs rounded-full border border-slate-300 bg-white/90 focus:outline-none focus:ring-2 focus:ring-slate-950 font-mono shadow-2xs"
             />
             <Button
               type="submit"
-              variant="secondary"
+              variant="pill-outline"
               size="lg"
-              className="w-full"
+              className="w-full text-xs font-bold uppercase tracking-wider"
               isLoading={isSubmittingToken}
             >
               Join Care Circle
@@ -121,15 +121,15 @@ export default function NoCareCircleView() {
       </div>
 
       {/* Demo Persona Switcher Banner for Evaluators */}
-      <div className="p-4 rounded-xl bg-slate-100 border border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-600">
+      <div className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-subtle flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-600">
         <div className="flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-teal-600 shrink-0" />
-          <span>Evaluating the platform? You can switch to the interactive demo baseline at any time.</span>
+          <Sparkles className="w-4 h-4 text-slate-900 shrink-0" />
+          <span className="font-medium">Evaluating the platform? You can switch to the interactive demo baseline at any time.</span>
         </div>
         <button
           type="button"
           onClick={() => signInAsDemo('elderly')}
-          className="font-bold text-teal-700 hover:text-teal-900 hover:underline shrink-0"
+          className="font-black text-slate-950 hover:underline shrink-0"
         >
           Switch to Kamla Sharma (Demo) &rarr;
         </button>

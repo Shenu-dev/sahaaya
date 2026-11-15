@@ -37,6 +37,7 @@ supabase/.temp/
 # Editor & OS files
 .DS_Store
 Thumbs.db
+Pictures/
 .idea/
 .vscode/
 *.suo

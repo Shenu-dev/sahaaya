@@ -81,38 +81,40 @@ export default function CareCirclePage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 font-sans">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-6 sm:p-7 rounded-2xl border border-slate-200/90 shadow-subtle">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-7 sm:p-8 rounded-[32px] border border-slate-200/90 shadow-subtle">
         <div>
-          <span className="text-xs font-bold text-teal-700 uppercase tracking-wider">Unified Care Ecosystem</span>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1.5 tracking-tight">
+          <span className="text-xs font-black text-slate-500 uppercase tracking-widest">Unified Care Ecosystem</span>
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-950 mt-1.5 tracking-tight">
             {careCircle?.name || 'Care Circle'}
           </h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="text-xs font-semibold text-slate-500 mt-1">
             Central patient: <span className="font-bold text-slate-800">{elderlyProfile?.full_name || 'Senior'}</span>. Access strictly governed by PostgreSQL Row Level Security.
           </p>
         </div>
 
         <div className="flex items-center gap-3 flex-wrap">
           <Button
-            variant="outline"
+            variant="pill-outline"
             size="md"
             icon={Plus}
             onClick={() => setCreateCircleModalOpen(true)}
+            className="text-xs font-bold uppercase tracking-wider"
           >
             New Circle
           </Button>
 
           {canInvite ? (
             <Button
-              variant="primary"
+              variant="electric"
               size="md"
               icon={UserPlus}
               onClick={() => {
                 setGeneratedInviteLink('');
                 setInviteModalOpen(true);
               }}
+              className="text-xs font-bold uppercase tracking-wider shadow-sm"
             >
               Invite Member
             </Button>

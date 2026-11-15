@@ -101,18 +101,18 @@ export default function FamilyDashboard({ onNavigateTab }) {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 font-sans">
       {/* Top Welcome Bar */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 bg-white p-6 sm:p-7 rounded-2xl border border-slate-200 shadow-subtle">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 bg-white p-7 sm:p-8 rounded-[32px] border border-slate-200/90 shadow-subtle">
         <div>
           <div className="flex items-center gap-2.5 flex-wrap">
-            <span className="text-xs font-bold text-teal-700 uppercase tracking-wider">Family Care Oversight</span>
+            <span className="text-xs font-black text-slate-500 uppercase tracking-widest">Family Care Oversight</span>
             {isReadOnly && <Badge variant="warning" size="sm">Read-Only Observer</Badge>}
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1.5 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-950 mt-1.5 tracking-tight">
             Care Dashboard for {elderlyProfile?.full_name || 'Elderly Member'}
           </h1>
-          <p className="text-sm text-slate-500 mt-1">
+          <p className="text-xs font-semibold text-slate-500 mt-1">
             Logged in as {profile?.full_name || 'Family Member'} ({profile?.role === 'elderly' ? 'Elderly Owner' : 'Care Circle Member'})
           </p>
         </div>
@@ -120,19 +120,21 @@ export default function FamilyDashboard({ onNavigateTab }) {
         {/* Action Buttons */}
         <div className="flex items-center gap-3 flex-wrap">
           <Button
-            variant="outline"
+            variant="pill-outline"
             size="md"
             icon={Calendar}
             disabled={!canModifyDoses}
             onClick={() => setApptModalOpen(true)}
+            className="text-xs font-bold uppercase tracking-wider"
           >
-            Add Appointment
+            Add Visit
           </Button>
           <Button
-            variant="primary"
+            variant="electric"
             size="md"
             icon={Pill}
             onClick={() => onNavigateTab('medications')}
+            className="text-xs font-bold uppercase tracking-wider shadow-sm"
           >
             Manage Meds
           </Button>
@@ -141,7 +143,7 @@ export default function FamilyDashboard({ onNavigateTab }) {
 
       {/* Action Error Alert */}
       {actionError && (
-        <div className="bg-red-50 border-2 border-red-300 rounded-2xl p-4 text-red-900 flex items-center justify-between gap-3">
+        <div className="bg-red-50 border border-red-200 rounded-2xl p-4 text-red-900 flex items-center justify-between gap-3">
           <p className="text-sm font-bold">{actionError}</p>
           <button
             type="button"
@@ -155,8 +157,8 @@ export default function FamilyDashboard({ onNavigateTab }) {
 
       {/* Urgent Missed Dose Alert (If any) */}
       {missedDoses.length > 0 && (
-        <div className="bg-red-50 border border-red-300 rounded-2xl p-5 sm:p-6 text-red-900 shadow-sm flex items-start gap-4">
-          <div className="p-2.5 bg-red-600 text-white rounded-xl shrink-0 mt-0.5">
+        <div className="bg-red-50 border border-red-300 rounded-[28px] p-5 sm:p-6 text-red-900 shadow-sm flex items-start gap-4">
+          <div className="p-2.5 bg-bento-coral text-white rounded-full shrink-0 mt-0.5">
             <AlertTriangle className="w-5 h-5" />
           </div>
           <div className="space-y-1">
@@ -168,87 +170,87 @@ export default function FamilyDashboard({ onNavigateTab }) {
         </div>
       )}
 
-      {/* Mathematically Rigorous Adherence & Progress Cards */}
+      {/* Reference Harmonic Bento Metric Quadrant */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-        {/* 1. Due Doses Adherence Rate */}
-        <Card className="flex flex-col justify-between">
+        {/* 1. Due Doses Adherence Rate (Reference Bento Mint) */}
+        <Card variant="mint" className="flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Due Doses Adherence</span>
-              <span className="text-[10px] text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full font-bold">
+              <span className="text-xs font-black text-slate-700 uppercase tracking-wider">Adherence Rate</span>
+              <span className="text-[10px] text-emerald-950 bg-white/80 border border-white px-2 py-0.5 rounded-full font-black">
                 Eligible Doses
               </span>
             </div>
             <div className="mt-3 flex items-baseline gap-2">
-              <span className="text-4xl font-extrabold text-teal-700">
+              <span className="text-4xl font-black text-slate-950">
                 {adherenceMetrics.hasDueDoses ? `${adherenceMetrics.adherenceRate}%` : 'N/A'}
               </span>
-              <span className="text-xs text-slate-500 font-medium">
+              <span className="text-xs text-slate-700 font-semibold">
                 {adherenceMetrics.hasDueDoses
-                  ? `${adherenceMetrics.takenCount} of ${adherenceMetrics.dueDosesCount} due`
-                  : 'No doses due yet'}
+                  ? `${adherenceMetrics.takenCount}/${adherenceMetrics.dueDosesCount} due`
+                  : 'None due'}
               </span>
             </div>
           </div>
           <div className="mt-3">
-            <div className="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+            <div className="w-full bg-white/70 rounded-full h-2 overflow-hidden">
               <div
-                className="bg-teal-600 h-2.5 rounded-full transition-all duration-500"
+                className="bg-emerald-600 h-2 rounded-full transition-all duration-500"
                 style={{ width: `${adherenceMetrics.adherenceRate || 0}%` }}
               />
             </div>
-            <p className="text-[11px] text-slate-400 mt-1.5">
+            <p className="text-[11px] text-slate-600 mt-1.5 font-medium">
               Excludes {adherenceMetrics.upcomingCount} future doses
             </p>
           </div>
         </Card>
 
-        {/* 2. Full Day Progress */}
-        <Card className="flex flex-col justify-between">
+        {/* 2. Full Day Progress (Reference Bento Lavender) */}
+        <Card variant="lavender" className="flex flex-col justify-between">
           <div>
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Day Progress</span>
+            <span className="text-xs font-black text-slate-700 uppercase tracking-wider">Day Progress</span>
             <div className="mt-3 flex items-baseline gap-2">
-              <span className="text-4xl font-extrabold text-emerald-600">
+              <span className="text-4xl font-black text-slate-950">
                 {adherenceMetrics.takenCount}/{adherenceMetrics.totalCount}
               </span>
-              <span className="text-xs text-slate-500 font-medium">
+              <span className="text-xs text-slate-700 font-semibold">
                 ({adherenceMetrics.dayCompletionRate}% complete)
               </span>
             </div>
           </div>
-          <p className="text-xs text-slate-500 mt-3 font-medium">
+          <p className="text-xs text-slate-700 mt-3 font-semibold">
             {adherenceMetrics.takenCount} taken • {adherenceMetrics.upcomingCount} remaining
           </p>
         </Card>
 
-        {/* 3. Upcoming Today */}
-        <Card className="flex flex-col justify-between">
+        {/* 3. Upcoming Today (Reference Bento Peach) */}
+        <Card variant="peach" className="flex flex-col justify-between">
           <div>
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Pending / Upcoming</span>
+            <span className="text-xs font-black text-slate-700 uppercase tracking-wider">Pending / Upcoming</span>
             <div className="mt-3 flex items-baseline gap-2">
-              <span className="text-4xl font-extrabold text-blue-600">
+              <span className="text-4xl font-black text-slate-950">
                 {adherenceMetrics.upcomingCount}
               </span>
-              <span className="text-xs text-slate-500 font-medium">future doses</span>
+              <span className="text-xs text-slate-700 font-semibold">future doses</span>
             </div>
           </div>
-          <p className="text-xs text-slate-500 mt-3 font-medium">Scheduled for later today</p>
+          <p className="text-xs text-slate-700 mt-3 font-semibold">Scheduled for later today</p>
         </Card>
 
         {/* 4. Missed & Skipped */}
-        <Card className="flex flex-col justify-between">
+        <Card className="flex flex-col justify-between bg-white border-slate-200/90 shadow-subtle">
           <div>
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Missed / Skipped</span>
+            <span className="text-xs font-black text-slate-500 uppercase tracking-wider">Missed / Skipped</span>
             <div className="mt-3 flex items-baseline gap-2">
-              <span className={`text-4xl font-extrabold ${adherenceMetrics.missedCount > 0 ? 'text-red-600' : 'text-slate-700'}`}>
+              <span className={`text-4xl font-black ${adherenceMetrics.missedCount > 0 ? 'text-bento-coral' : 'text-slate-950'}`}>
                 {adherenceMetrics.missedCount + adherenceMetrics.skippedCount}
               </span>
-              <span className="text-xs text-slate-500 font-medium">
-                ({adherenceMetrics.missedCount} missed, {adherenceMetrics.skippedCount} skipped)
+              <span className="text-xs text-slate-500 font-semibold">
+                ({adherenceMetrics.missedCount} missed, {adherenceMetrics.skippedCount} skip)
               </span>
             </div>
           </div>
-          <p className="text-xs text-slate-500 mt-3 font-medium">
+          <p className="text-xs text-slate-500 mt-3 font-semibold">
             {adherenceMetrics.missedCount > 0 ? 'Requires attention' : 'Zero unconfirmed doses'}
           </p>
         </Card>

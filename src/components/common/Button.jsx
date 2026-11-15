@@ -9,12 +9,13 @@ export default function Button({
   isElderly = false,
   isLoading = false,
   disabled = false,
+  pill = false,
   className = '',
   onClick,
   icon: Icon,
   ...props
 }) {
-  const baseStyles = 'inline-flex items-center justify-center font-medium gap-2 transition-all duration-150 rounded-xl focus:outline-none focus-visible:ring-3 focus-visible:ring-teal-500/50 disabled:opacity-50 disabled:cursor-not-allowed select-none active:scale-[0.98]';
+  const baseStyles = 'inline-flex items-center justify-center font-medium gap-2 transition-all duration-150 focus:outline-none focus-visible:ring-3 focus-visible:ring-bento-lime/60 disabled:opacity-50 disabled:cursor-not-allowed select-none active:scale-[0.98]';
 
   const variants = {
     primary: 'bg-teal-600 text-white hover:bg-teal-700 shadow-sm border border-teal-700/80 active:bg-teal-800',
@@ -22,9 +23,13 @@ export default function Button({
     outline: 'border border-teal-600 text-teal-700 hover:bg-teal-50/80 bg-transparent active:bg-teal-100',
     danger: 'bg-red-600 text-white hover:bg-red-700 shadow-sm border border-red-700/80 active:bg-red-800',
     ghost: 'text-slate-600 hover:bg-slate-100 hover:text-slate-900 border border-transparent active:bg-slate-200',
+    // Reference-inspired Bento action variants
+    electric: 'bg-bento-lime text-slate-950 hover:bg-bento-lime-hover font-bold shadow-sm border border-lime-400 rounded-full active:bg-lime-400',
+    coral: 'bg-bento-coral text-white hover:bg-bento-coral-hover font-semibold shadow-sm border border-red-400 rounded-full active:bg-red-500',
+    'pill-outline': 'border border-slate-300/90 text-slate-800 hover:bg-white bg-white/70 backdrop-blur-sm rounded-full shadow-subtle active:bg-slate-100',
     // Specially engineered for elderly accessibility: maximum contrast, high readability
-    'elderly-action': 'bg-teal-700 text-white hover:bg-teal-800 text-xl font-bold shadow-elderly-action border-2 border-teal-900 touch-target-elderly px-8 py-4',
-    'elderly-skip': 'bg-amber-100 text-amber-900 hover:bg-amber-200 text-lg font-bold border-2 border-amber-300 touch-target-elderly px-6 py-4',
+    'elderly-action': 'bg-bento-lime text-slate-950 hover:bg-bento-lime-hover text-xl font-extrabold shadow-card border-2 border-slate-900 touch-target-elderly px-8 py-4 rounded-full',
+    'elderly-skip': 'bg-amber-100 text-amber-900 hover:bg-amber-200 text-lg font-bold border-2 border-amber-300 touch-target-elderly px-6 py-4 rounded-full',
   };
 
   const sizes = {
@@ -35,13 +40,14 @@ export default function Button({
   };
 
   const selectedSize = isElderly ? (variant === 'elderly-action' ? '' : sizes.xl) : sizes[size];
+  const radius = pill || variant === 'electric' || variant === 'coral' || variant === 'pill-outline' || variant.startsWith('elderly') ? 'rounded-full' : 'rounded-2xl';
 
   return (
     <button
       type={type}
       onClick={onClick}
       disabled={disabled || isLoading}
-      className={`${baseStyles} ${variants[variant] || variants.primary} ${selectedSize} ${className}`}
+      className={`${baseStyles} ${radius} ${variants[variant] || variants.primary} ${selectedSize} ${className}`}
       {...props}
     >
       {isLoading ? (

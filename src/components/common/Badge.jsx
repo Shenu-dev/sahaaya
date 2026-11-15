@@ -22,6 +22,12 @@ export default function Badge({
     danger: 'bg-red-50 text-red-700 border border-red-200',
     info: 'bg-blue-50 text-blue-700 border border-blue-200',
     admin: 'bg-purple-100 text-purple-800 border border-purple-300 font-bold tracking-wide uppercase',
+    lime: 'bg-bento-lime text-slate-950 border border-lime-400 font-bold',
+    coral: 'bg-bento-coral text-white border border-red-400 font-bold',
+    lavender: 'bg-bento-lavender text-indigo-900 border border-bento-lavender-border font-semibold',
+    mint: 'bg-bento-mint text-emerald-900 border border-bento-mint-border font-semibold',
+    peach: 'bg-bento-peach text-amber-950 border border-bento-peach-border font-semibold',
+    sticker: 'bg-white/90 text-slate-800 border border-white/80 shadow-subtle backdrop-blur-sm font-semibold',
   };
 
   if (doseStatus && DOSE_STATUS_CONFIG[doseStatus]) {

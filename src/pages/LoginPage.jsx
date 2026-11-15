@@ -43,28 +43,28 @@ export default function LoginPage({ onNavigate }) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 selection:bg-teal-500 selection:text-white">
+    <div className="min-h-screen bg-[#F5F5F9] flex flex-col justify-center py-12 sm:px-6 lg:px-8 selection:bg-bento-lime selection:text-slate-950 font-sans">
       {/* Brand Header */}
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
         <button
           onClick={() => onNavigate('landing')}
           className="inline-flex items-center gap-3 focus:outline-none group mb-4"
         >
-          <div className="w-11 h-11 rounded-xl bg-teal-600 flex items-center justify-center text-white shadow-md shadow-teal-600/20 group-hover:bg-teal-700 transition-colors">
-            <Heart className="w-6 h-6 fill-white" />
+          <div className="w-11 h-11 rounded-full bg-slate-900 flex items-center justify-center text-white shadow-sm">
+            <Heart className="w-5 h-5 fill-bento-lime text-bento-lime" />
           </div>
-          <span className="text-3xl font-black tracking-tight text-slate-900">Sahaaya</span>
+          <span className="text-3xl font-black tracking-tight text-slate-950 font-sans">Sahaaya</span>
         </button>
-        <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Sign in to your Care Ecosystem</h2>
-        <p className="mt-1 text-sm text-slate-500">
+        <h2 className="text-2xl font-black text-slate-950 tracking-tight">Sign in to your Care Ecosystem</h2>
+        <p className="mt-1 text-xs font-semibold text-slate-500 uppercase tracking-wider">
           Connecting elderly individuals, family, and caregivers
         </p>
       </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-6 shadow-card rounded-2xl sm:rounded-3xl border border-slate-200/90 sm:px-10 space-y-6">
+      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md px-4 sm:px-0">
+        <div className="bg-white py-8 px-6 shadow-card rounded-[32px] sm:rounded-[36px] border border-slate-200/90 sm:px-10 space-y-6">
           {error && (
-            <div className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-xs font-semibold text-red-700">
+            <div className="p-3.5 rounded-2xl bg-red-50 border border-red-200 text-xs font-semibold text-red-700">
               {error}
             </div>
           )}
@@ -90,9 +90,9 @@ export default function LoginPage({ onNavigate }) {
 
             <Button
               type="submit"
-              variant="primary"
+              variant="electric"
               size="md"
-              className="w-full mt-2 shadow-md shadow-teal-600/20"
+              className="w-full mt-2 text-xs font-bold uppercase tracking-wider shadow-sm"
               isLoading={isLoading}
             >
               Sign In
@@ -102,7 +102,7 @@ export default function LoginPage({ onNavigate }) {
           {/* Quick Demo Login Box for Judges */}
           <div className="pt-4 border-t border-slate-100">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+              <span className="text-xs font-black text-slate-400 uppercase tracking-widest">
                 Judge 1-Click Demo Logins
               </span>
             </div>
@@ -111,43 +111,43 @@ export default function LoginPage({ onNavigate }) {
               <button
                 type="button"
                 onClick={() => handleDemoClick('elderly')}
-                className="w-full flex items-center justify-between p-3.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-teal-50/70 hover:border-teal-300 transition-all text-left group"
+                className="w-full flex items-center justify-between p-3.5 rounded-2xl border border-bento-lavender-border bg-bento-lavender/40 hover:bg-bento-lavender transition-all text-left group"
               >
                 <div>
-                  <span className="text-xs font-bold text-slate-900 block group-hover:text-teal-900">
+                  <span className="text-xs font-black text-slate-950 block">
                     👵 Kamla Sharma (Elderly Individual)
                   </span>
-                  <span className="text-xs text-slate-500">Accessible high-contrast 1-tap view</span>
+                  <span className="text-xs text-slate-600 font-medium">Accessible high-contrast 1-tap view</span>
                 </div>
-                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-teal-600 transition-transform group-hover:translate-x-0.5" />
+                <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-slate-950 transition-transform group-hover:translate-x-0.5" />
               </button>
 
               <button
                 type="button"
                 onClick={() => handleDemoClick('family')}
-                className="w-full flex items-center justify-between p-3.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-teal-50/70 hover:border-teal-300 transition-all text-left group"
+                className="w-full flex items-center justify-between p-3.5 rounded-2xl border border-bento-peach-border bg-bento-peach/40 hover:bg-bento-peach transition-all text-left group"
               >
                 <div>
-                  <span className="text-xs font-bold text-slate-900 block group-hover:text-teal-900">
+                  <span className="text-xs font-black text-slate-950 block">
                     👨‍👦 Rohan Sharma (Family Admin)
                   </span>
-                  <span className="text-xs text-slate-500">Adherence charts, alerts & appointments</span>
+                  <span className="text-xs text-slate-600 font-medium">Adherence charts, alerts & appointments</span>
                 </div>
-                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-teal-600 transition-transform group-hover:translate-x-0.5" />
+                <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-slate-950 transition-transform group-hover:translate-x-0.5" />
               </button>
 
               <button
                 type="button"
                 onClick={() => handleDemoClick('caregiver')}
-                className="w-full flex items-center justify-between p-3.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-teal-50/70 hover:border-teal-300 transition-all text-left group"
+                className="w-full flex items-center justify-between p-3.5 rounded-2xl border border-bento-mint-border bg-bento-mint/40 hover:bg-bento-mint transition-all text-left group"
               >
                 <div>
-                  <span className="text-xs font-bold text-slate-900 block group-hover:text-teal-900">
+                  <span className="text-xs font-black text-slate-950 block">
                     👩‍⚕️ Nurse Priya Rao (Caregiver)
                   </span>
-                  <span className="text-xs text-slate-500">Dose administration & shift notes</span>
+                  <span className="text-xs text-slate-600 font-medium">Dose administration & shift notes</span>
                 </div>
-                <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-teal-600 transition-transform group-hover:translate-x-0.5" />
+                <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-slate-950 transition-transform group-hover:translate-x-0.5" />
               </button>
             </div>
           </div>

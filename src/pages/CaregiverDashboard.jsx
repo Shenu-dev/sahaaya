@@ -79,22 +79,22 @@ export default function CaregiverDashboard() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 font-sans">
       {/* Header Bar */}
-      <div className="bg-white p-6 sm:p-7 rounded-2xl border border-slate-200 shadow-subtle flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
+      <div className="bg-white p-7 sm:p-8 rounded-[32px] border border-slate-200/90 shadow-subtle flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
         <div>
-          <span className="text-xs font-bold text-teal-700 uppercase tracking-wider">Clinical Caregiver Portal</span>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1.5 tracking-tight">
+          <span className="text-xs font-black text-slate-500 uppercase tracking-widest">Clinical Caregiver Portal</span>
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-950 mt-1.5 tracking-tight">
             Shift Management • {profile?.full_name || 'Caregiver'}
           </h1>
-          <p className="text-sm text-slate-500 mt-1">
-            Assigned patient: <span className="font-bold text-slate-800">{elderlyProfile?.full_name || 'Senior'}</span> (Care Circle: {careCircle?.name || 'Care Circle'})
+          <p className="text-xs font-semibold text-slate-500 mt-1">
+            Assigned patient: <span className="font-bold text-slate-900">{elderlyProfile?.full_name || 'Senior'}</span> (Care Circle: {careCircle?.name || 'Care Circle'})
           </p>
         </div>
 
-        <Badge variant="primary" size="lg" className="gap-2">
-          <HeartHandshake className="w-4 h-4" />
-          <span>Active Clinical Shift</span>
+        <Badge variant="mint" size="lg" className="gap-2 px-4 py-2 text-xs font-bold uppercase tracking-wider">
+          <HeartHandshake className="w-4 h-4 text-emerald-900" />
+          <span>Active Shift</span>
         </Badge>
       </div>
 
@@ -152,10 +152,11 @@ export default function CaregiverDashboard() {
 
                       {!isTaken && canModifyDoses && (
                         <Button
-                          variant="primary"
+                          variant="electric"
                           size="md"
                           icon={CheckCircle2}
                           onClick={() => handleOpenAdminister(dose)}
+                          className="text-xs uppercase tracking-wider font-bold shadow-xs"
                         >
                           Record Administration
                         </Button>
