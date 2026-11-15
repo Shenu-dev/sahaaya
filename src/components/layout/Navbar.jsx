@@ -6,7 +6,7 @@ import Badge from '../common/Badge';
 
 export default function Navbar({ activeTab, onTabChange }) {
   const { profile, signOut, signInAsDemo } = useAuth();
-  const { careCircle, notifications, isDemo, resetDemoData } = useCareCircle();
+  const { careCircle, notifications, isDemo, resetDemoData, hasCareCircle } = useCareCircle();
   const [resetFeedback, setResetFeedback] = useState('');
 
   const isElderly = profile?.role === 'elderly';
@@ -47,52 +47,54 @@ export default function Navbar({ activeTab, onTabChange }) {
             </button>
           </div>
 
-          {/* Center Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-1.5 bg-slate-100/90 p-1.5 rounded-xl border border-slate-200/80">
-            <button
-              onClick={() => onTabChange('dashboard')}
-              className={`px-3.5 py-2 rounded-lg text-sm font-semibold transition-all whitespace-nowrap ${
-                activeTab === 'dashboard'
-                  ? 'bg-white text-teal-800 shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              {isElderly ? "Today's Schedule" : 'Overview'}
-            </button>
-            <button
-              onClick={() => onTabChange('medications')}
-              className={`px-3.5 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 whitespace-nowrap ${
-                activeTab === 'medications'
-                  ? 'bg-white text-teal-800 shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <Pill className="w-4 h-4 text-slate-400 group-hover:text-slate-600" />
-              <span>Medications</span>
-            </button>
-            <button
-              onClick={() => onTabChange('appointments')}
-              className={`px-3.5 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 whitespace-nowrap ${
-                activeTab === 'appointments'
-                  ? 'bg-white text-teal-800 shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <Calendar className="w-4 h-4 text-slate-400 group-hover:text-slate-600" />
-              <span>Appointments</span>
-            </button>
-            <button
-              onClick={() => onTabChange('circle')}
-              className={`px-3.5 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 whitespace-nowrap ${
-                activeTab === 'circle'
-                  ? 'bg-white text-teal-800 shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900'
-              }`}
-            >
-              <Users className="w-4 h-4 text-slate-400 group-hover:text-slate-600" />
-              <span>Care Circle</span>
-            </button>
-          </nav>
+          {/* Center Navigation Links (Only shown when Care Circle is active) */}
+          {hasCareCircle && (
+            <nav className="hidden lg:flex items-center gap-1.5 bg-slate-100/90 p-1.5 rounded-xl border border-slate-200/80">
+              <button
+                onClick={() => onTabChange('dashboard')}
+                className={`px-3.5 py-2 rounded-lg text-sm font-semibold transition-all whitespace-nowrap ${
+                  activeTab === 'dashboard'
+                    ? 'bg-white text-teal-800 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                {isElderly ? "Today's Schedule" : 'Overview'}
+              </button>
+              <button
+                onClick={() => onTabChange('medications')}
+                className={`px-3.5 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 whitespace-nowrap ${
+                  activeTab === 'medications'
+                    ? 'bg-white text-teal-800 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <Pill className="w-4 h-4 text-slate-400 group-hover:text-slate-600" />
+                <span>Medications</span>
+              </button>
+              <button
+                onClick={() => onTabChange('appointments')}
+                className={`px-3.5 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 whitespace-nowrap ${
+                  activeTab === 'appointments'
+                    ? 'bg-white text-teal-800 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <Calendar className="w-4 h-4 text-slate-400 group-hover:text-slate-600" />
+                <span>Appointments</span>
+              </button>
+              <button
+                onClick={() => onTabChange('circle')}
+                className={`px-3.5 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 whitespace-nowrap ${
+                  activeTab === 'circle'
+                    ? 'bg-white text-teal-800 shadow-sm'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                <Users className="w-4 h-4 text-slate-400 group-hover:text-slate-600" />
+                <span>Care Circle</span>
+              </button>
+            </nav>
+          )}
 
           {/* Right Action Bar */}
           <div className="flex items-center gap-3 shrink-0">
@@ -171,41 +173,43 @@ export default function Navbar({ activeTab, onTabChange }) {
           </div>
         </div>
 
-        {/* Mobile Sub-Navigation Bar */}
-        <div className="lg:hidden flex items-center justify-around py-2 border-t border-slate-100 text-xs font-semibold">
-          <button
-            onClick={() => onTabChange('dashboard')}
-            className={`px-3 py-1.5 rounded-lg min-h-[36px] ${
-              activeTab === 'dashboard' ? 'bg-teal-50 text-teal-800 font-bold' : 'text-slate-600'
-            }`}
-          >
-            {isElderly ? 'Today' : 'Overview'}
-          </button>
-          <button
-            onClick={() => onTabChange('medications')}
-            className={`px-3 py-1.5 rounded-lg min-h-[36px] ${
-              activeTab === 'medications' ? 'bg-teal-50 text-teal-800 font-bold' : 'text-slate-600'
-            }`}
-          >
-            Meds
-          </button>
-          <button
-            onClick={() => onTabChange('appointments')}
-            className={`px-3 py-1.5 rounded-lg min-h-[36px] ${
-              activeTab === 'appointments' ? 'bg-teal-50 text-teal-800 font-bold' : 'text-slate-600'
-            }`}
-          >
-            Appointments
-          </button>
-          <button
-            onClick={() => onTabChange('circle')}
-            className={`px-3 py-1.5 rounded-lg min-h-[36px] ${
-              activeTab === 'circle' ? 'bg-teal-50 text-teal-800 font-bold' : 'text-slate-600'
-            }`}
-          >
-            Care Circle
-          </button>
-        </div>
+        {/* Mobile Sub-Navigation Bar (Only shown when Care Circle is active) */}
+        {hasCareCircle && (
+          <div className="lg:hidden flex items-center justify-around py-2 border-t border-slate-100 text-xs font-semibold">
+            <button
+              onClick={() => onTabChange('dashboard')}
+              className={`px-3 py-1.5 rounded-lg min-h-[36px] ${
+                activeTab === 'dashboard' ? 'bg-teal-50 text-teal-800 font-bold' : 'text-slate-600'
+              }`}
+            >
+              {isElderly ? 'Today' : 'Overview'}
+            </button>
+            <button
+              onClick={() => onTabChange('medications')}
+              className={`px-3 py-1.5 rounded-lg min-h-[36px] ${
+                activeTab === 'medications' ? 'bg-teal-50 text-teal-800 font-bold' : 'text-slate-600'
+              }`}
+            >
+              Meds
+            </button>
+            <button
+              onClick={() => onTabChange('appointments')}
+              className={`px-3 py-1.5 rounded-lg min-h-[36px] ${
+                activeTab === 'appointments' ? 'bg-teal-50 text-teal-800 font-bold' : 'text-slate-600'
+              }`}
+            >
+              Appointments
+            </button>
+            <button
+              onClick={() => onTabChange('circle')}
+              className={`px-3 py-1.5 rounded-lg min-h-[36px] ${
+                activeTab === 'circle' ? 'bg-teal-50 text-teal-800 font-bold' : 'text-slate-600'
+              }`}
+            >
+              Care Circle
+            </button>
+          </div>
+        )}
 
         {/* Mobile Persona Quick Switcher */}
         <div className="sm:hidden flex items-center justify-between px-3 py-2 bg-teal-50/80 border-t border-teal-100 text-[11px]">

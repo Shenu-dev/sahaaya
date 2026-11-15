@@ -3,8 +3,10 @@ import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
 import { DOSE_STATUS } from '../lib/constants';
 import { formatTimeTo12Hour, checkIsFutureDose, getLocalDateString, toISOStringSafe } from '../lib/dateUtils';
+import { isUserDemoPersona } from '../lib/authUtils';
 
 const CareCircleContext = createContext(null);
+export { isUserDemoPersona };
 
 // Default realistic sample data for initial demonstration
 const SEED_CARE_CIRCLE = {
@@ -150,15 +152,23 @@ const SEED_NOTIFICATIONS = [
 
 export function CareCircleProvider({ children }) {
   const { user, profile } = useAuth();
+  const isDemo = isUserDemoPersona(user);
 
-  const [careCircle, setCareCircle] = useState(SEED_CARE_CIRCLE);
-  const [elderlyProfile, setElderlyProfile] = useState(SEED_ELDERLY_PROFILE);
-  const [members, setMembers] = useState(SEED_MEMBERS);
-  const [medications, setMedications] = useState(SEED_MEDICATIONS);
-  const [appointments, setAppointments] = useState(SEED_APPOINTMENTS);
-  const [todayDoses, setTodayDoses] = useState(SEED_TODAY_DOSES);
-  const [activityLogs, setActivityLogs] = useState(SEED_ACTIVITY_LOGS);
-  const [notifications, setNotifications] = useState(SEED_NOTIFICATIONS);
+  // Distinguish reliable state:
+  // 1. Demo personas (hasCareCircle = true, uses seed data)
+  // 2. Real user with circle (hasCareCircle = true, uses DB data)
+  // 3. Real user without circle (hasCareCircle = false, cleared empty state)
+  const [hasCareCircle, setHasCareCircle] = useState(() => isDemo);
+  const [circleLoading, setCircleLoading] = useState(false);
+
+  const [careCircle, setCareCircle] = useState(() => (isDemo ? SEED_CARE_CIRCLE : null));
+  const [elderlyProfile, setElderlyProfile] = useState(() => (isDemo ? SEED_ELDERLY_PROFILE : null));
+  const [members, setMembers] = useState(() => (isDemo ? SEED_MEMBERS : []));
+  const [medications, setMedications] = useState(() => (isDemo ? SEED_MEDICATIONS : []));
+  const [appointments, setAppointments] = useState(() => (isDemo ? SEED_APPOINTMENTS : []));
+  const [todayDoses, setTodayDoses] = useState(() => (isDemo ? SEED_TODAY_DOSES : []));
+  const [activityLogs, setActivityLogs] = useState(() => (isDemo ? SEED_ACTIVITY_LOGS : []));
+  const [notifications, setNotifications] = useState(() => (isDemo ? SEED_NOTIFICATIONS : []));
 
   // Determine current user's Care Circle permission
   const currentMember = members.find(
@@ -168,110 +178,168 @@ export function CareCircleProvider({ children }) {
   const isReadOnly = currentPermissions === 'read';
   const canModifyDoses = !isReadOnly;
 
+  // Real Database Active Condition:
+  // True ONLY for real authenticated accounts with a live, verified Care Circle.
+  // Demo personas NEVER satisfy this condition and NEVER query or mutate Supabase.
+  const isRealDbActive = Boolean(
+    isSupabaseConfigured &&
+    supabase &&
+    user &&
+    !isDemo &&
+    hasCareCircle &&
+    careCircle?.id &&
+    !careCircle?.is_demo
+  );
+
   // Load Real Supabase Data when user is logged in and DB configured
   const fetchCircleData = useCallback(async () => {
-    if (!isSupabaseConfigured || !supabase || !user) return;
+    // Demo personas NEVER query Supabase and stay isolated in local state
+    if (isUserDemoPersona(user)) {
+      setHasCareCircle(true);
+      setCircleLoading(false);
+      return;
+    }
 
+    if (!isSupabaseConfigured || !supabase || !user) {
+      setCircleLoading(false);
+      return;
+    }
+
+    setCircleLoading(true);
     try {
-      const { data: memberData } = await supabase
+      const { data: memberData, error: memberErr } = await supabase
         .from('care_circle_members')
         .select('*, care_circles(*)')
         .eq('profile_id', user.id)
         .limit(1);
 
-      if (memberData && memberData.length > 0) {
-        const activeCircle = memberData[0].care_circles;
-        if (activeCircle) {
-          setCareCircle(activeCircle);
+      if (memberErr) {
+        console.error('Error fetching member care circles:', memberErr);
+      }
 
-          const { data: elderlyData } = await supabase
-            .from('elderly_profiles')
+      if (memberData && memberData.length > 0 && memberData[0].care_circles) {
+        const activeCircle = memberData[0].care_circles;
+        setCareCircle(activeCircle);
+        setHasCareCircle(true);
+
+        const { data: elderlyData } = await supabase
+          .from('elderly_profiles')
+          .select('*')
+          .eq('care_circle_id', activeCircle.id)
+          .single();
+
+        if (elderlyData) {
+          setElderlyProfile(elderlyData);
+
+          // Timezone-safe local date string eliminates UTC midnight boundary desync (DATA-HIGH-04)
+          const todayStr = getLocalDateString(new Date(), elderlyData.timezone || 'Asia/Kolkata');
+          await supabase.rpc('generate_daily_doses', {
+            p_elderly_id: elderlyData.id,
+            p_target_date: todayStr,
+          });
+
+          await supabase.rpc('evaluate_missed_doses', {
+            p_elderly_id: elderlyData.id,
+          });
+
+          const { data: medsData } = await supabase
+            .from('medications')
+            .select('*')
+            .eq('elderly_id', elderlyData.id)
+            .eq('is_active', true);
+          setMedications(medsData || []);
+
+          // Include instructions to eliminate hardcoded instruction bug (UI-MED-07)
+          const { data: dosesData } = await supabase
+            .from('medication_doses')
+            .select('*, medications(name, dosage, form, instructions)')
+            .eq('elderly_id', elderlyData.id)
+            .eq('dose_date', todayStr)
+            .order('scheduled_time', { ascending: true });
+
+          setTodayDoses(
+            (dosesData || []).map((d) => ({
+              ...d,
+              med_name: d.medications?.name || 'Medication',
+              dosage: d.medications?.dosage || '',
+              instructions: d.medications?.instructions || '',
+            }))
+          );
+
+          const { data: apptsData } = await supabase
+            .from('appointments')
+            .select('*')
+            .eq('elderly_id', elderlyData.id)
+            .order('appointment_time', { ascending: true });
+          setAppointments(apptsData || []);
+
+          const { data: allMembers } = await supabase
+            .from('care_circle_members')
+            .select('*, profiles(full_name, email, phone)')
+            .eq('care_circle_id', activeCircle.id);
+          if (allMembers) {
+            setMembers(
+              allMembers.map((m) => ({
+                id: m.id,
+                profile_id: m.profile_id,
+                full_name: m.profiles?.full_name || 'Member',
+                role: m.member_role,
+                permissions: m.permissions,
+                relationship_label: m.relationship_label,
+              }))
+            );
+          }
+
+          const { data: logsData } = await supabase
+            .from('activity_logs')
             .select('*')
             .eq('care_circle_id', activeCircle.id)
-            .single();
-
-          if (elderlyData) {
-            setElderlyProfile(elderlyData);
-
-            // Timezone-safe local date string eliminates UTC midnight boundary desync (DATA-HIGH-04)
-            const todayStr = getLocalDateString(new Date(), elderlyData.timezone || 'Asia/Kolkata');
-            await supabase.rpc('generate_daily_doses', {
-              p_elderly_id: elderlyData.id,
-              p_target_date: todayStr,
-            });
-
-            await supabase.rpc('evaluate_missed_doses', {
-              p_elderly_id: elderlyData.id,
-            });
-
-            const { data: medsData } = await supabase
-              .from('medications')
-              .select('*')
-              .eq('elderly_id', elderlyData.id)
-              .eq('is_active', true);
-            if (medsData) setMedications(medsData);
-
-            // Include instructions to eliminate hardcoded instruction bug (UI-MED-07)
-            const { data: dosesData } = await supabase
-              .from('medication_doses')
-              .select('*, medications(name, dosage, form, instructions)')
-              .eq('elderly_id', elderlyData.id)
-              .eq('dose_date', todayStr)
-              .order('scheduled_time', { ascending: true });
-
-            if (dosesData) {
-              setTodayDoses(
-                dosesData.map((d) => ({
-                  ...d,
-                  med_name: d.medications?.name || 'Medication',
-                  dosage: d.medications?.dosage || '',
-                  instructions: d.medications?.instructions || '',
-                }))
-              );
-            }
-
-            const { data: apptsData } = await supabase
-              .from('appointments')
-              .select('*')
-              .eq('elderly_id', elderlyData.id)
-              .order('appointment_time', { ascending: true });
-            if (apptsData) setAppointments(apptsData);
-
-            const { data: allMembers } = await supabase
-              .from('care_circle_members')
-              .select('*, profiles(full_name, email, phone)')
-              .eq('care_circle_id', activeCircle.id);
-            if (allMembers) {
-              setMembers(
-                allMembers.map((m) => ({
-                  id: m.id,
-                  profile_id: m.profile_id,
-                  full_name: m.profiles?.full_name || 'Member',
-                  role: m.member_role,
-                  permissions: m.permissions,
-                  relationship_label: m.relationship_label,
-                }))
-              );
-            }
-
-            const { data: logsData } = await supabase
-              .from('activity_logs')
-              .select('*')
-              .eq('care_circle_id', activeCircle.id)
-              .order('created_at', { ascending: false })
-              .limit(20);
-            if (logsData) setActivityLogs(logsData);
-          }
+            .order('created_at', { ascending: false })
+            .limit(20);
+          setActivityLogs(logsData || []);
+        } else {
+          setElderlyProfile(null);
+          setMedications([]);
+          setTodayDoses([]);
+          setAppointments([]);
+          setMembers([]);
+          setActivityLogs([]);
         }
+      } else {
+        // Authenticated real user without a Care Circle:
+        // Clear all seeded Sharma family data immediately to prevent leakage!
+        setHasCareCircle(false);
+        setCareCircle(null);
+        setElderlyProfile(null);
+        setMedications([]);
+        setTodayDoses([]);
+        setAppointments([]);
+        setMembers([]);
+        setActivityLogs([]);
       }
     } catch (err) {
       console.warn('Notice loading care circle data from DB:', err);
+    } finally {
+      setCircleLoading(false);
     }
   }, [user]);
 
+  // Synchronize persona mode changes (switching between real account and demo)
   useEffect(() => {
-    fetchCircleData();
-  }, [fetchCircleData]);
+    if (isDemo) {
+      setCareCircle(SEED_CARE_CIRCLE);
+      setElderlyProfile(SEED_ELDERLY_PROFILE);
+      setMembers(SEED_MEMBERS);
+      setMedications(SEED_MEDICATIONS);
+      setAppointments(SEED_APPOINTMENTS);
+      setTodayDoses(SEED_TODAY_DOSES);
+      setActivityLogs(SEED_ACTIVITY_LOGS);
+      setNotifications(SEED_NOTIFICATIONS);
+      setHasCareCircle(true);
+    } else {
+      fetchCircleData();
+    }
+  }, [user, isDemo, fetchCircleData]);
 
   // Mark Dose Status (Never auto-marks; records actor & timestamp; validates early admin)
   const markDose = async (doseId, newStatus, notes = '', isEarlyConfirmed = false) => {
@@ -308,7 +376,7 @@ export function CareCircleProvider({ children }) {
       }
     }
 
-    if (isSupabaseConfigured && supabase && user) {
+    if (isRealDbActive) {
       try {
         const { error } = await supabase
           .from('medication_doses')
@@ -321,11 +389,14 @@ export function CareCircleProvider({ children }) {
           })
           .eq('id', doseId);
 
-        if (error) throw error;
+        if (error) {
+          console.error('Error updating dose in Supabase:', error);
+          return { success: false, error: error.message };
+        }
         await fetchCircleData();
         return { success: true };
       } catch (err) {
-        console.error('Error updating dose:', err);
+        console.error('Exception updating dose in Supabase:', err);
         return { success: false, error: err.message };
       }
     }
@@ -359,7 +430,7 @@ export function CareCircleProvider({ children }) {
 
   // Add Medication
   const addMedication = async (medData) => {
-    if (isSupabaseConfigured && supabase && elderlyProfile?.id && user) {
+    if (isRealDbActive && elderlyProfile?.id) {
       try {
         const { data: newMed, error: medError } = await supabase
           .from('medications')
@@ -422,7 +493,7 @@ export function CareCircleProvider({ children }) {
   // Add Doctor Appointment (Safely converts localized datetime to ISO - DATA-HIGH-05)
   const addAppointment = async (apptData) => {
     const isoAppointmentTime = toISOStringSafe(apptData.appointmentTime);
-    if (isSupabaseConfigured && supabase && elderlyProfile?.id && user) {
+    if (isRealDbActive && elderlyProfile?.id) {
       try {
         const { error } = await supabase.from('appointments').insert({
           elderly_id: elderlyProfile.id,
@@ -470,7 +541,7 @@ export function CareCircleProvider({ children }) {
       return { success: false, error: 'Permission denied: Read-only members cannot update appointments.' };
     }
 
-    if (isSupabaseConfigured && supabase && user) {
+    if (isRealDbActive) {
       try {
         const { error } = await supabase
           .from('appointments')
@@ -508,7 +579,7 @@ export function CareCircleProvider({ children }) {
       return { success: false, error: 'Permission denied: Read-only members cannot archive medications.' };
     }
 
-    if (isSupabaseConfigured && supabase && user) {
+    if (isRealDbActive) {
       try {
         const { error } = await supabase
           .from('medications')
@@ -549,7 +620,7 @@ export function CareCircleProvider({ children }) {
 
   // Atomic Care Circle Creation for New Users (FUNC-HIGH-06)
   const createCareCircle = async (circleData) => {
-    if (isSupabaseConfigured && supabase && user) {
+    if (isSupabaseConfigured && supabase && user && !isDemo) {
       try {
         const { data, error } = await supabase.rpc('create_care_circle_atomic', {
           p_circle_name: circleData.circleName,
@@ -576,7 +647,7 @@ export function CareCircleProvider({ children }) {
       }
     }
 
-    // Local fallback
+    // Local demo fallback
     const newCircle = { id: `circle-${Date.now()}`, name: circleData.circleName, is_demo: false };
     const newElderly = {
       id: `elderly-${Date.now()}`,
@@ -589,6 +660,7 @@ export function CareCircleProvider({ children }) {
     };
     setCareCircle(newCircle);
     setElderlyProfile(newElderly);
+    setHasCareCircle(true);
     return { success: true };
   };
 
@@ -602,7 +674,7 @@ export function CareCircleProvider({ children }) {
       const hashArray = Array.from(new Uint8Array(hashBuffer));
       const tokenHash = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
 
-      if (isSupabaseConfigured && supabase && user) {
+      if (isSupabaseConfigured && supabase && user && !isDemo) {
         const { data: resData, error } = await supabase.rpc('accept_care_circle_invitation', {
           p_token_hash: tokenHash,
         });
@@ -622,6 +694,7 @@ export function CareCircleProvider({ children }) {
         relationship_label: 'Care Circle Member',
       };
       setMembers((prev) => [...prev, newMember]);
+      setHasCareCircle(true);
       return { success: true };
     } catch (err) {
       return { success: false, error: err.message || 'Invalid or expired invitation token.' };
@@ -672,10 +745,9 @@ export function CareCircleProvider({ children }) {
     ]);
     setActivityLogs(SEED_ACTIVITY_LOGS);
     setNotifications(SEED_NOTIFICATIONS);
+    setHasCareCircle(true);
     return true;
   };
-
-  const isDemo = Boolean(!user || user.is_demo || careCircle?.is_demo);
 
   // =========================================================================
   // MATHEMATICALLY RIGOROUS ADHERENCE METRICS
@@ -714,6 +786,10 @@ export function CareCircleProvider({ children }) {
         canModifyDoses,
         isReadOnly,
         currentPermissions,
+        hasCareCircle,
+        circleLoading,
+        isRealDbActive,
+        isDemo,
         adherenceMetrics: {
           takenCount,
           missedCount,
@@ -734,7 +810,6 @@ export function CareCircleProvider({ children }) {
         createCareCircle,
         acceptInvitation,
         resetDemoData,
-        isDemo,
         refreshData: fetchCircleData,
       }}
     >

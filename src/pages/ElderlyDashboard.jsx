@@ -138,6 +138,13 @@ export default function ElderlyDashboard() {
             </button>
           </div>
         </div>
+      ) : todayDoses.length === 0 ? (
+        <div className="bg-slate-50 border-2 border-slate-200 rounded-2xl p-8 text-center space-y-2">
+          <h2 className="text-2xl font-bold text-slate-800">No Prescribed Medications Yet</h2>
+          <p className="text-base text-slate-600 font-medium max-w-md mx-auto">
+            Your Care Circle does not have any active medications scheduled for today.
+          </p>
+        </div>
       ) : (
         <div className="bg-emerald-50 border-2 border-emerald-300 rounded-2xl p-8 text-center space-y-2">
           <div className="w-14 h-14 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center mx-auto mb-2">

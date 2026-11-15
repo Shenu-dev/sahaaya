@@ -48,7 +48,7 @@ export default function CareCirclePage() {
       const tokenHash = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
 
       // 3. Persist cryptographically hashed invitation to database (FUNC-HIGH-02)
-      if (isSupabaseConfigured && supabase && profile?.id && careCircle?.id) {
+      if (isSupabaseConfigured && supabase && profile?.id && careCircle?.id && !careCircle?.is_demo) {
         const expiresAt = new Date(Date.now() + 72 * 3600 * 1000).toISOString();
         const { error: inviteError } = await supabase.from('care_circle_invitations').insert({
           care_circle_id: careCircle.id,

@@ -246,7 +246,18 @@ export default function FamilyDashboard({ onNavigateTab }) {
             </div>
 
             <div className="space-y-3.5">
-              {todayDoses.map((dose) => (
+              {todayDoses.length === 0 ? (
+                <div className="p-8 text-center bg-slate-50 border border-dashed border-slate-300 rounded-xl">
+                  <p className="text-sm font-semibold text-slate-600">No medication doses scheduled for today.</p>
+                  <button
+                    onClick={() => onNavigateTab('medications')}
+                    className="mt-2 text-xs font-bold text-teal-700 hover:text-teal-900 underline"
+                  >
+                    + Add a medication to schedule doses
+                  </button>
+                </div>
+              ) : (
+                todayDoses.map((dose) => (
                 <div
                   key={dose.id}
                   className="p-5 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white hover:border-slate-300 transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
@@ -288,7 +299,7 @@ export default function FamilyDashboard({ onNavigateTab }) {
                     </div>
                   )}
                 </div>
-              ))}
+              )))}
             </div>
           </div>
 

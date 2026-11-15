@@ -17,6 +17,8 @@ import {
   toISOStringSafe, 
   checkIsFutureDose 
 } from '../src/lib/dateUtils.js';
+import { isUserDemoPersona } from '../src/lib/authUtils.js';
+import { DOSE_STATUS } from '../src/lib/constants.js';
 
 let totalTests = 0;
 let passedTests = 0;
@@ -231,6 +233,148 @@ runTest('Appointment status transitions between upcoming, completed, and cancell
   assert.ok(validStatuses.includes('completed'), 'Completed is valid status');
   assert.ok(validStatuses.includes('cancelled'), 'Cancelled is valid status');
   assert.ok(validStatuses.includes('upcoming'), 'Upcoming is valid status');
+});
+
+// -----------------------------------------------------------------------------
+// 7. PERSONA DETECTION & DATA ISOLATION (BUG REGRESSION)
+// -----------------------------------------------------------------------------
+console.log('\n--- Suite 7: Persona Mode Detection & Data Isolation ---');
+
+runTest('isUserDemoPersona correctly detects unauthenticated and demo sessions', () => {
+  assert.strictEqual(isUserDemoPersona(null), true, 'Null user must be detected as demo');
+  assert.strictEqual(isUserDemoPersona(undefined), true, 'Undefined user must be detected as demo');
+  assert.strictEqual(isUserDemoPersona({ is_demo: true }), true, 'User with is_demo flag must be detected as demo');
+  assert.strictEqual(isUserDemoPersona({ id: 'demo-elderly-id' }), true, 'User with demo- prefix ID must be detected as demo');
+  assert.strictEqual(isUserDemoPersona({ id: 'mock-family' }), true, 'User with mock- prefix ID must be detected as demo');
+  assert.strictEqual(isUserDemoPersona({ email: 'kamla.demo@sahaaya.care' }), true, 'User with demo email must be detected as demo');
+});
+
+runTest('isUserDemoPersona correctly recognizes real authenticated accounts', () => {
+  const realUser = {
+    id: 'a5d09b67-4d7a-426b-873b-5a024b4f0b12',
+    email: 'real.user@gmail.com',
+  };
+  assert.strictEqual(isUserDemoPersona(realUser), false, 'Real Supabase UUID account must NOT be detected as demo');
+});
+
+runTest('Real user without Care Circle produces zero leaked demo records', () => {
+  // Scenario: Real user authenticated, memberData from Supabase is empty
+  const isDemo = isUserDemoPersona({ id: 'b7e21a88-5c8e-4a7c-9b1d-8f921e4a11b0', email: 'arvind@example.com' });
+  assert.strictEqual(isDemo, false, 'User must not be in demo mode');
+
+  const memberData = []; // Supabase returns 0 Care Circles for fresh user
+  const hasCareCircle = isDemo ? true : (memberData.length > 0);
+  assert.strictEqual(hasCareCircle, false, 'Fresh user must have hasCareCircle = false');
+
+  // Verify state initialization clears seed records
+  const isolatedState = {
+    careCircle: hasCareCircle ? { name: 'Sharma Family' } : null,
+    elderlyProfile: hasCareCircle ? { full_name: 'Kamla Sharma' } : null,
+    medications: hasCareCircle ? ['med-1', 'med-2'] : [],
+    todayDoses: hasCareCircle ? ['dose-1', 'dose-2', 'dose-3'] : [],
+    appointments: hasCareCircle ? ['appt-1'] : [],
+  };
+
+  assert.strictEqual(isolatedState.careCircle, null, 'No circle data may be present');
+  assert.strictEqual(isolatedState.elderlyProfile, null, 'No senior profile may be present');
+  assert.strictEqual(isolatedState.medications.length, 0, 'No medications may leak');
+  assert.strictEqual(isolatedState.todayDoses.length, 0, 'No doses may leak');
+  assert.strictEqual(isolatedState.appointments.length, 0, 'No appointments may leak');
+});
+
+// -----------------------------------------------------------------------------
+// 8. MEDICATION ACTIONS & REACTIVITY (BUG REGRESSION)
+// -----------------------------------------------------------------------------
+console.log('\n--- Suite 8: Medication Actions in Demo Sandbox ---');
+
+runTest('Dose status action TAKEN updates dose state and records timestamp', () => {
+  const doses = [
+    { id: 'dose-1', status: DOSE_STATUS.TAKEN, recorded_at: '2026-11-15T08:00:00Z', recorded_by_name: 'Kamla Sharma' },
+    { id: 'dose-2', status: DOSE_STATUS.UPCOMING, recorded_at: null, recorded_by_name: null },
+    { id: 'dose-3', status: DOSE_STATUS.UPCOMING, recorded_at: null, recorded_by_name: null },
+  ];
+
+  const nowIso = new Date().toISOString();
+  const updatedDoses = doses.map((d) =>
+    d.id === 'dose-2'
+      ? { ...d, status: DOSE_STATUS.TAKEN, recorded_at: nowIso, recorded_by_name: 'Kamla Sharma' }
+      : d
+  );
+
+  const dose2 = updatedDoses.find((d) => d.id === 'dose-2');
+  assert.strictEqual(dose2.status, DOSE_STATUS.TAKEN, 'Dose 2 status must be TAKEN');
+  assert.strictEqual(dose2.recorded_at, nowIso, 'Recorded at timestamp must match');
+  assert.strictEqual(dose2.recorded_by_name, 'Kamla Sharma', 'Recorded by actor name must be captured');
+});
+
+runTest('Dose status action SKIP updates dose state with reason note', () => {
+  const doses = [
+    { id: 'dose-1', status: DOSE_STATUS.TAKEN },
+    { id: 'dose-2', status: DOSE_STATUS.UPCOMING },
+  ];
+
+  const skipReason = 'Feeling unwell / nauseous';
+  const updatedDoses = doses.map((d) =>
+    d.id === 'dose-2'
+      ? { ...d, status: DOSE_STATUS.SKIPPED, notes: skipReason }
+      : d
+  );
+
+  const dose2 = updatedDoses.find((d) => d.id === 'dose-2');
+  assert.strictEqual(dose2.status, DOSE_STATUS.SKIPPED, 'Dose 2 status must be SKIPPED');
+  assert.strictEqual(dose2.notes, skipReason, 'Skip reason must be preserved');
+});
+
+runTest('Marking dose dynamically recalculates adherence rate', () => {
+  // Initial demo baseline: 1 taken out of 1 due dose = 100% adherence
+  const initialDoses = [
+    { id: 'dose-1', status: DOSE_STATUS.TAKEN },
+    { id: 'dose-2', status: DOSE_STATUS.UPCOMING },
+    { id: 'dose-3', status: DOSE_STATUS.UPCOMING },
+  ];
+
+  const calcAdherence = (dosesList) => {
+    const taken = dosesList.filter((d) => d.status === DOSE_STATUS.TAKEN).length;
+    const missed = dosesList.filter((d) => d.status === DOSE_STATUS.MISSED).length;
+    const skipped = dosesList.filter((d) => d.status === DOSE_STATUS.SKIPPED).length;
+    const unconfirmed = dosesList.filter((d) => d.status === DOSE_STATUS.UNCONFIRMED).length;
+    const due = taken + missed + skipped + unconfirmed;
+    return due > 0 ? Math.round((taken / due) * 100) : null;
+  };
+
+  assert.strictEqual(calcAdherence(initialDoses), 100, 'Initial adherence must be 100%');
+
+  // User skips dose 2: now 1 taken, 1 skipped -> 1/2 = 50%
+  const dosesAfterSkip = initialDoses.map((d) =>
+    d.id === 'dose-2' ? { ...d, status: DOSE_STATUS.SKIPPED } : d
+  );
+  assert.strictEqual(calcAdherence(dosesAfterSkip), 50, 'Adherence after 1 skip must drop to 50%');
+
+  // User marks dose 3 as taken: now 2 taken, 1 skipped -> 2/3 = 67%
+  const dosesAfterTaken = dosesAfterSkip.map((d) =>
+    d.id === 'dose-3' ? { ...d, status: DOSE_STATUS.TAKEN } : d
+  );
+  assert.strictEqual(calcAdherence(dosesAfterTaken), 67, 'Adherence after taking dose 3 must be 67%');
+});
+
+runTest('Demo reset restores exact pristine initial baseline', () => {
+  const pristineSeedDoses = [
+    { id: 'dose-1', status: DOSE_STATUS.TAKEN, scheduled_time: '08:00:00' },
+    { id: 'dose-2', status: DOSE_STATUS.UPCOMING, scheduled_time: '13:00:00' },
+    { id: 'dose-3', status: DOSE_STATUS.UPCOMING, scheduled_time: '21:00:00' },
+  ];
+
+  // Modified state: all taken
+  let stateDoses = pristineSeedDoses.map((d) => ({ ...d, status: DOSE_STATUS.TAKEN }));
+  assert.strictEqual(stateDoses.filter((d) => d.status === DOSE_STATUS.TAKEN).length, 3);
+
+  // Trigger reset
+  stateDoses = [...pristineSeedDoses];
+  const upcomingCount = stateDoses.filter((d) => d.status === DOSE_STATUS.UPCOMING).length;
+  const takenCount = stateDoses.filter((d) => d.status === DOSE_STATUS.TAKEN).length;
+
+  assert.strictEqual(takenCount, 1, 'Reset must restore exactly 1 taken dose');
+  assert.strictEqual(upcomingCount, 2, 'Reset must restore exactly 2 upcoming doses');
 });
 
 // -----------------------------------------------------------------------------

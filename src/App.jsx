@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
-import { CareCircleProvider } from './context/CareCircleContext';
+import { CareCircleProvider, useCareCircle } from './context/CareCircleContext';
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -13,9 +13,11 @@ import CareCirclePage from './pages/CareCirclePage';
 import Navbar from './components/layout/Navbar';
 import LoadingSpinner from './components/common/LoadingSpinner';
 import AcceptInvitationModal from './components/common/AcceptInvitationModal';
+import NoCareCircleView from './components/common/NoCareCircleView';
 
 function MainApp() {
   const { user, profile, loading, signInAsDemo } = useAuth();
+  const { hasCareCircle, circleLoading, isDemo } = useCareCircle();
   const [authPage, setAuthPage] = useState('landing'); // 'landing' | 'login' | 'register'
   const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard' | 'medications' | 'appointments' | 'circle'
   
@@ -29,7 +31,7 @@ function MainApp() {
   });
   const [showInviteModal, setShowInviteModal] = useState(Boolean(inviteToken));
 
-  if (loading) {
+  if (loading || circleLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
         <LoadingSpinner label="Securing connection to Sahaaya..." size="lg" />
@@ -55,6 +57,11 @@ function MainApp() {
 
   // Authenticated Dashboard Layout
   const renderContent = () => {
+    // If authenticated real user has no care circle yet, isolate them completely from demo data
+    if (!isDemo && !hasCareCircle) {
+      return <NoCareCircleView />;
+    }
+
     if (activeTab === 'medications') {
       return <MedicationsPage />;
     }
