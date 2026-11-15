@@ -71,7 +71,7 @@ export default function Navbar({ activeTab, onTabChange }) {
 
           {/* Center Navigation Links (Only shown when Care Circle is active) */}
           {hasCareCircle && (
-            <nav className="hidden lg:flex items-center gap-1 bg-slate-100/90 p-1 rounded-full border border-slate-200/80">
+            <nav className="hidden xl:flex items-center gap-1 bg-slate-100/90 p-1 rounded-full border border-slate-200/80">
               <button
                 onClick={() => onTabChange('dashboard')}
                 className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all whitespace-nowrap ${
@@ -122,14 +122,14 @@ export default function Navbar({ activeTab, onTabChange }) {
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             {/* Persona Switcher for Demo / Perspective Switcher for Real Accounts */}
             {(isDemo || hasCareCircle) && (
-              <div className="hidden md:flex items-center gap-1 bg-slate-50 border border-slate-200/90 p-1 rounded-full text-xs">
-                <span className="font-bold text-[10px] uppercase tracking-wider text-slate-400 pl-2 pr-1">
+              <div className="hidden md:flex items-center gap-1.5 bg-slate-50 border border-slate-200/90 py-1.5 pl-3.5 pr-2.5 rounded-full text-xs shrink-0 shadow-2xs">
+                <span className="font-bold text-[10px] uppercase tracking-wider text-slate-400 pl-1 pr-1.5 select-none">
                   {isDemo ? 'Persona:' : 'View:'}
                 </span>
                 <button
                   type="button"
                   onClick={() => handleRoleSwitch('elderly')}
-                  className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all ${
                     currentRole === 'elderly'
                       ? 'bg-bento-lavender text-slate-900 border border-bento-lavender-border shadow-xs'
                       : 'text-slate-600 hover:text-slate-900'
@@ -141,7 +141,7 @@ export default function Navbar({ activeTab, onTabChange }) {
                 <button
                   type="button"
                   onClick={() => handleRoleSwitch('family')}
-                  className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all ${
                     currentRole === 'family'
                       ? 'bg-bento-peach text-slate-900 border border-bento-peach-border shadow-xs'
                       : 'text-slate-600 hover:text-slate-900'
@@ -153,7 +153,7 @@ export default function Navbar({ activeTab, onTabChange }) {
                 <button
                   type="button"
                   onClick={() => handleRoleSwitch('caregiver')}
-                  className={`px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all ${
                     currentRole === 'caregiver'
                       ? 'bg-bento-mint text-slate-900 border border-bento-mint-border shadow-xs'
                       : 'text-slate-600 hover:text-slate-900'
@@ -167,10 +167,10 @@ export default function Navbar({ activeTab, onTabChange }) {
                   <button
                     type="button"
                     onClick={handleResetDemo}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-100 rounded-full font-bold text-xs transition-all border border-slate-200/90 ml-0.5 shadow-2xs"
+                    className="flex items-center gap-1.5 px-3.5 py-1.5 text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-100 rounded-full font-bold text-xs whitespace-nowrap transition-all border border-slate-200/90 ml-1 shadow-2xs"
                     title="Reset demo data to initial seed state"
                   >
-                    <RotateCcw className={`w-3.5 h-3.5 ${resetFeedback ? 'text-indigo-600 animate-spin' : ''}`} />
+                    <RotateCcw className={`w-3.5 h-3.5 shrink-0 ${resetFeedback ? 'text-indigo-600 animate-spin' : ''}`} />
                     <span>{resetFeedback || 'Reset'}</span>
                   </button>
                 )}
