@@ -75,7 +75,7 @@ export default function LoginPage({ onNavigate }) {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="e.g. kamla@example.com"
+              placeholder="e.g. name@example.com"
               required
             />
 

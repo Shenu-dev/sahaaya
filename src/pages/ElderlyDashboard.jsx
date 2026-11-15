@@ -19,6 +19,7 @@ export default function ElderlyDashboard() {
   const [earlyModalOpen, setEarlyModalOpen] = useState(false);
   const [earlyDoseTarget, setEarlyDoseTarget] = useState(null);
   const [earlyMinutesAhead, setEarlyMinutesAhead] = useState(0);
+  const [actionError, setActionError] = useState('');
 
   // Find the immediate next upcoming dose
   const nextDose = todayDoses.find((d) => d.status === DOSE_STATUS.UPCOMING);
@@ -26,17 +27,24 @@ export default function ElderlyDashboard() {
 
   const handleMarkTaken = async (dose, isEarlyConfirmed = false) => {
     if (!dose) return;
+    setActionError('');
     const res = await markDose(dose.id, DOSE_STATUS.TAKEN, 'Confirmed by Senior', isEarlyConfirmed);
     if (res?.needsEarlyConfirmation) {
       setEarlyDoseTarget(res.dose);
       setEarlyMinutesAhead(res.minutesAhead);
       setEarlyModalOpen(true);
+    } else if (res && !res.success && res.error) {
+      setActionError(res.error);
     }
   };
 
   const handleConfirmEarlyDose = async () => {
     if (earlyDoseTarget) {
-      await markDose(earlyDoseTarget.id, DOSE_STATUS.TAKEN, 'Confirmed by Senior (Early Administration)', true);
+      setActionError('');
+      const res = await markDose(earlyDoseTarget.id, DOSE_STATUS.TAKEN, 'Confirmed by Senior (Early Administration)', true);
+      if (res && !res.success && res.error) {
+        setActionError(res.error);
+      }
       setEarlyModalOpen(false);
       setEarlyDoseTarget(null);
     }
@@ -49,7 +57,11 @@ export default function ElderlyDashboard() {
 
   const handleConfirmSkip = async () => {
     if (selectedDose) {
-      await markDose(selectedDose.id, DOSE_STATUS.SKIPPED, skipReason, true);
+      setActionError('');
+      const res = await markDose(selectedDose.id, DOSE_STATUS.SKIPPED, skipReason, true);
+      if (res && !res.success && res.error) {
+        setActionError(res.error);
+      }
       setSkipModalOpen(false);
       setSelectedDose(null);
     }
@@ -90,6 +102,20 @@ export default function ElderlyDashboard() {
           )}
         </div>
       </div>
+
+      {/* Action Error Alert */}
+      {actionError && (
+        <div className="bg-red-50 border-2 border-red-300 rounded-2xl p-4 text-red-900 flex items-center justify-between gap-3">
+          <p className="text-sm font-bold">{actionError}</p>
+          <button
+            type="button"
+            onClick={() => setActionError('')}
+            className="text-xs text-red-700 hover:text-red-900 font-bold underline shrink-0"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Immediate Next Dose Hero (Prominent Single-Action Center) */}
       {nextDose ? (

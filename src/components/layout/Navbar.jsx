@@ -117,59 +117,61 @@ export default function Navbar({ activeTab, onTabChange }) {
           {/* Right Action Bar */}
           <div className="flex items-center gap-3 shrink-0">
             {/* Persona Switcher for Demo / Perspective Switcher for Real Accounts */}
-            <div className="hidden md:flex items-center gap-1.5 bg-slate-50 border border-slate-200/90 px-3 py-1.5 rounded-xl text-xs">
-              <span className="font-semibold text-slate-500 mr-0.5">
-                {isDemo ? 'Persona:' : 'View:'}
-              </span>
-              <button
-                type="button"
-                onClick={() => handleRoleSwitch('elderly')}
-                className={`px-2.5 py-1 rounded-md font-bold transition-all ${
-                  currentRole === 'elderly'
-                    ? 'bg-teal-700 text-white shadow-xs'
-                    : 'text-slate-700 hover:bg-slate-200/70'
-                }`}
-                title={isDemo ? "Switch to Elderly demo persona" : "View your Care Circle from Senior's perspective"}
-              >
-                Elderly
-              </button>
-              <button
-                type="button"
-                onClick={() => handleRoleSwitch('family')}
-                className={`px-2.5 py-1 rounded-md font-bold transition-all ${
-                  currentRole === 'family'
-                    ? 'bg-teal-700 text-white shadow-xs'
-                    : 'text-slate-700 hover:bg-slate-200/70'
-                }`}
-                title={isDemo ? "Switch to Family Admin demo persona" : "View your Care Circle from Family overview perspective"}
-              >
-                Family
-              </button>
-              <button
-                type="button"
-                onClick={() => handleRoleSwitch('caregiver')}
-                className={`px-2.5 py-1 rounded-md font-bold transition-all ${
-                  currentRole === 'caregiver'
-                    ? 'bg-teal-700 text-white shadow-xs'
-                    : 'text-slate-700 hover:bg-slate-200/70'
-                }`}
-                title={isDemo ? "Switch to Caregiver demo persona" : "View your Care Circle from Caregiver shift perspective"}
-              >
-                Caregiver
-              </button>
-
-              {isDemo && (
+            {(isDemo || hasCareCircle) && (
+              <div className="hidden md:flex items-center gap-1.5 bg-slate-50 border border-slate-200/90 px-3 py-1.5 rounded-xl text-xs">
+                <span className="font-semibold text-slate-500 mr-0.5">
+                  {isDemo ? 'Persona:' : 'View:'}
+                </span>
                 <button
                   type="button"
-                  onClick={handleResetDemo}
-                  className="flex items-center gap-1.5 px-2.5 py-1 text-slate-600 hover:text-teal-800 hover:bg-slate-200/70 rounded-md font-semibold transition-all border-l border-slate-200 pl-2.5 ml-1"
-                  title="Reset demo data to initial seed state"
+                  onClick={() => handleRoleSwitch('elderly')}
+                  className={`px-2.5 py-1 rounded-md font-bold transition-all ${
+                    currentRole === 'elderly'
+                      ? 'bg-teal-700 text-white shadow-xs'
+                      : 'text-slate-700 hover:bg-slate-200/70'
+                  }`}
+                  title={isDemo ? "Switch to Elderly demo persona" : "View your Care Circle from Senior's perspective"}
                 >
-                  <RotateCcw className={`w-3.5 h-3.5 ${resetFeedback ? 'text-teal-600 animate-spin' : ''}`} />
-                  <span>{resetFeedback || 'Reset'}</span>
+                  Elderly
                 </button>
-              )}
-            </div>
+                <button
+                  type="button"
+                  onClick={() => handleRoleSwitch('family')}
+                  className={`px-2.5 py-1 rounded-md font-bold transition-all ${
+                    currentRole === 'family'
+                      ? 'bg-teal-700 text-white shadow-xs'
+                      : 'text-slate-700 hover:bg-slate-200/70'
+                  }`}
+                  title={isDemo ? "Switch to Family Admin demo persona" : "View your Care Circle from Family overview perspective"}
+                >
+                  Family
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleRoleSwitch('caregiver')}
+                  className={`px-2.5 py-1 rounded-md font-bold transition-all ${
+                    currentRole === 'caregiver'
+                      ? 'bg-teal-700 text-white shadow-xs'
+                      : 'text-slate-700 hover:bg-slate-200/70'
+                  }`}
+                  title={isDemo ? "Switch to Caregiver demo persona" : "View your Care Circle from Caregiver shift perspective"}
+                >
+                  Caregiver
+                </button>
+
+                {isDemo && (
+                  <button
+                    type="button"
+                    onClick={handleResetDemo}
+                    className="flex items-center gap-1.5 px-2.5 py-1 text-slate-600 hover:text-teal-800 hover:bg-slate-200/70 rounded-md font-semibold transition-all border-l border-slate-200 pl-2.5 ml-1"
+                    title="Reset demo data to initial seed state"
+                  >
+                    <RotateCcw className={`w-3.5 h-3.5 ${resetFeedback ? 'text-teal-600 animate-spin' : ''}`} />
+                    <span>{resetFeedback || 'Reset'}</span>
+                  </button>
+                )}
+              </div>
+            )}
 
             {/* Profile Pill */}
             <div className="flex items-center gap-2.5 pl-3 border-l border-slate-200">
@@ -235,56 +237,58 @@ export default function Navbar({ activeTab, onTabChange }) {
         )}
 
         {/* Mobile Persona / View Switcher */}
-        <div className="md:hidden flex items-center justify-between px-3 py-2 bg-teal-50/80 border-t border-teal-100 text-[11px]">
-          <div className="flex items-center gap-1.5">
-            <span className="font-bold text-teal-900">{isDemo ? 'Persona:' : 'View:'}</span>
-            {isDemo && (
-              <span className="px-1.5 py-0.2 rounded text-[9px] font-bold uppercase bg-teal-100 text-teal-800">
-                Demo
-              </span>
-            )}
-          </div>
-          <div className="flex items-center gap-1">
-            <button
-              type="button"
-              onClick={() => handleRoleSwitch('elderly')}
-              className={`px-2 py-0.5 rounded font-bold ${
-                currentRole === 'elderly' ? 'bg-teal-700 text-white' : 'text-teal-800 bg-white border border-teal-200'
-              }`}
-            >
-              Elderly
-            </button>
-            <button
-              type="button"
-              onClick={() => handleRoleSwitch('family')}
-              className={`px-2 py-0.5 rounded font-bold ${
-                currentRole === 'family' ? 'bg-teal-700 text-white' : 'text-teal-800 bg-white border border-teal-200'
-              }`}
-            >
-              Family
-            </button>
-            <button
-              type="button"
-              onClick={() => handleRoleSwitch('caregiver')}
-              className={`px-2 py-0.5 rounded font-bold ${
-                currentRole === 'caregiver' ? 'bg-teal-700 text-white' : 'text-teal-800 bg-white border border-teal-200'
-              }`}
-            >
-              Caregiver
-            </button>
-            {isDemo && (
+        {(isDemo || hasCareCircle) && (
+          <div className="md:hidden flex items-center justify-between px-3 py-2 bg-teal-50/80 border-t border-teal-100 text-[11px]">
+            <div className="flex items-center gap-1.5">
+              <span className="font-bold text-teal-900">{isDemo ? 'Persona:' : 'View:'}</span>
+              {isDemo && (
+                <span className="px-1.5 py-0.2 rounded text-[9px] font-bold uppercase bg-teal-100 text-teal-800">
+                  Demo
+                </span>
+              )}
+            </div>
+            <div className="flex items-center gap-1">
               <button
                 type="button"
-                onClick={handleResetDemo}
-                className="p-1 text-slate-600 hover:text-teal-800 font-bold ml-1 rounded hover:bg-teal-100/60"
-                title="Reset Demo Data"
-                aria-label="Reset Demo Data"
+                onClick={() => handleRoleSwitch('elderly')}
+                className={`px-2 py-0.5 rounded font-bold ${
+                  currentRole === 'elderly' ? 'bg-teal-700 text-white' : 'text-teal-800 bg-white border border-teal-200'
+                }`}
               >
-                <RotateCcw className={`w-3.5 h-3.5 ${resetFeedback ? 'text-teal-600 animate-spin' : ''}`} />
+                Elderly
               </button>
-            )}
+              <button
+                type="button"
+                onClick={() => handleRoleSwitch('family')}
+                className={`px-2 py-0.5 rounded font-bold ${
+                  currentRole === 'family' ? 'bg-teal-700 text-white' : 'text-teal-800 bg-white border border-teal-200'
+                }`}
+              >
+                Family
+              </button>
+              <button
+                type="button"
+                onClick={() => handleRoleSwitch('caregiver')}
+                className={`px-2 py-0.5 rounded font-bold ${
+                  currentRole === 'caregiver' ? 'bg-teal-700 text-white' : 'text-teal-800 bg-white border border-teal-200'
+                }`}
+              >
+                Caregiver
+              </button>
+              {isDemo && (
+                <button
+                  type="button"
+                  onClick={handleResetDemo}
+                  className="p-1 text-slate-600 hover:text-teal-800 font-bold ml-1 rounded hover:bg-teal-100/60"
+                  title="Reset Demo Data"
+                  aria-label="Reset Demo Data"
+                >
+                  <RotateCcw className={`w-3.5 h-3.5 ${resetFeedback ? 'text-teal-600 animate-spin' : ''}`} />
+                </button>
+              )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </header>
   );

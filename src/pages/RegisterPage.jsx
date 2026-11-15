@@ -84,7 +84,7 @@ export default function RegisterPage({ onNavigate }) {
                 label="Full Name"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                placeholder="e.g. Kamla Sharma"
+                placeholder="e.g. Aarav Gupta"
                 required
               />
 
@@ -93,7 +93,7 @@ export default function RegisterPage({ onNavigate }) {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="e.g. kamla@example.com"
+                placeholder="e.g. aarav@example.com"
                 required
               />
 

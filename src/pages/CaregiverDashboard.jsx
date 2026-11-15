@@ -32,6 +32,7 @@ export default function CaregiverDashboard() {
   const [selectedDose, setSelectedDose] = useState(null);
   const [caregiverNotes, setCaregiverNotes] = useState('Administered per schedule. Patient vitals stable.');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [adminError, setAdminError] = useState('');
 
   // Premature Dose Early Confirmation State
   const [earlyModalOpen, setEarlyModalOpen] = useState(false);
@@ -40,6 +41,7 @@ export default function CaregiverDashboard() {
   const handleOpenAdminister = (dose) => {
     setSelectedDose(dose);
     setCaregiverNotes('Administered per schedule. Patient vitals stable.');
+    setAdminError('');
 
     // Check if early administration
     const futureCheck = checkIsFutureDose(dose.scheduled_time);
@@ -59,13 +61,18 @@ export default function CaregiverDashboard() {
 
   const handleConfirmAdminister = async (status) => {
     if (!selectedDose) return;
+    setAdminError('');
     setIsSubmitting(true);
     try {
-      await markDose(selectedDose.id, status, caregiverNotes, true);
+      const res = await markDose(selectedDose.id, status, caregiverNotes, true);
+      if (res && !res.success) {
+        setAdminError(res.error || 'Failed to record administration.');
+        return;
+      }
       setAdministerModalOpen(false);
       setSelectedDose(null);
     } catch (err) {
-      console.error('Error administering dose:', err);
+      setAdminError(err.message || 'Error administering dose');
     } finally {
       setIsSubmitting(false);
     }
@@ -262,6 +269,12 @@ export default function CaregiverDashboard() {
         subtitle={`Administering ${selectedDose?.med_name} (${selectedDose?.dosage}) to ${elderlyProfile?.full_name || 'Senior'}. Scheduled: ${formatTimeTo12Hour(selectedDose?.scheduled_time)}.`}
       >
         <div className="space-y-4">
+          {adminError && (
+            <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs font-semibold text-red-700">
+              {adminError}
+            </div>
+          )}
+
           <Input
             label="Clinical Notes / Patient Observation"
             value={caregiverNotes}

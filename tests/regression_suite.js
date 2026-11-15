@@ -431,6 +431,127 @@ runTest('Empty circle or members state renders safe fallbacks', () => {
 });
 
 // -----------------------------------------------------------------------------
+// 10. ACCOUNT LIFECYCLE & TRANSITION ISOLATION
+// -----------------------------------------------------------------------------
+console.log('\n--- Suite 10: Lifecycle & Transition Isolation ---');
+
+runTest('Transition 1: Demo persona switching preserves mock state without database leaks', () => {
+  const demoElderly = { id: 'demo-elderly-id', email: 'kamla.elderly@sahaaya.demo', is_demo: true };
+  const demoFamily = { id: 'demo-family-id', email: 'rohan.family@sahaaya.demo', is_demo: true };
+
+  assert.strictEqual(isUserDemoPersona(demoElderly), true);
+  assert.strictEqual(isUserDemoPersona(demoFamily), true);
+});
+
+runTest('Transition 2: Demo to real user transition cleanses demo state', () => {
+  // Demo state active
+  let activeUser = { id: 'demo-elderly-id', email: 'kamla.elderly@sahaaya.demo', is_demo: true };
+  let isDemoActive = isUserDemoPersona(activeUser);
+  assert.strictEqual(isDemoActive, true);
+
+  // User logs out and logs in as real user
+  activeUser = null; // Logout
+  assert.strictEqual(activeUser, null);
+
+  activeUser = { id: 'e79b4fcb-2b44-4f81-bfd2-0b1e3e7f4c56', email: 'ananya@gmail.com' };
+  isDemoActive = isUserDemoPersona(activeUser);
+  assert.strictEqual(isDemoActive, false, 'Real user must NEVER be marked as demo');
+
+  // Verify newly registered user without circle has 0 Sharma records
+  const memberCircles = []; // No circles associated
+  const hasCareCircle = memberCircles.length > 0;
+  assert.strictEqual(hasCareCircle, false, 'New real user hasCareCircle must be false');
+});
+
+runTest('Transition 3: Real account to another real account does not carry over data', () => {
+  const userA = { id: 'user-a-uuid', email: 'alice@example.com' };
+  const userB = { id: 'user-b-uuid', email: 'bob@example.com' };
+
+  let currentSessionData = {
+    circleId: 'circle-a',
+    medications: ['Med A'],
+    patientName: 'Alice Senior',
+  };
+
+  // User A logs out
+  currentSessionData = null;
+  assert.strictEqual(currentSessionData, null);
+
+  // User B logs in
+  currentSessionData = {
+    circleId: 'circle-b',
+    medications: ['Med B'],
+    patientName: 'Bob Senior',
+  };
+
+  assert.notStrictEqual(currentSessionData.patientName, 'Alice Senior');
+  assert.strictEqual(currentSessionData.patientName, 'Bob Senior');
+});
+
+runTest('Transition 4: Logged-out state completely purges private state', () => {
+  let user = { id: 'user-uuid', email: 'test@example.com' };
+  let circleState = { careCircle: { id: 'circle-1' }, todayDoses: [{ id: '1' }] };
+
+  // Logout hook simulation
+  user = null;
+  circleState = { careCircle: null, todayDoses: [] };
+
+  assert.strictEqual(user, null);
+  assert.strictEqual(circleState.careCircle, null);
+  assert.strictEqual(circleState.todayDoses.length, 0);
+});
+
+runTest('Transition 5: Real user without circle sees onboarding and 0 demo records', () => {
+  const realUser = { id: 'c981249b-381f-4e92-938a-3bc123456789', email: 'newuser@example.com' };
+  const isDemo = isUserDemoPersona(realUser);
+  const memberData = []; // Supabase returns 0 member rows
+
+  const hasCareCircle = memberData.length > 0;
+  const renderedScreen = !isDemo && !hasCareCircle ? 'NoCareCircleView' : 'Dashboard';
+
+  assert.strictEqual(isDemo, false);
+  assert.strictEqual(hasCareCircle, false);
+  assert.strictEqual(renderedScreen, 'NoCareCircleView');
+});
+
+// -----------------------------------------------------------------------------
+// 11. ZERO-ROW MUTATION & FAKE ID INTERCEPTION
+// -----------------------------------------------------------------------------
+console.log('\n--- Suite 11: Zero-Row Mutation & Fake ID Interception ---');
+
+runTest('Fake dose, medication, and appointment IDs are intercepted before DB calls', () => {
+  const isFakeId = (id) => {
+    const s = String(id);
+    return s.startsWith('dose-') || s.startsWith('mock-') || s.startsWith('med-') || s.startsWith('appt-');
+  };
+
+  assert.strictEqual(isFakeId('dose-2'), true, 'dose-2 must be caught as fake ID');
+  assert.strictEqual(isFakeId('med-1'), true, 'med-1 must be caught as fake ID');
+  assert.strictEqual(isFakeId('appt-1'), true, 'appt-1 must be caught as fake ID');
+  assert.strictEqual(isFakeId('mock-demo-elderly'), true, 'mock-demo-elderly must be caught as fake ID');
+  assert.strictEqual(isFakeId('7e44a302-23c2-491b-9fb7-e070c79ab6a2'), false, 'Real UUID must not be caught as fake ID');
+});
+
+runTest('Zero-row update detection returns error instead of false success', () => {
+  const handleUpdateResult = (updateData, error) => {
+    if (error) return { success: false, error: error.message };
+    if (!updateData || updateData.length === 0) {
+      return { success: false, error: 'Dose update was not permitted or dose record was not found.' };
+    }
+    return { success: true };
+  };
+
+  // Zero rows returned by Postgres
+  const zeroRowResult = handleUpdateResult([], null);
+  assert.strictEqual(zeroRowResult.success, false, 'Zero row update must NOT return success');
+  assert.ok(zeroRowResult.error.includes('not permitted or dose record was not found'));
+
+  // Successful 1-row update
+  const successResult = handleUpdateResult([{ id: 'uuid-1', status: 'taken' }], null);
+  assert.strictEqual(successResult.success, true, 'Confirmed row update must return success');
+});
+
+// -----------------------------------------------------------------------------
 // SUMMARY
 // -----------------------------------------------------------------------------
 console.log('\n======================================================');

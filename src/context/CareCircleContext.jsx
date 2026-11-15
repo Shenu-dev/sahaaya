@@ -392,9 +392,9 @@ export function CareCircleProvider({ children }) {
       }
     }
 
-    if (isRealDbActive) {
+    if (isRealDbActive && !String(doseId).startsWith('dose-') && !String(doseId).startsWith('mock-')) {
       try {
-        const { error } = await supabase
+        const { data: updateData, error } = await supabase
           .from('medication_doses')
           .update({
             status: newStatus,
@@ -403,12 +403,19 @@ export function CareCircleProvider({ children }) {
             notes: finalNotes || null,
             updated_at: recordedAt,
           })
-          .eq('id', doseId);
+          .eq('id', doseId)
+          .select();
 
         if (error) {
           console.error('Error updating dose in Supabase:', error);
           return { success: false, error: error.message };
         }
+
+        if (!updateData || updateData.length === 0) {
+          console.warn('Zero rows updated in Supabase for dose:', doseId);
+          return { success: false, error: 'Dose update was not permitted or dose record was not found.' };
+        }
+
         await fetchCircleData();
         return { success: true };
       } catch (err) {
@@ -557,13 +564,17 @@ export function CareCircleProvider({ children }) {
       return { success: false, error: 'Permission denied: Read-only members cannot update appointments.' };
     }
 
-    if (isRealDbActive) {
+    if (isRealDbActive && !String(appointmentId).startsWith('appt-') && !String(appointmentId).startsWith('mock-')) {
       try {
-        const { error } = await supabase
+        const { data: apptUpdateData, error } = await supabase
           .from('appointments')
           .update({ status: newStatus, updated_at: new Date().toISOString() })
-          .eq('id', appointmentId);
+          .eq('id', appointmentId)
+          .select();
         if (error) throw error;
+        if (!apptUpdateData || apptUpdateData.length === 0) {
+          return { success: false, error: 'Appointment update was not permitted or record was not found.' };
+        }
         await fetchCircleData();
         return { success: true };
       } catch (err) {
@@ -595,18 +606,22 @@ export function CareCircleProvider({ children }) {
       return { success: false, error: 'Permission denied: Read-only members cannot archive medications.' };
     }
 
-    if (isRealDbActive) {
+    if (isRealDbActive && !String(medicationId).startsWith('med-') && !String(medicationId).startsWith('mock-')) {
       try {
-        const { error } = await supabase
+        const { data: archData, error } = await supabase
           .from('medications')
           .update({
             is_active: false,
             archived_at: new Date().toISOString(),
             updated_at: new Date().toISOString(),
           })
-          .eq('id', medicationId);
+          .eq('id', medicationId)
+          .select();
 
         if (error) throw error;
+        if (!archData || archData.length === 0) {
+          return { success: false, error: 'Medication archive was not permitted or medication was not found.' };
+        }
         await fetchCircleData();
         return { success: true };
       } catch (err) {
@@ -676,8 +691,17 @@ export function CareCircleProvider({ children }) {
       medical_conditions: circleData.medicalConditions || 'None reported',
       timezone: circleData.timezone || 'Asia/Kolkata',
     };
+    const creatorMember = {
+      id: `mem-${Date.now()}`,
+      profile_id: user?.id || 'creator',
+      full_name: profile?.full_name || 'Admin',
+      role: profile?.role || 'elderly',
+      permissions: 'admin',
+      relationship_label: profile?.role === 'elderly' ? 'Elderly Self' : 'Primary Family Admin',
+    };
     setCareCircle(newCircle);
     setElderlyProfile(newElderly);
+    setMembers([creatorMember]);
     setHasCareCircle(true);
     return { success: true };
   };

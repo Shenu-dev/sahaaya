@@ -67,7 +67,7 @@ export default function CreateCircleModal({ isOpen, onClose }) {
 
         <Input
           label="Care Circle Name"
-          placeholder="e.g. Sharma Family Care Circle"
+          placeholder="e.g. Gupta Family Care Circle"
           value={circleName}
           onChange={(e) => setCircleName(e.target.value)}
           required
@@ -75,7 +75,7 @@ export default function CreateCircleModal({ isOpen, onClose }) {
 
         <Input
           label="Elderly Patient Full Name"
-          placeholder="e.g. Kamla Sharma"
+          placeholder="e.g. Maya Devi"
           value={elderlyName}
           onChange={(e) => setElderlyName(e.target.value)}
           required
@@ -84,7 +84,7 @@ export default function CreateCircleModal({ isOpen, onClose }) {
         <div className="grid grid-cols-2 gap-4">
           <Input
             label="Emergency Contact Name"
-            placeholder="e.g. Rohan Sharma"
+            placeholder="e.g. Aarav Gupta"
             value={emergencyName}
             onChange={(e) => setEmergencyName(e.target.value)}
             required

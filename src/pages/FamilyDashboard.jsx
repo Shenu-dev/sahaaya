@@ -44,22 +44,30 @@ export default function FamilyDashboard({ onNavigateTab }) {
   const [earlyModalOpen, setEarlyModalOpen] = useState(false);
   const [earlyDoseTarget, setEarlyDoseTarget] = useState(null);
   const [earlyMinutesAhead, setEarlyMinutesAhead] = useState(0);
+  const [actionError, setActionError] = useState('');
 
   // Check if any doses are missed
   const missedDoses = todayDoses.filter((d) => d.status === DOSE_STATUS.MISSED);
 
   const handleMarkDoseClick = async (dose, isEarlyConfirmed = false) => {
+    setActionError('');
     const res = await markDose(dose.id, DOSE_STATUS.TAKEN, 'Confirmed by Family', isEarlyConfirmed);
     if (res?.needsEarlyConfirmation) {
       setEarlyDoseTarget(res.dose);
       setEarlyMinutesAhead(res.minutesAhead);
       setEarlyModalOpen(true);
+    } else if (res && !res.success && res.error) {
+      setActionError(res.error);
     }
   };
 
   const handleConfirmEarlyDose = async () => {
     if (earlyDoseTarget) {
-      await markDose(earlyDoseTarget.id, DOSE_STATUS.TAKEN, 'Confirmed by Family (Early Administration)', true);
+      setActionError('');
+      const res = await markDose(earlyDoseTarget.id, DOSE_STATUS.TAKEN, 'Confirmed by Family (Early Administration)', true);
+      if (res && !res.success && res.error) {
+        setActionError(res.error);
+      }
       setEarlyModalOpen(false);
       setEarlyDoseTarget(null);
     }
@@ -130,6 +138,20 @@ export default function FamilyDashboard({ onNavigateTab }) {
           </Button>
         </div>
       </div>
+
+      {/* Action Error Alert */}
+      {actionError && (
+        <div className="bg-red-50 border-2 border-red-300 rounded-2xl p-4 text-red-900 flex items-center justify-between gap-3">
+          <p className="text-sm font-bold">{actionError}</p>
+          <button
+            type="button"
+            onClick={() => setActionError('')}
+            className="text-xs text-red-700 hover:text-red-900 font-bold underline shrink-0"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Urgent Missed Dose Alert (If any) */}
       {missedDoses.length > 0 && (
@@ -297,7 +319,12 @@ export default function FamilyDashboard({ onNavigateTab }) {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => markDose(dose.id, DOSE_STATUS.SKIPPED, 'Skipped by Family', true)}
+                        onClick={async () => {
+                          const res = await markDose(dose.id, DOSE_STATUS.SKIPPED, 'Skipped by Family', true);
+                          if (res && !res.success && res.error) {
+                            setActionError(res.error);
+                          }
+                        }}
                       >
                         Skip
                       </Button>

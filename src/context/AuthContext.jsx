@@ -50,7 +50,10 @@ export function AuthProvider({ children }) {
 
         if (initialSession?.user) {
           const userProfile = await fetchProfile(initialSession.user.id);
-          if (mounted) setProfile(userProfile);
+          if (mounted) {
+            setProfile(userProfile);
+            setIsDemoMode(Boolean(initialSession.user.email?.includes('.demo')));
+          }
         }
       } catch (err) {
         console.warn('Supabase auth session initialization notice:', err);
@@ -67,9 +70,15 @@ export function AuthProvider({ children }) {
 
           if (newSession?.user) {
             const userProfile = await fetchProfile(newSession.user.id);
-            if (mounted) setProfile(userProfile);
+            if (mounted) {
+              setProfile(userProfile);
+              setIsDemoMode(Boolean(newSession.user.email?.includes('.demo')));
+            }
           } else {
-            if (mounted) setProfile(null);
+            if (mounted) {
+              setProfile(null);
+              setIsDemoMode(false);
+            }
           }
           setLoading(false);
         }
@@ -93,7 +102,7 @@ export function AuthProvider({ children }) {
       );
       if (matchingRole) {
         const demo = DEMO_ACCOUNTS[matchingRole];
-        const mockUser = { id: `mock-${demo.role}`, email: demo.email };
+        const mockUser = { id: `mock-demo-${demo.role}`, email: demo.email, is_demo: true };
         const mockProfile = { id: mockUser.id, full_name: demo.name, email: demo.email, role: demo.role };
         setUser(mockUser);
         setProfile(mockProfile);
@@ -115,12 +124,12 @@ export function AuthProvider({ children }) {
   // Standard Sign Up
   const signUp = async (email, password, fullName, role = ROLES.ELDERLY) => {
     if (!isSupabaseConfigured || !supabase) {
-      const mockUser = { id: `mock-${Date.now()}`, email };
-      const mockProfile = { id: mockUser.id, full_name: fullName, email, role };
-      setUser(mockUser);
-      setProfile(mockProfile);
-      setIsDemoMode(true);
-      return { data: { user: mockUser }, error: null };
+      const localUser = { id: `local-user-${Date.now()}`, email, is_demo: false };
+      const localProfile = { id: localUser.id, full_name: fullName, email, role };
+      setUser(localUser);
+      setProfile(localProfile);
+      setIsDemoMode(false);
+      return { data: { user: localUser }, error: null };
     }
 
     return await supabase.auth.signUp({
@@ -186,6 +195,7 @@ export function AuthProvider({ children }) {
     setUser(null);
     setProfile(null);
     setSession(null);
+    setIsDemoMode(false);
   };
 
   const refreshProfile = async () => {

@@ -18,8 +18,65 @@ import NoCareCircleView from './components/common/NoCareCircleView';
 function MainApp() {
   const { user, profile, loading, signInAsDemo } = useAuth();
   const { hasCareCircle, circleLoading, isDemo, activeViewRole } = useCareCircle();
-  const [authPage, setAuthPage] = useState('landing'); // 'landing' | 'login' | 'register'
-  const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard' | 'medications' | 'appointments' | 'circle'
+  
+  const [authPage, setAuthPage] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const path = window.location.pathname.toLowerCase();
+      if (path === '/login') return 'login';
+      if (path === '/register') return 'register';
+    }
+    return 'landing';
+  });
+
+  const [activeTab, setActiveTab] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash.replace('#', '').toLowerCase();
+      if (['medications', 'appointments', 'circle'].includes(hash)) {
+        return hash;
+      }
+    }
+    return 'dashboard';
+  });
+
+  const handleNavigateAuth = (page) => {
+    setAuthPage(page);
+    if (typeof window !== 'undefined') {
+      const newPath = page === 'landing' ? '/' : `/${page}`;
+      if (window.location.pathname !== newPath) {
+        window.history.pushState({}, '', newPath);
+      }
+    }
+  };
+
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    if (typeof window !== 'undefined') {
+      const newHash = tab === 'dashboard' ? '' : `#${tab}`;
+      if (window.location.hash !== newHash) {
+        window.history.replaceState(null, '', window.location.pathname + newHash);
+      }
+    }
+  };
+
+  React.useEffect(() => {
+    const handlePopState = () => {
+      if (typeof window !== 'undefined') {
+        const path = window.location.pathname.toLowerCase();
+        if (path === '/login') setAuthPage('login');
+        else if (path === '/register') setAuthPage('register');
+        else setAuthPage('landing');
+
+        const hash = window.location.hash.replace('#', '').toLowerCase();
+        if (['medications', 'appointments', 'circle'].includes(hash)) {
+          setActiveTab(hash);
+        } else {
+          setActiveTab('dashboard');
+        }
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
   
   // Detect invitation token in URL (FUNC-HIGH-03)
   const [inviteToken, setInviteToken] = useState(() => {
@@ -42,14 +99,14 @@ function MainApp() {
   // Unauthenticated Flows
   if (!user) {
     if (authPage === 'login') {
-      return <LoginPage onNavigate={setAuthPage} />;
+      return <LoginPage onNavigate={handleNavigateAuth} />;
     }
     if (authPage === 'register') {
-      return <RegisterPage onNavigate={setAuthPage} />;
+      return <RegisterPage onNavigate={handleNavigateAuth} />;
     }
     return (
       <LandingPage
-        onNavigate={setAuthPage}
+        onNavigate={handleNavigateAuth}
         onDemoLogin={(role) => signInAsDemo(role)}
       />
     );
@@ -82,12 +139,12 @@ function MainApp() {
       return <CaregiverDashboard />;
     }
     // Default to Family Dashboard
-    return <FamilyDashboard onNavigateTab={setActiveTab} />;
+    return <FamilyDashboard onNavigateTab={handleTabChange} />;
   };
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans text-slate-900 selection:bg-teal-500 selection:text-white">
-      <Navbar activeTab={activeTab} onTabChange={setActiveTab} />
+      <Navbar activeTab={activeTab} onTabChange={handleTabChange} />
       <main className="flex-1 pb-16">{renderContent()}</main>
 
       {/* Cryptographic Care Circle Invitation Acceptance Modal (FUNC-HIGH-03) */}
