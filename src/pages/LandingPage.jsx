@@ -12,7 +12,6 @@ import {
   Activity,
   Smile,
   Pill,
-  Star,
   ChevronRight
 } from 'lucide-react';
 import Button from '../components/common/Button';
@@ -110,13 +109,15 @@ export default function LandingPage({ onNavigate, onDemoLogin }) {
                     />
                   </div>
 
-                  {/* Floating 4.9 Rating Card Over Photo */}
-                  <div className="absolute -bottom-3 -left-4 z-20 bg-white/95 backdrop-blur-md border border-white/90 rounded-2xl p-3 shadow-card flex flex-col items-center">
-                    <div className="flex items-center gap-1 text-slate-950 font-black text-base">
-                      <span>4.9</span>
-                      <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                  {/* Floating Senior Accessibility Badge Over Photo */}
+                  <div className="absolute -bottom-3 -left-4 z-20 bg-white/95 backdrop-blur-md border border-white/90 rounded-2xl px-3.5 py-2.5 shadow-card flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-800 shrink-0">
+                      <CheckCircle2 className="w-4 h-4" />
                     </div>
-                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Family-Rated</span>
+                    <div>
+                      <span className="text-xs font-black text-slate-950 block leading-tight">WCAG AAA</span>
+                      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Senior Accessible</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -134,13 +135,11 @@ export default function LandingPage({ onNavigate, onDemoLogin }) {
                     </span>
                   </div>
 
-                  {/* Trust Rating Pill with Avatar */}
+                  {/* Real Security & Tech Pill */}
                   <div className="flex items-center gap-2 shrink-0">
-                    <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs font-bold ring-2 ring-white">
-                      KS
-                    </div>
-                    <div className="px-3 py-1 rounded-full bg-bento-lime text-slate-950 text-xs font-black border border-lime-400 shadow-2xs">
-                      5.0 ★
+                    <div className="px-3.5 py-1.5 rounded-full bg-white/90 text-slate-950 text-xs font-bold border border-white flex items-center gap-1.5 shadow-2xs">
+                      <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                      <span>PostgreSQL RLS Protected</span>
                     </div>
                   </div>
                 </div>
@@ -235,8 +234,8 @@ export default function LandingPage({ onNavigate, onDemoLogin }) {
             {/* Warm Peach Highlight Card (Col 5) */}
             <div className="lg:col-span-5 bg-bento-peach rounded-[32px] sm:rounded-[40px] border border-bento-peach-border p-7 sm:p-9 flex flex-col justify-between shadow-subtle">
               <div className="flex items-center justify-between">
-                <span className="px-3.5 py-1 rounded-full bg-bento-coral text-white text-xs font-bold tracking-wide shadow-2xs">
-                  Top Rated
+                <span className="px-3.5 py-1 rounded-full bg-slate-900 text-white text-xs font-bold tracking-wide shadow-2xs">
+                  Unified Ecosystem
                 </span>
                 <button
                   onClick={() => onDemoLogin('family')}
@@ -257,10 +256,10 @@ export default function LandingPage({ onNavigate, onDemoLogin }) {
               <div className="flex items-end justify-between gap-4">
                 <div>
                   <h4 className="text-2xl sm:text-3xl font-black text-slate-950 font-sans leading-tight">
-                    More Than 2k Doses Protected
+                    Elderly, Family & Caregivers
                   </h4>
                   <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mt-1">
-                    Zero Missed Doses Logged
+                    Three Perspectives • One Shared Circle
                   </p>
                 </div>
 
