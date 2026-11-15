@@ -55,34 +55,45 @@ export default function MedicationsPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 font-sans">
-      {/* Page Header */}
+      {/* Page Header with Real Medication Visual */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 bg-white p-7 sm:p-8 rounded-[32px] border border-slate-200/90 shadow-subtle">
-        <div>
-          <span className="text-xs font-black text-slate-500 uppercase tracking-widest">Prescriptions & Regimen</span>
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-950 mt-1.5 tracking-tight">
-            Medications for {elderlyProfile?.full_name || 'Senior'}
-          </h1>
-          <p className="text-xs font-semibold text-slate-500 mt-1">
-            Preserved history: active medications with dose history are archived rather than deleted.
-          </p>
+        <div className="flex items-center gap-5">
+          <div className="w-16 h-16 rounded-2xl overflow-hidden border border-slate-200/90 shadow-subtle shrink-0 hidden sm:block">
+            <img 
+              src="/images/photo-1587854692152-cbe660dbde88.avif" 
+              alt="Prescription capsules" 
+              className="w-full h-full object-cover" 
+            />
+          </div>
+          <div>
+            <span className="text-xs font-black text-slate-500 uppercase tracking-widest">Prescriptions & Regimen</span>
+            <h1 className="text-2xl sm:text-3xl font-black text-slate-950 mt-1 tracking-tight">
+              Medications for {elderlyProfile?.full_name || 'Senior'}
+            </h1>
+            <p className="text-xs font-semibold text-slate-500 mt-1">
+              Preserved history: active medications with dose history are archived rather than deleted.
+            </p>
+          </div>
         </div>
 
-        {canModifyDoses && (
-          <Button
-            variant="electric"
-            size="md"
-            icon={Plus}
-            onClick={() => setAddModalOpen(true)}
-            className="text-xs font-bold uppercase tracking-wider shadow-sm"
-          >
-            Add Medication
-          </Button>
-        )}
-        {isReadOnly && (
-          <Badge variant="warning" size="md">
-            Read-Only (Modification Restricted)
-          </Badge>
-        )}
+        <div className="flex items-center gap-3">
+          {canModifyDoses && (
+            <Button
+              variant="electric"
+              size="md"
+              icon={Plus}
+              onClick={() => setAddModalOpen(true)}
+              className="text-xs font-bold uppercase tracking-wider shadow-sm"
+            >
+              Add Medication
+            </Button>
+          )}
+          {isReadOnly && (
+            <Badge variant="warning" size="md">
+              Read-Only
+            </Badge>
+          )}
+        </div>
       </div>
 
       {/* Medication List or Empty State */}

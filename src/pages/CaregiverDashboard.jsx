@@ -82,14 +82,23 @@ export default function CaregiverDashboard() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 font-sans">
       {/* Header Bar */}
       <div className="bg-white p-7 sm:p-8 rounded-[32px] border border-slate-200/90 shadow-subtle flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
-        <div>
-          <span className="text-xs font-black text-slate-500 uppercase tracking-widest">Clinical Caregiver Portal</span>
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-950 mt-1.5 tracking-tight">
-            Shift Management • {profile?.full_name || 'Caregiver'}
-          </h1>
-          <p className="text-xs font-semibold text-slate-500 mt-1">
-            Assigned patient: <span className="font-bold text-slate-900">{elderlyProfile?.full_name || 'Senior'}</span> (Care Circle: {careCircle?.name || 'Care Circle'})
-          </p>
+        <div className="flex items-center gap-4">
+          <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-slate-200/90 shadow-2xs shrink-0 hidden sm:block">
+            <img 
+              src="/images/premium_photo-1663089870095-c231a534ac31.avif" 
+              alt="Caregiver Shift" 
+              className="w-full h-full object-cover" 
+            />
+          </div>
+          <div>
+            <span className="text-xs font-black text-slate-500 uppercase tracking-widest">Clinical Caregiver Portal</span>
+            <h1 className="text-2xl sm:text-3xl font-black text-slate-950 mt-1 tracking-tight">
+              Shift Management • {profile?.full_name || 'Caregiver'}
+            </h1>
+            <p className="text-xs font-semibold text-slate-500 mt-0.5">
+              Assigned patient: <span className="font-bold text-slate-900">{elderlyProfile?.full_name || 'Senior'}</span> (Care Circle: {careCircle?.name || 'Care Circle'})
+            </p>
+          </div>
         </div>
 
         <Badge variant="mint" size="lg" className="gap-2 px-4 py-2 text-xs font-bold uppercase tracking-wider">

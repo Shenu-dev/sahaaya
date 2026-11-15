@@ -79,15 +79,24 @@ export default function ElderlyDashboard() {
       <div className="bg-bento-lavender rounded-[32px] sm:rounded-[36px] border border-bento-lavender-border p-7 sm:p-9 text-slate-950 shadow-subtle relative overflow-hidden">
         <div className="absolute top-0 right-0 w-48 h-48 bg-bento-coral/15 rounded-full blur-2xl pointer-events-none" />
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 relative z-10">
-          <div>
-            <div className="inline-flex items-center gap-2 bg-white/80 border border-white px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider text-slate-800 mb-2.5 shadow-2xs">
-              <Sparkles className="w-3.5 h-3.5 text-slate-900" />
-              <span>Namaste & Welcome Back</span>
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-full overflow-hidden border-2 border-white shadow-sm shrink-0">
+              <img 
+                src="/images/premium_photo-1674855780695-b5d5c3e86b88.avif" 
+                alt="Kamla Sharma" 
+                className="w-full h-full object-cover" 
+              />
             </div>
-            <h1 className="text-3xl sm:text-4xl font-black text-slate-950 tracking-tight">
-              {elderlyProfile?.full_name || 'Senior'}
-            </h1>
-            <p className="text-base text-slate-700 mt-1 font-semibold">{todayFormatted}</p>
+            <div>
+              <div className="inline-flex items-center gap-2 bg-white/80 border border-white px-3.5 py-1 rounded-full text-xs font-black uppercase tracking-wider text-slate-800 mb-1.5 shadow-2xs">
+                <Sparkles className="w-3.5 h-3.5 text-slate-900" />
+                <span>Namaste & Welcome Back</span>
+              </div>
+              <h1 className="text-3xl sm:text-4xl font-black text-slate-950 tracking-tight leading-tight">
+                {elderlyProfile?.full_name || 'Senior'}
+              </h1>
+              <p className="text-sm text-slate-700 mt-0.5 font-semibold">{todayFormatted}</p>
+            </div>
           </div>
 
           {/* Emergency Call Quick Button (Reference Bento Coral Pill) */}

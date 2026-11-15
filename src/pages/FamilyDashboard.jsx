@@ -104,17 +104,26 @@ export default function FamilyDashboard({ onNavigateTab }) {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 font-sans">
       {/* Top Welcome Bar */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 bg-white p-7 sm:p-8 rounded-[32px] border border-slate-200/90 shadow-subtle">
-        <div>
-          <div className="flex items-center gap-2.5 flex-wrap">
-            <span className="text-xs font-black text-slate-500 uppercase tracking-widest">Family Care Oversight</span>
-            {isReadOnly && <Badge variant="warning" size="sm">Read-Only Observer</Badge>}
+        <div className="flex items-center gap-4">
+          <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-slate-200/90 shadow-2xs shrink-0 hidden sm:block">
+            <img 
+              src="/images/premium_photo-1674855780695-b5d5c3e86b88.avif" 
+              alt={elderlyProfile?.full_name || 'Senior'} 
+              className="w-full h-full object-cover" 
+            />
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-950 mt-1.5 tracking-tight">
-            Care Dashboard for {elderlyProfile?.full_name || 'Elderly Member'}
-          </h1>
-          <p className="text-xs font-semibold text-slate-500 mt-1">
-            Logged in as {profile?.full_name || 'Family Member'} ({profile?.role === 'elderly' ? 'Elderly Owner' : 'Care Circle Member'})
-          </p>
+          <div>
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <span className="text-xs font-black text-slate-500 uppercase tracking-widest">Family Care Oversight</span>
+              {isReadOnly && <Badge variant="warning" size="sm">Read-Only Observer</Badge>}
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-black text-slate-950 mt-1 tracking-tight">
+              Care Dashboard for {elderlyProfile?.full_name || 'Elderly Member'}
+            </h1>
+            <p className="text-xs font-semibold text-slate-500 mt-0.5">
+              Logged in as {profile?.full_name || 'Family Member'} ({profile?.role === 'elderly' ? 'Elderly Owner' : 'Care Circle Member'})
+            </p>
+          </div>
         </div>
 
         {/* Action Buttons */}

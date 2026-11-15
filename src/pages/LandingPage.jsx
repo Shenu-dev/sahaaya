@@ -264,16 +264,28 @@ export default function LandingPage({ onNavigate, onDemoLogin }) {
                   </p>
                 </div>
 
-                {/* Stacked Circular Avatars */}
-                <div className="flex -space-x-2 shrink-0">
-                  <div className="w-9 h-9 rounded-full bg-slate-900 text-white flex items-center justify-center text-xs font-bold ring-2 ring-white">
-                    KS
+                {/* Stacked Circular Avatars with Real Photos */}
+                <div className="flex -space-x-2.5 shrink-0">
+                  <div className="w-10 h-10 rounded-full overflow-hidden ring-2 ring-white shadow-2xs">
+                    <img 
+                      src="/images/premium_photo-1674855780695-b5d5c3e86b88.avif" 
+                      alt="Kamla Sharma" 
+                      className="w-full h-full object-cover" 
+                    />
                   </div>
-                  <div className="w-9 h-9 rounded-full bg-bento-coral text-white flex items-center justify-center text-xs font-bold ring-2 ring-white">
-                    RS
+                  <div className="w-10 h-10 rounded-full overflow-hidden ring-2 ring-white shadow-2xs">
+                    <img 
+                      src="/images/premium_photo-1663036976879-4baf18adfd5b.avif" 
+                      alt="Rohan Sharma" 
+                      className="w-full h-full object-cover" 
+                    />
                   </div>
-                  <div className="w-9 h-9 rounded-full bg-bento-cornflower text-white flex items-center justify-center text-xs font-bold ring-2 ring-white">
-                    PR
+                  <div className="w-10 h-10 rounded-full overflow-hidden ring-2 ring-white shadow-2xs">
+                    <img 
+                      src="/images/premium_photo-1663089870095-c231a534ac31.avif" 
+                      alt="Nurse Priya Rao" 
+                      className="w-full h-full object-cover" 
+                    />
                   </div>
                 </div>
               </div>
@@ -282,7 +294,7 @@ export default function LandingPage({ onNavigate, onDemoLogin }) {
         </div>
       </section>
 
-      {/* 3 Interactive Personas Bento Showcase */}
+      {/* 3 Interactive Personas Bento Showcase with Authentic Photography */}
       <section id="personas" className="py-16 sm:py-20 px-4 sm:px-6 lg:px-8 border-t border-slate-200/80 bg-white">
         <div className="max-w-7xl mx-auto space-y-12">
           <div className="text-center max-w-3xl mx-auto space-y-3">
@@ -301,21 +313,31 @@ export default function LandingPage({ onNavigate, onDemoLogin }) {
             {/* Persona 1: Kamla Sharma (Elderly) */}
             <div 
               onClick={() => onDemoLogin('elderly')}
-              className="bg-bento-lavender rounded-[32px] p-7 sm:p-8 border border-bento-lavender-border hover:shadow-card transition-all cursor-pointer flex flex-col justify-between group"
+              className="bg-bento-lavender rounded-[32px] p-6 sm:p-7 border border-bento-lavender-border hover:shadow-card transition-all cursor-pointer flex flex-col justify-between group"
             >
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="px-3 py-1 rounded-full bg-white/80 text-slate-900 text-xs font-extrabold uppercase tracking-wider border border-white">
-                    Elderly Individual
-                  </span>
-                  <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center group-hover:bg-bento-lime group-hover:text-slate-950 transition-colors">
-                    <ArrowUpRight className="w-4 h-4 font-bold" />
+                {/* Photo Header */}
+                <div className="w-full h-40 rounded-2xl overflow-hidden border border-white/60 shadow-subtle relative">
+                  <img 
+                    src="/images/premium_photo-1674855780695-b5d5c3e86b88.avif" 
+                    alt="Elderly patient Kamla Sharma" 
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
+                  />
+                  <div className="absolute top-2.5 left-2.5">
+                    <span className="px-3 py-1 rounded-full bg-white/95 backdrop-blur-sm text-slate-950 text-[10px] font-extrabold uppercase tracking-wider border border-white shadow-2xs">
+                      Elderly Individual
+                    </span>
                   </div>
                 </div>
 
-                <div className="pt-2">
-                  <h3 className="text-2xl font-black text-slate-950">Kamla Sharma</h3>
-                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Age 74 • Hypertension & Type 2 Diabetes</p>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-2xl font-black text-slate-950">Kamla Sharma</h3>
+                    <p className="text-xs font-bold text-slate-600 uppercase tracking-wider">Age 74 • Daily Regimen</p>
+                  </div>
+                  <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center group-hover:bg-bento-lime group-hover:text-slate-950 transition-colors">
+                    <ArrowUpRight className="w-4 h-4 font-bold" />
+                  </div>
                 </div>
 
                 <p className="text-xs text-slate-700 leading-relaxed font-medium">
@@ -323,7 +345,7 @@ export default function LandingPage({ onNavigate, onDemoLogin }) {
                 </p>
               </div>
 
-              <div className="pt-6 border-t border-slate-900/10 mt-6 flex items-center justify-between text-xs font-bold text-slate-900">
+              <div className="pt-5 border-t border-slate-900/10 mt-5 flex items-center justify-between text-xs font-bold text-slate-900">
                 <span>Try Senior View</span>
                 <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
@@ -332,21 +354,31 @@ export default function LandingPage({ onNavigate, onDemoLogin }) {
             {/* Persona 2: Rohan Sharma (Family Admin) */}
             <div 
               onClick={() => onDemoLogin('family')}
-              className="bg-bento-peach rounded-[32px] p-7 sm:p-8 border border-bento-peach-border hover:shadow-card transition-all cursor-pointer flex flex-col justify-between group"
+              className="bg-bento-peach rounded-[32px] p-6 sm:p-7 border border-bento-peach-border hover:shadow-card transition-all cursor-pointer flex flex-col justify-between group"
             >
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="px-3 py-1 rounded-full bg-white/80 text-slate-900 text-xs font-extrabold uppercase tracking-wider border border-white">
-                    Family Member
-                  </span>
-                  <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center group-hover:bg-bento-lime group-hover:text-slate-950 transition-colors">
-                    <ArrowUpRight className="w-4 h-4 font-bold" />
+                {/* Photo Header */}
+                <div className="w-full h-40 rounded-2xl overflow-hidden border border-white/60 shadow-subtle relative">
+                  <img 
+                    src="/images/photo-1454875392665-2ac2c85e8d3e.avif" 
+                    alt="Family Caregiving" 
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
+                  />
+                  <div className="absolute top-2.5 left-2.5">
+                    <span className="px-3 py-1 rounded-full bg-white/95 backdrop-blur-sm text-slate-950 text-[10px] font-extrabold uppercase tracking-wider border border-white shadow-2xs">
+                      Family Member
+                    </span>
                   </div>
                 </div>
 
-                <div className="pt-2">
-                  <h3 className="text-2xl font-black text-slate-950">Rohan Sharma</h3>
-                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Son • Care Circle Administrator</p>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-2xl font-black text-slate-950">Rohan Sharma</h3>
+                    <p className="text-xs font-bold text-slate-600 uppercase tracking-wider">Son • Circle Admin</p>
+                  </div>
+                  <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center group-hover:bg-bento-lime group-hover:text-slate-950 transition-colors">
+                    <ArrowUpRight className="w-4 h-4 font-bold" />
+                  </div>
                 </div>
 
                 <p className="text-xs text-slate-700 leading-relaxed font-medium">
@@ -354,7 +386,7 @@ export default function LandingPage({ onNavigate, onDemoLogin }) {
                 </p>
               </div>
 
-              <div className="pt-6 border-t border-slate-900/10 mt-6 flex items-center justify-between text-xs font-bold text-slate-900">
+              <div className="pt-5 border-t border-slate-900/10 mt-5 flex items-center justify-between text-xs font-bold text-slate-900">
                 <span>Try Family Overview</span>
                 <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
@@ -363,21 +395,31 @@ export default function LandingPage({ onNavigate, onDemoLogin }) {
             {/* Persona 3: Nurse Priya Rao (Caregiver) */}
             <div 
               onClick={() => onDemoLogin('caregiver')}
-              className="bg-bento-mint rounded-[32px] p-7 sm:p-8 border border-bento-mint-border hover:shadow-card transition-all cursor-pointer flex flex-col justify-between group"
+              className="bg-bento-mint rounded-[32px] p-6 sm:p-7 border border-bento-mint-border hover:shadow-card transition-all cursor-pointer flex flex-col justify-between group"
             >
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="px-3 py-1 rounded-full bg-white/80 text-slate-900 text-xs font-extrabold uppercase tracking-wider border border-white">
-                    Professional Caregiver
-                  </span>
-                  <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center group-hover:bg-bento-lime group-hover:text-slate-950 transition-colors">
-                    <ArrowUpRight className="w-4 h-4 font-bold" />
+                {/* Photo Header */}
+                <div className="w-full h-40 rounded-2xl overflow-hidden border border-white/60 shadow-subtle relative">
+                  <img 
+                    src="/images/premium_photo-1663089870095-c231a534ac31.avif" 
+                    alt="Nurse Priya Rao compassionate care" 
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
+                  />
+                  <div className="absolute top-2.5 left-2.5">
+                    <span className="px-3 py-1 rounded-full bg-white/95 backdrop-blur-sm text-slate-950 text-[10px] font-extrabold uppercase tracking-wider border border-white shadow-2xs">
+                      Professional Caregiver
+                    </span>
                   </div>
                 </div>
 
-                <div className="pt-2">
-                  <h3 className="text-2xl font-black text-slate-950">Nurse Priya Rao</h3>
-                  <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Home Nurse • Shift Coordinator</p>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-2xl font-black text-slate-950">Nurse Priya Rao</h3>
+                    <p className="text-xs font-bold text-slate-600 uppercase tracking-wider">Home Nurse • Shift Lead</p>
+                  </div>
+                  <div className="w-8 h-8 rounded-full bg-slate-900 text-white flex items-center justify-center group-hover:bg-bento-lime group-hover:text-slate-950 transition-colors">
+                    <ArrowUpRight className="w-4 h-4 font-bold" />
+                  </div>
                 </div>
 
                 <p className="text-xs text-slate-700 leading-relaxed font-medium">
@@ -385,7 +427,7 @@ export default function LandingPage({ onNavigate, onDemoLogin }) {
                 </p>
               </div>
 
-              <div className="pt-6 border-t border-slate-900/10 mt-6 flex items-center justify-between text-xs font-bold text-slate-900">
+              <div className="pt-5 border-t border-slate-900/10 mt-5 flex items-center justify-between text-xs font-bold text-slate-900">
                 <span>Try Caregiver Shift</span>
                 <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
