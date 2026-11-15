@@ -36,8 +36,8 @@ export default function Button({
 
   const sizes = {
     sm: isPill ? 'text-xs px-5 py-2 min-h-[38px]' : 'text-xs px-3.5 py-1.5 min-h-[38px]',
-    md: isPill ? 'text-xs sm:text-sm px-6 py-2.5 min-h-[44px]' : 'text-sm px-5 py-2.5 min-h-[44px]',
-    lg: isPill ? 'text-sm sm:text-base font-semibold px-7 py-3 min-h-[48px]' : 'text-sm sm:text-base font-semibold px-6 py-2.5 min-h-[48px]',
+    md: isPill ? 'text-xs sm:text-sm px-7 py-2.5 min-h-[44px]' : 'text-sm px-5 py-2.5 min-h-[44px]',
+    lg: isPill ? 'text-sm sm:text-base font-semibold px-8 py-3 min-h-[48px]' : 'text-sm sm:text-base font-semibold px-6 py-2.5 min-h-[48px]',
     xl: 'text-base sm:text-lg font-bold px-8 py-3.5 min-h-[56px]',
   };
 
