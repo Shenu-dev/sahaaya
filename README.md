@@ -61,6 +61,11 @@ Password for demo accounts: `Sahaaya@2026`
 
 ## Hackathon Compliance
 
-- Repository Size: Strictly under 10 MB (< 100 KB total size).
+- Repository Size: Strictly under 10 MB (< 250 KB total size).
 - Branch: Single `main` branch.
 - Cost: ₹0 to develop and deploy.
+
+## Release Baseline
+
+- **Version**: `v1.0.0` (Polished Demo Baseline)
+- **Status**: Stable baseline with verified adherence math, premature dose safeguards, appointment lifecycle actions, and PostgreSQL Row Level Security.
