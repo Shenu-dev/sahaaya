@@ -1,5 +1,5 @@
 -- ==============================================================================
--- SAARTHI DATABASE MIGRATION 001: INITIAL SCHEMA & INTEGRITY CONSTRAINTS
+-- SAHAAYA DATABASE MIGRATION 001: INITIAL SCHEMA & INTEGRITY CONSTRAINTS
 -- ==============================================================================
 
 -- 1. Enable Required Extensions

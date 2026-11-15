@@ -1,6 +1,8 @@
-# Saarthi — Elderly Care & Medication Management Platform
+# Sahaaya — Elderly Care & Medication Management Platform
 
-Saarthi is an accessible healthcare platform designed to connect elderly individuals, their families, and caregivers into a unified care network.
+> **Care that connects generations.**
+
+Sahaaya is an accessible, connected elderly healthcare management platform bringing elderly individuals, family members, and caregivers together into a unified care network.
 
 ## Core Features
 
@@ -51,11 +53,11 @@ Saarthi is an accessible healthcare platform designed to connect elderly individ
 ## Judge Demo Personas
 
 The application includes built-in one-click demo personas:
-- **Kamla Sharma (Elderly)**: `kamla.elderly@saarthi.demo`
-- **Rohan Sharma (Family)**: `rohan.family@saarthi.demo`
-- **Nurse Priya Rao (Caregiver)**: `priya.nurse@saarthi.demo`
+- **Kamla Sharma (Elderly)**: `kamla.elderly@sahaaya.demo`
+- **Rohan Sharma (Family)**: `rohan.family@sahaaya.demo`
+- **Nurse Priya Rao (Caregiver)**: `priya.nurse@sahaaya.demo`
 
-Password for demo accounts: `Saarthi@2026`
+Password for demo accounts: `Sahaaya@2026`
 
 ## Hackathon Compliance
 

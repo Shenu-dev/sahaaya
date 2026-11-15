@@ -73,22 +73,22 @@ export const MEDICATION_FORMS = [
 
 export const DEMO_ACCOUNTS = {
   ELDERLY: {
-    email: 'kamla.elderly@saarthi.demo',
-    password: 'Saarthi@2026',
+    email: 'kamla.elderly@sahaaya.demo',
+    password: 'Sahaaya@2026',
     role: 'elderly',
     name: 'Kamla Sharma',
     age: 74,
   },
   FAMILY: {
-    email: 'rohan.family@saarthi.demo',
-    password: 'Saarthi@2026',
+    email: 'rohan.family@sahaaya.demo',
+    password: 'Sahaaya@2026',
     role: 'family',
     name: 'Rohan Sharma (Son)',
     permissions: 'admin',
   },
   CAREGIVER: {
-    email: 'priya.nurse@saarthi.demo',
-    password: 'Saarthi@2026',
+    email: 'priya.nurse@sahaaya.demo',
+    password: 'Sahaaya@2026',
     role: 'caregiver',
     name: 'Nurse Priya Rao',
     permissions: 'write',

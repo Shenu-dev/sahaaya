@@ -1,5 +1,5 @@
 -- ==============================================================================
--- SAARTHI DATABASE MIGRATION 004: SEED REALISTIC DEMO DATA
+-- SAHAAYA DATABASE MIGRATION 004: SEED REALISTIC DEMO DATA
 -- ==============================================================================
 
 DO $$
@@ -20,9 +20,9 @@ DECLARE
   v_sched3_id UUID := '44444444-4444-4444-4444-444444444443';
 BEGIN
   -- Look up existing auth user IDs if created, otherwise pick fallback UUIDs
-  SELECT id INTO v_elderly_user_id FROM auth.users WHERE email = 'kamla.elderly@saarthi.demo';
-  SELECT id INTO v_family_user_id FROM auth.users WHERE email = 'rohan.family@saarthi.demo';
-  SELECT id INTO v_caregiver_user_id FROM auth.users WHERE email = 'priya.nurse@saarthi.demo';
+  SELECT id INTO v_elderly_user_id FROM auth.users WHERE email = 'kamla.elderly@sahaaya.demo';
+  SELECT id INTO v_family_user_id FROM auth.users WHERE email = 'rohan.family@sahaaya.demo';
+  SELECT id INTO v_caregiver_user_id FROM auth.users WHERE email = 'priya.nurse@sahaaya.demo';
 
   IF v_elderly_user_id IS NULL THEN
     v_elderly_user_id := 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa';
@@ -37,9 +37,9 @@ BEGIN
   -- 1. Ensure Profile Rows Exist
   INSERT INTO public.profiles (id, full_name, email, role, phone)
   VALUES 
-    (v_elderly_user_id, 'Kamla Sharma', 'kamla.elderly@saarthi.demo', 'elderly', '+91 98765 43210'),
-    (v_family_user_id, 'Rohan Sharma', 'rohan.family@saarthi.demo', 'family', '+91 98765 43211'),
-    (v_caregiver_user_id, 'Nurse Priya Rao', 'priya.nurse@saarthi.demo', 'caregiver', '+91 98765 43212')
+    (v_elderly_user_id, 'Kamla Sharma', 'kamla.elderly@sahaaya.demo', 'elderly', '+91 98765 43210'),
+    (v_family_user_id, 'Rohan Sharma', 'rohan.family@sahaaya.demo', 'family', '+91 98765 43211'),
+    (v_caregiver_user_id, 'Nurse Priya Rao', 'priya.nurse@sahaaya.demo', 'caregiver', '+91 98765 43212')
   ON CONFLICT (id) DO UPDATE SET
     full_name = EXCLUDED.full_name,
     role = EXCLUDED.role;

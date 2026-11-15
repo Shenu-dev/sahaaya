@@ -44,7 +44,7 @@ export default function RegisterPage({ onNavigate }) {
           <div className="w-11 h-11 rounded-xl bg-teal-600 flex items-center justify-center text-white shadow-md shadow-teal-600/20 group-hover:bg-teal-700 transition-colors">
             <Heart className="w-6 h-6 fill-white" />
           </div>
-          <span className="text-3xl font-black tracking-tight text-slate-900">Saarthi</span>
+          <span className="text-3xl font-black tracking-tight text-slate-900">Sahaaya</span>
         </button>
         <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Create your Care Circle</h2>
         <p className="mt-1 text-sm text-slate-500">

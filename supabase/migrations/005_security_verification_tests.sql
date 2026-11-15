@@ -1,5 +1,5 @@
 -- ==============================================================================
--- SAARTHI DATABASE MIGRATION 005: SECURITY & RLS VERIFICATION TEST SUITE
+-- SAHAAYA DATABASE MIGRATION 005: SECURITY & RLS VERIFICATION TEST SUITE
 -- ==============================================================================
 -- Run these assertions to formally verify database security and RLS boundaries.
 
@@ -8,7 +8,7 @@ DECLARE
   v_test_failed BOOLEAN := FALSE;
 BEGIN
   RAISE NOTICE '=====================================================';
-  RAISE NOTICE 'RUNNING SAARTHI SECURITY & RLS VERIFICATION SUITE';
+  RAISE NOTICE 'RUNNING SAHAAYA SECURITY & RLS VERIFICATION SUITE';
   RAISE NOTICE '=====================================================';
 
   -- TEST 1: Direct insert into medication_dose_history must fail

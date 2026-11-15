@@ -7,7 +7,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        saarthi: {
+        sahaaya: {
           50: '#F0FDFA',
           100: '#CCFBF1',
           200: '#99F6E4',

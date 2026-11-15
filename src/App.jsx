@@ -32,7 +32,7 @@ function MainApp() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <LoadingSpinner label="Securing connection to Saarthi..." size="lg" />
+        <LoadingSpinner label="Securing connection to Sahaaya..." size="lg" />
       </div>
     );
   }

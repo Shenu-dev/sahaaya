@@ -1,5 +1,5 @@
 -- ==============================================================================
--- SAARTHI DATABASE MIGRATION 003: COMPLETE ROW LEVEL SECURITY (RLS) POLICIES
+-- SAHAAYA DATABASE MIGRATION 003: COMPLETE ROW LEVEL SECURITY (RLS) POLICIES
 -- ==============================================================================
 
 -- ------------------------------------------------------------------------------

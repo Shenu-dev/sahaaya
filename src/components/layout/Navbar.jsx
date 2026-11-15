@@ -25,7 +25,7 @@ export default function Navbar({ activeTab, onTabChange }) {
                 <Heart className="w-5 h-5 fill-white" />
               </div>
               <div>
-                <span className="text-xl font-extrabold tracking-tight text-slate-900 block leading-tight">Saarthi</span>
+                <span className="text-xl font-extrabold tracking-tight text-slate-900 block leading-tight">Sahaaya</span>
                 <span className="text-xs font-semibold text-teal-700 truncate max-w-[130px] sm:max-w-[180px] block">
                   {careCircle?.name || 'Care Ecosystem'}
                 </span>

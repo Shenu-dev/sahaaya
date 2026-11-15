@@ -1,5 +1,5 @@
 -- ==============================================================================
--- SAARTHI DATABASE MIGRATION 006: FIX MISSED-DOSE EVALUATOR MIDNIGHT WRAPAROUND
+-- SAHAAYA DATABASE MIGRATION 006: FIX MISSED-DOSE EVALUATOR MIDNIGHT WRAPAROUND
 -- ==============================================================================
 -- Fixes SEC-CRIT-01: Replaces TIME subtraction with combined TIMESTAMP comparison
 -- to prevent 24-hour wraparound past midnight (00:00 - 01:00 AM) that falsely

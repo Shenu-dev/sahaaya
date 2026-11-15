@@ -27,7 +27,7 @@ export default function LandingPage({ onNavigate, onDemoLogin }) {
               <Heart className="w-5 h-5 fill-white" />
             </div>
             <div>
-              <span className="text-2xl font-black tracking-tight text-slate-900">Saarthi</span>
+              <span className="text-2xl font-black tracking-tight text-slate-900">Sahaaya</span>
               <span className="block text-xs font-semibold text-teal-600 tracking-wider uppercase">Care Ecosystem</span>
             </div>
           </div>
@@ -59,7 +59,7 @@ export default function LandingPage({ onNavigate, onDemoLogin }) {
             <div className="lg:col-span-7 space-y-6 text-center lg:text-left">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-teal-50 border border-teal-200 text-teal-800 text-xs sm:text-sm font-semibold">
                 <Sparkles className="w-4 h-4 text-teal-600" />
-                <span>Empowering Elderly Healthcare Independence</span>
+                <span>Care that connects generations</span>
               </div>
 
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-950 tracking-tight leading-[1.15]">
@@ -67,7 +67,7 @@ export default function LandingPage({ onNavigate, onDemoLogin }) {
               </h1>
 
               <p className="text-lg sm:text-xl text-slate-600 max-w-2xl mx-auto lg:mx-0 font-normal leading-relaxed">
-                Saarthi connects elderly individuals with their children and caregivers through a calm, high-contrast interface. Never miss a vital medication dose, doctor visit, or care alert again.
+                Sahaaya connects elderly individuals with their children and caregivers through a calm, high-contrast interface. Never miss a vital medication dose, doctor visit, or care alert again.
               </p>
 
               {/* Action Buttons */}
@@ -187,7 +187,7 @@ export default function LandingPage({ onNavigate, onDemoLogin }) {
               Three tailored experiences, one shared circle
             </h2>
             <p className="text-base text-slate-600 mt-3">
-              Most health apps overwhelm seniors with small text and complicated charts. Saarthi gives each member the exact view they need.
+              Most health apps overwhelm seniors with small text and complicated charts. Sahaaya gives each member the exact view they need.
             </p>
           </div>
 
@@ -277,10 +277,10 @@ export default function LandingPage({ onNavigate, onDemoLogin }) {
             <div className="w-9 h-9 rounded-xl bg-teal-600 flex items-center justify-center text-white">
               <Heart className="w-5 h-5 fill-white" />
             </div>
-            <span className="text-lg font-bold text-white">Saarthi</span>
+            <span className="text-lg font-bold text-white">Sahaaya</span>
           </div>
           <p className="text-xs text-slate-500 text-center sm:text-right">
-            Empowering elderly healthcare management & family wellness.
+            Care that connects generations.
           </p>
         </div>
       </footer>

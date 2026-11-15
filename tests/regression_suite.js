@@ -1,5 +1,5 @@
 /**
- * SAARTHI AUTOMATED REGRESSION & SECURITY VERIFICATION SUITE
+ * SAHAAYA AUTOMATED REGRESSION & SECURITY VERIFICATION SUITE
  * Tests adherence math, timezone safety, date parsing, token hashing,
  * and permission boundaries.
  */
@@ -34,7 +34,7 @@ function runTest(name, fn) {
 }
 
 console.log('======================================================');
-console.log('SAARTHI AUTOMATED TEST & VERIFICATION SUITE');
+console.log('SAHAAYA AUTOMATED TEST & VERIFICATION SUITE');
 console.log('======================================================\n');
 
 // -----------------------------------------------------------------------------

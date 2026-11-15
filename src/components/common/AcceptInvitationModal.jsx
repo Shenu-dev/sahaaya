@@ -39,7 +39,7 @@ export default function AcceptInvitationModal({ isOpen, onClose, token }) {
       isOpen={isOpen}
       onClose={onClose}
       title="Join Care Circle"
-      subtitle="You have received a secure cryptographic invitation to join a Saarthi Care Circle."
+      subtitle="You have received a secure cryptographic invitation to join a Sahaaya Care Circle."
     >
       <div className="space-y-5 py-2">
         {error && (

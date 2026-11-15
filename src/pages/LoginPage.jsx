@@ -53,7 +53,7 @@ export default function LoginPage({ onNavigate }) {
           <div className="w-11 h-11 rounded-xl bg-teal-600 flex items-center justify-center text-white shadow-md shadow-teal-600/20 group-hover:bg-teal-700 transition-colors">
             <Heart className="w-6 h-6 fill-white" />
           </div>
-          <span className="text-3xl font-black tracking-tight text-slate-900">Saarthi</span>
+          <span className="text-3xl font-black tracking-tight text-slate-900">Sahaaya</span>
         </button>
         <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Sign in to your Care Ecosystem</h2>
         <p className="mt-1 text-sm text-slate-500">
@@ -154,7 +154,7 @@ export default function LoginPage({ onNavigate }) {
 
           <div className="text-center pt-2">
             <p className="text-xs text-slate-600">
-              New to Saarthi?{' '}
+              New to Sahaaya?{' '}
               <button
                 type="button"
                 onClick={() => onNavigate('register')}

@@ -1,5 +1,5 @@
 /**
- * Date and Time utilities for Saarthi
+ * Date and Time utilities for Sahaaya
  * Standardizes 12-hour AM/PM formats, timezone-safe date extraction, and premature dose detection.
  */
 

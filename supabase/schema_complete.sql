@@ -1,5 +1,5 @@
 -- ==============================================================================
--- SAARTHI COMPLETE SINGLE-EXECUTION DATABASE SCRIPT
+-- SAHAAYA COMPLETE SINGLE-EXECUTION DATABASE SCRIPT
 -- Paste and run this entire file in your Supabase SQL Editor
 -- Cost: ₹0 / $0 (Supabase Free Tier)
 -- ==============================================================================
@@ -211,7 +211,7 @@ BEGIN
   INSERT INTO public.profiles (id, full_name, email, role, created_at, updated_at)
   VALUES (
     NEW.id,
-    COALESCE(NEW.raw_user_meta_data->>'full_name', 'Saarthi User'),
+    COALESCE(NEW.raw_user_meta_data->>'full_name', 'Sahaaya User'),
     NEW.email,
     COALESCE(NEW.raw_user_meta_data->>'role', 'elderly'),
     NOW(),

@@ -1,5 +1,5 @@
 -- ==============================================================================
--- SAARTHI COMPLETE COMBINED DATABASE SPECIFICATION (MIGRATIONS 001 - 004)
+-- SAHAAYA COMPLETE COMBINED DATABASE SPECIFICATION (MIGRATIONS 001 - 006)
 -- ==============================================================================
 -- Paste and run this entire file in your Supabase SQL Editor (100% Free Tier)
 -- ==============================================================================

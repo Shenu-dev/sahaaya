@@ -1,5 +1,5 @@
 -- ==============================================================================
--- SAARTHI DATABASE MIGRATION 002: HARDENED STORED PROCEDURES & TRIGGERS
+-- SAHAAYA DATABASE MIGRATION 002: HARDENED STORED PROCEDURES & TRIGGERS
 -- ==============================================================================
 
 -- 1. Automatic User Profile Provisioning Trigger
@@ -12,7 +12,7 @@ BEGIN
   INSERT INTO public.profiles (id, full_name, email, role, created_at, updated_at)
   VALUES (
     NEW.id,
-    COALESCE(NEW.raw_user_meta_data->>'full_name', 'Saarthi User'),
+    COALESCE(NEW.raw_user_meta_data->>'full_name', 'Sahaaya User'),
     NEW.email,
     COALESCE(NEW.raw_user_meta_data->>'role', 'elderly'),
     NOW(),
