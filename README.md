@@ -1,71 +1,207 @@
-# Sahaaya — Elderly Care & Medication Management Platform
+# SAHAAYA — Elderly Care & Medication Adherence Platform
 
-> **Care that connects generations.**
+> **"Care that connects generations."**
 
-Sahaaya is an accessible, connected elderly healthcare management platform bringing elderly individuals, family members, and caregivers together into a unified care network.
+An accessible, connected elderly healthcare management and medication adherence platform uniting elderly individuals, family members, and caregivers into a coordinated, zero-friction circle of care.
 
-## Core Features
+[![License: MIT](https://img.shields.io/badge/License-MIT-teal.svg)](LICENSE)
+[![Build Status](https://img.shields.io/badge/Build-Passing-emerald.svg)](https://github.com/Shenu-dev/sahaaya)
+[![Architecture Budget](https://img.shields.io/badge/Budget-₹0%20Free%20Tier-blue.svg)](https://supabase.com)
+[![WCAG Accessibility](https://img.shields.io/badge/Accessibility-Senior--First%2056px-purple.svg)](https://www.w3.org/WAI/standards-guidelines/wcag/)
 
-- **Elderly Interface**: Clear, high-contrast dashboard with minimum 56px touch targets, today's schedule, one-tap dose marking, and emergency contact actions.
-- **Family Dashboard**: Medication adherence tracking, overdue dose notifications, care circle management, and doctor visit monitoring.
-- **Caregiver Tools**: Assigned care recipient records, dose administration checklists, and clinical notes.
-- **Database Security**: PostgreSQL Row Level Security (RLS) on all tables, cryptographically secure invitation tokens, and automated dose history audit triggers.
-- **Strict Budget Constraint**: Operates entirely within the free tiers of Supabase and Vercel (zero cost).
+---
 
-## Tech Stack
+## 1. Problem Statement
 
-- Frontend: React + Vite + Tailwind CSS
-- Backend / Database: Supabase (PostgreSQL 15, Supabase Auth, Row Level Security)
-- Icons: Lucide React
-- Hosting: Vercel Free Tier
+Millions of elderly individuals manage complex chronic medication regimens for hypertension, type-2 diabetes, and cardiovascular health. Common challenges include:
+- **Medication Non-Adherence**: Forgetting scheduled doses or accidentally taking duplicate doses due to cognitive decline or complex routines.
+- **Fragmented Care Communication**: Anxious family members living apart struggle to know whether daily medications were actually taken without disruptive phone calls.
+- **Hostile User Interfaces**: Modern health apps overwhelm seniors with tiny fonts, complex menus, multi-step navigation, and low-contrast elements.
+- **Shift Handover Gaps**: Professional caregivers and visiting nurses lack a shared, immutable log with family members to record dose delivery and clinical observations.
 
-## Local Development Setup
+---
 
-1. Install project dependencies:
+## 2. Proposed Solution
+
+**Sahaaya** bridges the generational divide with three tailored experiences powered by one synchronized, secure care circle:
+- **For Seniors**: A radically calm, high-contrast interface featuring large $\ge 56\text{px}$ touch targets, single-tap dose confirmation, prominent next-dose hero cards, and instant emergency calling.
+- **For Families**: Real-time adherence scores computed strictly on eligible due doses, automated alerts for missed doses, appointment tracking, and complete audit history.
+- **For Caregivers**: A verified shift portal to record medication delivery, capture clinical notes, and review care schedules within strict permission boundaries.
+- **Built for ₹0**: Designed to run entirely on the free tiers of Supabase (PostgreSQL 15, Auth, RLS) and Vercel.
+
+---
+
+## 3. Key Features
+
+- **Radically Accessible Elderly UX**: 56px+ touch targets, high contrast (`WCAG AAA` compliant color pairings), no multi-level dropdowns, and zero accidental double-tap issues.
+- **Mathematically Rigorous Adherence**: Excludes upcoming future doses from the denominator. Adherence rate is computed exclusively on due doses ($\frac{\text{Taken}}{\text{Due}} \times 100$), with a separate full-day completion metric.
+- **Premature Dose Confirmation Guard**: Prevents accidental confirmation of medication scheduled in the future; requires explicit confirmation and records the actual timestamp separately with audit annotations.
+- **PostgreSQL Row Level Security (RLS)**: Enforced at the database engine level. Read-only members are blocked from mutating doses, and caregivers are strictly isolated to their assigned Care Circles.
+- **Cryptographic Invitations**: 32-byte cryptographic entropy tokens hashed with SHA-256 before storage; invitations are single-use, time-bound (72h), and tied to the recipient's verified identity.
+- **Immutable Dose History**: An automatic PostgreSQL trigger logs every dose status transition to `medication_dose_history` with actor IDs and timestamps; client deletion is permanently denied.
+- **Interactive Judge Demo System**: 1-click role switching between Elderly, Family, and Caregiver personas with a predictable **"Reset Demo"** button to restore the pristine baseline at any time.
+
+---
+
+## 4. Technology Stack
+
+| Layer | Technology | Purpose |
+| :--- | :--- | :--- |
+| **Frontend Framework** | React 18 | Declarative component UI and state management |
+| **Build Tooling** | Vite 6 | Fast HMR and optimized production bundling |
+| **Styling & Design System** | Tailwind CSS 3 | Accessible, responsive, utility-first design system |
+| **Icons** | Lucide React | Clean, recognizable medical and navigational iconography |
+| **Backend & Database** | Supabase (PostgreSQL 15) | Row Level Security (RLS), Triggers, Stored Procedures |
+| **Cryptography** | Web Crypto API (SubtleCrypto) | Client-side SHA-256 token hashing and 256-bit entropy |
+| **Testing** | Node.js Test Harness | 16-test automated regression and security verification suite |
+
+---
+
+## 5. Architecture Overview
+
+```
+                      ┌────────────────────────────────────────┐
+                      │              SAHAAYA UI                │
+                      │  (Elderly / Family / Caregiver Views)  │
+                      └───────────────────┬────────────────────┘
+                                          │
+                   ┌──────────────────────┴──────────────────────┐
+                   ▼                                             ▼
+       ┌────────────────────────┐                   ┌────────────────────────┐
+       │   Interactive Demo     │                   │   Supabase Client      │
+       │   In-Memory Sandbox    │                   │   (PKCE Flow + Auth)   │
+       │  (1-Click Role Switch) │                   │  (hwwwsngryzrlvjnkqkip)│
+       └────────────────────────┘                   └────────────┬───────────┘
+                                                                 │
+                                          ┌──────────────────────┴──────────────────────┐
+                                          ▼                                             ▼
+                              ┌──────────────────────┐                     ┌──────────────────────┐
+                              │  PostgreSQL Tables   │                     │  Stored Procedures   │
+                              │  (RLS Enabled)       │                     │  (SECURITY DEFINER)  │
+                              ├──────────────────────┤                     ├──────────────────────┤
+                              │ • profiles           │                     │ • create_care_circle │
+                              │ • care_circles       │                     │ • accept_invitation  │
+                              │ • elderly_profiles   │                     │ • generate_daily_doses│
+                              │ • care_circle_members│                     │ • evaluate_missed_doses│
+                              │ • medications        │                     └──────────────────────┘
+                              │ • medication_doses   │
+                              │ • medication_history │
+                              │ • appointments       │
+                              │ • activity_logs      │
+                              └──────────────────────┘
+```
+
+---
+
+## 6. Demo Personas (Evaluation & Judging)
+
+For hackathon evaluators and judges, the application includes three pre-configured personas accessible via 1-click buttons in the navigation header:
+
+| Persona | Name | Role | Primary Capabilities |
+| :--- | :--- | :--- | :--- |
+| 👵 **Elderly Individual** | Kamla Sharma (Age 74) | `elderly` (Owner / Admin) | High-contrast next-dose card, 1-tap "I Have Taken This" button, skip with reason, emergency call button. |
+| 👨‍👦 **Family Member** | Rohan Sharma (Son) | `family` (Circle Admin) | Adherence percentage, missed-dose alerts, appointment booking, member invitation, audit logs. |
+| 👩‍⚕️ **Caregiver / Nurse** | Nurse Priya Rao | `caregiver` (Write Access) | Shift checklist, medication administration verification, patient clinical observation notes. |
+
+> **Predictable Demo Reset**: Click the **"Reset Demo"** button (with the circular arrow icon) in the header at any time to restore the seed doses, appointments, and activity logs back to the initial baseline.
+
+---
+
+## 7. Local Development Setup
+
+### Prerequisites
+- Node.js 18.x or higher
+- npm 9.x or higher
+- Git
+
+### Installation Steps
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/Shenu-dev/sahaaya.git
+   cd sahaaya
+   ```
+
+2. **Install project dependencies**:
    ```bash
    npm install
    ```
 
-2. Configure environment variables in `.env`:
-   ```env
-   VITE_SUPABASE_URL=https://your-project.supabase.co
-   VITE_SUPABASE_ANON_KEY=your-supabase-public-anon-key
+3. **Configure environment variables (Optional for Demo)**:
+   Copy the example file to `.env`:
+   ```bash
+   cp .env.example .env
    ```
-   *(If unconfigured, the application runs in local interactive demo mode).*
+   Edit `.env` with your Supabase credentials:
+   ```env
+   VITE_SUPABASE_URL=https://your-project-id.supabase.co
+   VITE_SUPABASE_ANON_KEY=your-supabase-public-anon-key-here
+   ```
+   *(If left unconfigured, the application automatically launches in full interactive demonstration mode).*
 
-3. Start the Vite development server:
+4. **Start the local development server**:
    ```bash
    npm run dev
    ```
+   Open [http://localhost:5173](http://localhost:5173) in your browser.
 
-4. Build for production:
+5. **Run the automated regression test suite**:
+   ```bash
+   npm test
+   ```
+
+6. **Create an optimized production build**:
    ```bash
    npm run build
    ```
 
-## Database Setup (Supabase Free Tier)
+---
 
-1. Open your Supabase project dashboard.
-2. Navigate to the SQL Editor.
-3. Execute `supabase/schema_complete.sql` to initialize tables, constraints, security definer procedures, and RLS policies.
-4. Copy your project URL and public anon key into `.env`.
+## 8. Supabase Backend Setup (Free Tier)
 
-## Judge Demo Personas
+To link Sahaaya to a live Supabase instance:
 
-The application includes built-in one-click demo personas:
-- **Kamla Sharma (Elderly)**: `kamla.elderly@sahaaya.demo`
-- **Rohan Sharma (Family)**: `rohan.family@sahaaya.demo`
-- **Nurse Priya Rao (Caregiver)**: `priya.nurse@sahaaya.demo`
+1. Create a free project at [supabase.com](https://supabase.com).
+2. Navigate to the **SQL Editor** in your Supabase dashboard.
+3. Open `supabase/schema_complete.sql` from this repository, paste its contents into the SQL Editor, and click **Run**.
+4. The script idempotently initializes:
+   - All 12 relational tables with foreign keys and `ON DELETE RESTRICT` safeguards.
+   - Complete Row Level Security (RLS) policies for circle isolation.
+   - Stored procedures (`create_care_circle_atomic`, `accept_care_circle_invitation`, `generate_daily_doses`, `evaluate_missed_doses`).
+   - Audit history triggers (`trg_medication_dose_history`).
+5. Copy your **Project URL** and **`anon` Public Key** from **Project Settings -> API** into your `.env` file.
 
-Password for demo accounts: `Sahaaya@2026`
+---
 
-## Hackathon Compliance
+## 9. Security Posture & Architecture Compliance
 
-- Repository Size: Strictly under 10 MB (< 250 KB total size).
-- Branch: Single `main` branch.
-- Cost: ₹0 to develop and deploy.
+- **No Exposed Secrets**: Zero hardcoded API keys, database passwords, or service-role secrets exist in the codebase.
+- **Search Path Hardening**: Every `SECURITY DEFINER` PostgreSQL function sets `search_path = public, pg_temp` to prevent search path injection.
+- **Non-Bypassable RLS**: Table data cannot be selected, inserted, or updated without satisfying row-level membership conditions. Read-only members cannot update doses.
+- **Audit Immutability**: Client applications are strictly denied direct `INSERT`, `UPDATE`, or `DELETE` on `medication_dose_history`.
+- **Soft-Delete Prescription Archiving**: Medications cannot be hard-deleted if dose records exist; active medications are soft-archived to preserve clinical history.
 
-## Release Baseline
+---
 
-- **Version**: `v1.0.0` (Polished Demo Baseline)
-- **Status**: Stable baseline with verified adherence math, premature dose safeguards, appointment lifecycle actions, and PostgreSQL Row Level Security.
+## 10. User Interface Layout Overview
+
+- **Elderly Schedule View**: Single prominent card displaying the immediate next medication due, dosage, instructions, and senior touch actions (`TAKE` / `SKIP`).
+- **Family Dashboard View**: 4-card metric strip showing Due Adherence %, Day Progress, Pending Doses, and Missed Doses, followed by today's timeline and clinical profile summary.
+- **Caregiver Portal View**: Structured shift administration checklist with observation input and patient medical file review.
+- **Prescriptions & Care Circle**: Prescription catalog with active/archived badges and a secure member directory with cryptographic invite link generation.
+
+---
+
+## 11. Future Scope
+
+- **Native Mobile Companion App**: React Native / PWA packaging with offline background sync and lock-screen medication widgets.
+- **Automated WhatsApp / SMS Voice Call Reminders**: ₹0-cost Twilio / Meta WhatsApp Cloud API webhooks for seniors without smartphones.
+- **Smart Dispenser IoT Integration**: MQTT / Bluetooth connectivity with smart pill organizers to auto-verify dose box opening.
+- **Multi-Lingual Voice Guidance**: Regional Indian languages (Hindi, Tamil, Telugu, Marathi, Bengali) using Web Speech API for voice prompts.
+
+---
+
+## 12. License & Attribution
+
+- **License**: MIT License — free for open-source and non-commercial eldercare innovation.
+- **Designed with love for elderly care & family peace of mind.**

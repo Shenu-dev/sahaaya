@@ -31,6 +31,8 @@ lerna-debug.log*
 .turbo/
 .cache/
 .vite/
+.temp/
+supabase/.temp/
 
 # Editor & OS files
 .DS_Store
