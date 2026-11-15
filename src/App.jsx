@@ -17,7 +17,7 @@ import NoCareCircleView from './components/common/NoCareCircleView';
 
 function MainApp() {
   const { user, profile, loading, signInAsDemo } = useAuth();
-  const { hasCareCircle, circleLoading, isDemo } = useCareCircle();
+  const { hasCareCircle, circleLoading, isDemo, activeViewRole } = useCareCircle();
   const [authPage, setAuthPage] = useState('landing'); // 'landing' | 'login' | 'register'
   const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard' | 'medications' | 'appointments' | 'circle'
   
@@ -72,11 +72,13 @@ function MainApp() {
       return <CareCirclePage />;
     }
 
-    // Default Dashboard depending on user role
-    if (profile?.role === 'elderly') {
+    // Effective dashboard view: allows real users to view their own Care Circle from Senior, Family, or Caregiver perspective
+    const effectiveRole = isDemo ? profile?.role : (activeViewRole || profile?.role || 'family');
+
+    if (effectiveRole === 'elderly') {
       return <ElderlyDashboard />;
     }
-    if (profile?.role === 'caregiver') {
+    if (effectiveRole === 'caregiver') {
       return <CaregiverDashboard />;
     }
     // Default to Family Dashboard

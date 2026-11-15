@@ -160,6 +160,7 @@ export function CareCircleProvider({ children }) {
   // 3. Real user without circle (hasCareCircle = false, cleared empty state)
   const [hasCareCircle, setHasCareCircle] = useState(() => isDemo);
   const [circleLoading, setCircleLoading] = useState(false);
+  const [activeViewRole, setActiveViewRole] = useState(null); // Allows real accounts to switch perspective without triggering demo accounts
 
   const [careCircle, setCareCircle] = useState(() => (isDemo ? SEED_CARE_CIRCLE : null));
   const [elderlyProfile, setElderlyProfile] = useState(() => (isDemo ? SEED_ELDERLY_PROFILE : null));
@@ -790,6 +791,8 @@ export function CareCircleProvider({ children }) {
         circleLoading,
         isRealDbActive,
         isDemo,
+        activeViewRole,
+        setActiveViewRole,
         adherenceMetrics: {
           takenCount,
           missedCount,

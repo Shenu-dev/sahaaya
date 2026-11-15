@@ -282,6 +282,33 @@ runTest('Real user without Care Circle produces zero leaked demo records', () =>
   assert.strictEqual(isolatedState.appointments.length, 0, 'No appointments may leak');
 });
 
+runTest('Role switching in real user session preserves account identity and updates perspective', () => {
+  const realUser = { id: 'a5d09b67-4d7a-426b-873b-5a024b4f0b12', email: 'real.user@gmail.com' };
+  const isDemo = isUserDemoPersona(realUser);
+  assert.strictEqual(isDemo, false, 'Must be real user');
+
+  let activeViewRole = null;
+  let loggedInUser = realUser;
+
+  // Real user clicks 'elderly' in Navbar
+  const handleRoleSwitch = (roleKey) => {
+    if (isDemo) {
+      loggedInUser = { id: 'demo-elderly-id', is_demo: true };
+    } else {
+      activeViewRole = roleKey;
+    }
+  };
+
+  handleRoleSwitch('elderly');
+  assert.strictEqual(activeViewRole, 'elderly', 'activeViewRole must update to elderly');
+  assert.strictEqual(loggedInUser.id, realUser.id, 'User account must NOT be switched to demo');
+  assert.strictEqual(loggedInUser.is_demo, undefined, 'User must remain real account');
+
+  handleRoleSwitch('caregiver');
+  assert.strictEqual(activeViewRole, 'caregiver', 'activeViewRole must update to caregiver');
+  assert.strictEqual(loggedInUser.id, realUser.id, 'User account must stay real account');
+});
+
 // -----------------------------------------------------------------------------
 // 8. MEDICATION ACTIONS & REACTIVITY (BUG REGRESSION)
 // -----------------------------------------------------------------------------

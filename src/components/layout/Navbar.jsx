@@ -6,11 +6,29 @@ import Badge from '../common/Badge';
 
 export default function Navbar({ activeTab, onTabChange }) {
   const { profile, signOut, signInAsDemo } = useAuth();
-  const { careCircle, notifications, isDemo, resetDemoData, hasCareCircle } = useCareCircle();
+  const { 
+    careCircle, 
+    notifications, 
+    isDemo, 
+    resetDemoData, 
+    hasCareCircle,
+    activeViewRole,
+    setActiveViewRole 
+  } = useCareCircle();
   const [resetFeedback, setResetFeedback] = useState('');
 
-  const isElderly = profile?.role === 'elderly';
+  // Active role displayed: in demo mode tracks demo persona; in real account tracks perspective within user's circle
+  const currentRole = isDemo ? profile?.role : (activeViewRole || profile?.role || 'family');
+  const isElderly = currentRole === 'elderly';
   const unreadCount = notifications.filter((n) => !n.is_read).length;
+
+  const handleRoleSwitch = (roleKey) => {
+    if (isDemo) {
+      signInAsDemo(roleKey);
+    } else {
+      setActiveViewRole(roleKey);
+    }
+  };
 
   const handleResetDemo = () => {
     resetDemoData();
@@ -98,39 +116,44 @@ export default function Navbar({ activeTab, onTabChange }) {
 
           {/* Right Action Bar */}
           <div className="flex items-center gap-3 shrink-0">
-            {/* Persona Switcher Dropdown / Quick Switch for Judges */}
+            {/* Persona Switcher for Demo / Perspective Switcher for Real Accounts */}
             <div className="hidden md:flex items-center gap-1.5 bg-slate-50 border border-slate-200/90 px-3 py-1.5 rounded-xl text-xs">
-              <span className="font-semibold text-slate-500 mr-0.5">Persona:</span>
+              <span className="font-semibold text-slate-500 mr-0.5">
+                {isDemo ? 'Persona:' : 'View:'}
+              </span>
               <button
-                onClick={() => signInAsDemo('elderly')}
+                type="button"
+                onClick={() => handleRoleSwitch('elderly')}
                 className={`px-2.5 py-1 rounded-md font-bold transition-all ${
-                  profile?.role === 'elderly'
+                  currentRole === 'elderly'
                     ? 'bg-teal-700 text-white shadow-xs'
                     : 'text-slate-700 hover:bg-slate-200/70'
                 }`}
-                title="Switch to Elderly individual view"
+                title={isDemo ? "Switch to Elderly demo persona" : "View your Care Circle from Senior's perspective"}
               >
                 Elderly
               </button>
               <button
-                onClick={() => signInAsDemo('family')}
+                type="button"
+                onClick={() => handleRoleSwitch('family')}
                 className={`px-2.5 py-1 rounded-md font-bold transition-all ${
-                  profile?.role === 'family'
+                  currentRole === 'family'
                     ? 'bg-teal-700 text-white shadow-xs'
                     : 'text-slate-700 hover:bg-slate-200/70'
                 }`}
-                title="Switch to Family member view"
+                title={isDemo ? "Switch to Family Admin demo persona" : "View your Care Circle from Family overview perspective"}
               >
                 Family
               </button>
               <button
-                onClick={() => signInAsDemo('caregiver')}
+                type="button"
+                onClick={() => handleRoleSwitch('caregiver')}
                 className={`px-2.5 py-1 rounded-md font-bold transition-all ${
-                  profile?.role === 'caregiver'
+                  currentRole === 'caregiver'
                     ? 'bg-teal-700 text-white shadow-xs'
                     : 'text-slate-700 hover:bg-slate-200/70'
                 }`}
-                title="Switch to Caregiver view"
+                title={isDemo ? "Switch to Caregiver demo persona" : "View your Care Circle from Caregiver shift perspective"}
               >
                 Caregiver
               </button>
@@ -211,10 +234,10 @@ export default function Navbar({ activeTab, onTabChange }) {
           </div>
         )}
 
-        {/* Mobile Persona Quick Switcher */}
+        {/* Mobile Persona / View Switcher */}
         <div className="sm:hidden flex items-center justify-between px-3 py-2 bg-teal-50/80 border-t border-teal-100 text-[11px]">
           <div className="flex items-center gap-1.5">
-            <span className="font-bold text-teal-900">Persona:</span>
+            <span className="font-bold text-teal-900">{isDemo ? 'Persona:' : 'View:'}</span>
             {isDemo && (
               <span className="px-1.5 py-0.2 rounded text-[9px] font-bold uppercase bg-teal-100 text-teal-800">
                 Demo
@@ -223,25 +246,28 @@ export default function Navbar({ activeTab, onTabChange }) {
           </div>
           <div className="flex items-center gap-1">
             <button
-              onClick={() => signInAsDemo('elderly')}
+              type="button"
+              onClick={() => handleRoleSwitch('elderly')}
               className={`px-2 py-0.5 rounded font-bold ${
-                profile?.role === 'elderly' ? 'bg-teal-700 text-white' : 'text-teal-800 bg-white border border-teal-200'
+                currentRole === 'elderly' ? 'bg-teal-700 text-white' : 'text-teal-800 bg-white border border-teal-200'
               }`}
             >
               Elderly
             </button>
             <button
-              onClick={() => signInAsDemo('family')}
+              type="button"
+              onClick={() => handleRoleSwitch('family')}
               className={`px-2 py-0.5 rounded font-bold ${
-                profile?.role === 'family' ? 'bg-teal-700 text-white' : 'text-teal-800 bg-white border border-teal-200'
+                currentRole === 'family' ? 'bg-teal-700 text-white' : 'text-teal-800 bg-white border border-teal-200'
               }`}
             >
               Family
             </button>
             <button
-              onClick={() => signInAsDemo('caregiver')}
+              type="button"
+              onClick={() => handleRoleSwitch('caregiver')}
               className={`px-2 py-0.5 rounded font-bold ${
-                profile?.role === 'caregiver' ? 'bg-teal-700 text-white' : 'text-teal-800 bg-white border border-teal-200'
+                currentRole === 'caregiver' ? 'bg-teal-700 text-white' : 'text-teal-800 bg-white border border-teal-200'
               }`}
             >
               Caregiver
