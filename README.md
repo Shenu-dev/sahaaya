@@ -5,6 +5,7 @@
 An accessible, connected elderly healthcare management and medication adherence platform uniting elderly individuals, family members, and caregivers into a coordinated, zero-friction circle of care.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-teal.svg)](LICENSE)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-sahaaya--three.vercel.app-000000.svg?logo=vercel&logoColor=white)](https://sahaaya-three.vercel.app/)
 [![Build Status](https://img.shields.io/badge/Build-Passing-emerald.svg)](https://github.com/Shenu-dev/sahaaya)
 [![Architecture Budget](https://img.shields.io/badge/Budget-₹0%20Free%20Tier-blue.svg)](https://supabase.com)
 [![WCAG Accessibility](https://img.shields.io/badge/Accessibility-Senior--First%2056px-purple.svg)](https://www.w3.org/WAI/standards-guidelines/wcag/)
