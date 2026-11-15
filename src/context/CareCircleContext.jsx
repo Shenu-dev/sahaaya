@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 import { useAuth } from './AuthContext';
 import { DOSE_STATUS } from '../lib/constants';
@@ -171,26 +171,34 @@ export function CareCircleProvider({ children }) {
   const [activityLogs, setActivityLogs] = useState(() => (isDemo ? SEED_ACTIVITY_LOGS : []));
   const [notifications, setNotifications] = useState(() => (isDemo ? SEED_NOTIFICATIONS : []));
 
-  // Determine current user's Care Circle permission
-  const currentMember = members.find(
-    (m) => m.id === profile?.id || m.profile_id === user?.id || m.role === profile?.role
-  );
-  const currentPermissions = currentMember?.permissions || (profile?.role === 'elderly' ? 'admin' : 'write');
+  // Determine current user's Care Circle permission (Memoized for high render efficiency)
+  const currentMember = useMemo(() => {
+    return members.find(
+      (m) => m.id === profile?.id || m.profile_id === user?.id || m.role === profile?.role
+    );
+  }, [members, profile?.id, profile?.role, user?.id]);
+
+  const currentPermissions = useMemo(() => {
+    return currentMember?.permissions || (profile?.role === 'elderly' ? 'admin' : 'write');
+  }, [currentMember, profile?.role]);
+
   const isReadOnly = currentPermissions === 'read';
   const canModifyDoses = !isReadOnly;
 
   // Real Database Active Condition:
   // True ONLY for real authenticated accounts with a live, verified Care Circle.
   // Demo personas NEVER satisfy this condition and NEVER query or mutate Supabase.
-  const isRealDbActive = Boolean(
-    isSupabaseConfigured &&
-    supabase &&
-    user &&
-    !isDemo &&
-    hasCareCircle &&
-    careCircle?.id &&
-    !careCircle?.is_demo
-  );
+  const isRealDbActive = useMemo(() => {
+    return Boolean(
+      isSupabaseConfigured &&
+      supabase &&
+      user &&
+      !isDemo &&
+      hasCareCircle &&
+      careCircle?.id &&
+      !careCircle?.is_demo
+    );
+  }, [user, isDemo, hasCareCircle, careCircle?.id, careCircle?.is_demo]);
 
   // Load Real Supabase Data when user is logged in and DB configured
   const fetchCircleData = useCallback(async () => {
@@ -792,71 +800,96 @@ export function CareCircleProvider({ children }) {
   };
 
   // =========================================================================
-  // MATHEMATICALLY RIGOROUS ADHERENCE METRICS
+  // MATHEMATICALLY RIGOROUS ADHERENCE METRICS (MEMOIZED)
   // =========================================================================
-  const takenCount = todayDoses.filter((d) => d.status === DOSE_STATUS.TAKEN).length;
-  const missedCount = todayDoses.filter((d) => d.status === DOSE_STATUS.MISSED).length;
-  const skippedCount = todayDoses.filter((d) => d.status === DOSE_STATUS.SKIPPED).length;
-  const upcomingCount = todayDoses.filter((d) => d.status === DOSE_STATUS.UPCOMING).length;
-  const unconfirmedCount = todayDoses.filter((d) => d.status === DOSE_STATUS.UNCONFIRMED).length;
-  const totalCount = todayDoses.length;
+  const adherenceMetrics = useMemo(() => {
+    const takenCount = todayDoses.filter((d) => d.status === DOSE_STATUS.TAKEN).length;
+    const missedCount = todayDoses.filter((d) => d.status === DOSE_STATUS.MISSED).length;
+    const skippedCount = todayDoses.filter((d) => d.status === DOSE_STATUS.SKIPPED).length;
+    const upcomingCount = todayDoses.filter((d) => d.status === DOSE_STATUS.UPCOMING).length;
+    const unconfirmedCount = todayDoses.filter((d) => d.status === DOSE_STATUS.UNCONFIRMED).length;
+    const totalCount = todayDoses.length;
 
-  // Eligible / Due doses: all doses that have reached their scheduled time or were resolved early
-  const dueDosesCount = takenCount + missedCount + skippedCount + unconfirmedCount;
-  
-  // Adherence on eligible due doses: (Taken / (Taken + Missed + Skipped + Unconfirmed)) * 100
-  const adherenceRate = dueDosesCount > 0 
-    ? Math.round((takenCount / dueDosesCount) * 100) 
-    : null; // null indicates no doses have come due yet
+    // Eligible / Due doses: all doses that have reached their scheduled time or were resolved early
+    const dueDosesCount = takenCount + missedCount + skippedCount + unconfirmedCount;
+    
+    // Adherence on eligible due doses: (Taken / (Taken + Missed + Skipped + Unconfirmed)) * 100
+    const adherenceRate = dueDosesCount > 0 
+      ? Math.round((takenCount / dueDosesCount) * 100) 
+      : null; // null indicates no doses have come due yet
 
-  // Overall day completion rate
-  const dayCompletionRate = totalCount > 0 
-    ? Math.round((takenCount / totalCount) * 100) 
-    : 0;
+    // Overall day completion rate
+    const dayCompletionRate = totalCount > 0 
+      ? Math.round((takenCount / totalCount) * 100) 
+      : 0;
+
+    return {
+      takenCount,
+      missedCount,
+      skippedCount,
+      upcomingCount,
+      unconfirmedCount,
+      dueDosesCount,
+      totalCount,
+      hasDueDoses: dueDosesCount > 0,
+      adherenceRate,
+      dayCompletionRate,
+    };
+  }, [todayDoses]);
+
+  // Context value memoization eliminates cascade re-renders across consumers
+  const contextValue = useMemo(() => ({
+    careCircle,
+    elderlyProfile,
+    members,
+    medications,
+    appointments,
+    todayDoses,
+    activityLogs,
+    notifications,
+    canModifyDoses,
+    isReadOnly,
+    currentPermissions,
+    hasCareCircle,
+    circleLoading,
+    isRealDbActive,
+    isDemo,
+    activeViewRole,
+    setActiveViewRole,
+    adherenceMetrics,
+    markDose,
+    addMedication,
+    archiveMedication,
+    addAppointment,
+    updateAppointmentStatus,
+    createCareCircle,
+    acceptInvitation,
+    resetDemoData,
+    refreshData: fetchCircleData,
+  }), [
+    careCircle,
+    elderlyProfile,
+    members,
+    medications,
+    appointments,
+    todayDoses,
+    activityLogs,
+    notifications,
+    canModifyDoses,
+    isReadOnly,
+    currentPermissions,
+    hasCareCircle,
+    circleLoading,
+    isRealDbActive,
+    isDemo,
+    activeViewRole,
+    setActiveViewRole,
+    adherenceMetrics,
+    fetchCircleData,
+  ]);
 
   return (
-    <CareCircleContext.Provider
-      value={{
-        careCircle,
-        elderlyProfile,
-        members,
-        medications,
-        appointments,
-        todayDoses,
-        activityLogs,
-        notifications,
-        canModifyDoses,
-        isReadOnly,
-        currentPermissions,
-        hasCareCircle,
-        circleLoading,
-        isRealDbActive,
-        isDemo,
-        activeViewRole,
-        setActiveViewRole,
-        adherenceMetrics: {
-          takenCount,
-          missedCount,
-          skippedCount,
-          upcomingCount,
-          unconfirmedCount,
-          dueDosesCount,
-          totalCount,
-          hasDueDoses: dueDosesCount > 0,
-          adherenceRate,
-          dayCompletionRate,
-        },
-        markDose,
-        addMedication,
-        archiveMedication,
-        addAppointment,
-        updateAppointmentStatus,
-        createCareCircle,
-        acceptInvitation,
-        resetDemoData,
-        refreshData: fetchCircleData,
-      }}
-    >
+    <CareCircleContext.Provider value={contextValue}>
       {children}
     </CareCircleContext.Provider>
   );

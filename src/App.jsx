@@ -1,19 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { CareCircleProvider, useCareCircle } from './context/CareCircleContext';
-import LandingPage from './pages/LandingPage';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import ElderlyDashboard from './pages/ElderlyDashboard';
-import FamilyDashboard from './pages/FamilyDashboard';
-import CaregiverDashboard from './pages/CaregiverDashboard';
-import MedicationsPage from './pages/MedicationsPage';
-import AppointmentsPage from './pages/AppointmentsPage';
-import CareCirclePage from './pages/CareCirclePage';
 import Navbar from './components/layout/Navbar';
 import LoadingSpinner from './components/common/LoadingSpinner';
-import AcceptInvitationModal from './components/common/AcceptInvitationModal';
-import NoCareCircleView from './components/common/NoCareCircleView';
+
+const LandingPage = lazy(() => import('./pages/LandingPage'));
+const LoginPage = lazy(() => import('./pages/LoginPage'));
+const RegisterPage = lazy(() => import('./pages/RegisterPage'));
+const ElderlyDashboard = lazy(() => import('./pages/ElderlyDashboard'));
+const FamilyDashboard = lazy(() => import('./pages/FamilyDashboard'));
+const CaregiverDashboard = lazy(() => import('./pages/CaregiverDashboard'));
+const MedicationsPage = lazy(() => import('./pages/MedicationsPage'));
+const AppointmentsPage = lazy(() => import('./pages/AppointmentsPage'));
+const CareCirclePage = lazy(() => import('./pages/CareCirclePage'));
+const NoCareCircleView = lazy(() => import('./components/common/NoCareCircleView'));
+const AcceptInvitationModal = lazy(() => import('./components/common/AcceptInvitationModal'));
 
 function MainApp() {
   const { user, profile, loading, signInAsDemo } = useAuth();
@@ -98,17 +99,23 @@ function MainApp() {
 
   // Unauthenticated Flows
   if (!user) {
-    if (authPage === 'login') {
-      return <LoginPage onNavigate={handleNavigateAuth} />;
-    }
-    if (authPage === 'register') {
-      return <RegisterPage onNavigate={handleNavigateAuth} />;
-    }
     return (
-      <LandingPage
-        onNavigate={handleNavigateAuth}
-        onDemoLogin={(role) => signInAsDemo(role)}
-      />
+      <Suspense
+        fallback={
+          <div className="min-h-screen flex items-center justify-center bg-slate-50">
+            <LoadingSpinner label="Loading Sahaaya..." size="lg" />
+          </div>
+        }
+      >
+        {authPage === 'login' && <LoginPage onNavigate={handleNavigateAuth} />}
+        {authPage === 'register' && <RegisterPage onNavigate={handleNavigateAuth} />}
+        {authPage !== 'login' && authPage !== 'register' && (
+          <LandingPage
+            onNavigate={handleNavigateAuth}
+            onDemoLogin={(role) => signInAsDemo(role)}
+          />
+        )}
+      </Suspense>
     );
   }
 
@@ -145,15 +152,27 @@ function MainApp() {
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans text-slate-900 selection:bg-teal-500 selection:text-white">
       <Navbar activeTab={activeTab} onTabChange={handleTabChange} />
-      <main className="flex-1 pb-16">{renderContent()}</main>
+      <main className="flex-1 pb-16">
+        <Suspense
+          fallback={
+            <div className="min-h-[50vh] flex items-center justify-center">
+              <LoadingSpinner size="md" />
+            </div>
+          }
+        >
+          {renderContent()}
+        </Suspense>
+      </main>
 
       {/* Cryptographic Care Circle Invitation Acceptance Modal (FUNC-HIGH-03) */}
       {inviteToken && (
-        <AcceptInvitationModal
-          isOpen={showInviteModal}
-          onClose={() => setShowInviteModal(false)}
-          token={inviteToken}
-        />
+        <Suspense fallback={null}>
+          <AcceptInvitationModal
+            isOpen={showInviteModal}
+            onClose={() => setShowInviteModal(false)}
+            token={inviteToken}
+          />
+        </Suspense>
       )}
     </div>
   );

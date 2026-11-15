@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 import { DEMO_ACCOUNTS, ROLES } from '../lib/constants';
 
@@ -205,22 +205,29 @@ export function AuthProvider({ children }) {
     }
   };
 
+  const contextValue = useMemo(() => ({
+    user,
+    profile,
+    session,
+    loading,
+    isDemoMode,
+    isSupabaseConfigured,
+    signIn,
+    signUp,
+    signInAsDemo,
+    signOut,
+    refreshProfile,
+  }), [
+    user,
+    profile,
+    session,
+    loading,
+    isDemoMode,
+    isSupabaseConfigured,
+  ]);
+
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        profile,
-        session,
-        loading,
-        isDemoMode,
-        isSupabaseConfigured,
-        signIn,
-        signUp,
-        signInAsDemo,
-        signOut,
-        refreshProfile,
-      }}
-    >
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );
