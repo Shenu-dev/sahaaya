@@ -231,6 +231,33 @@ CREATE TRIGGER on_auth_user_created
 
 REVOKE ALL ON FUNCTION public.handle_new_user() FROM PUBLIC;
 
+-- Trigger: Prevent client mutation of role or email on profiles
+CREATE OR REPLACE FUNCTION public.prevent_profile_privilege_escalation()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+BEGIN
+  IF (TG_OP = 'UPDATE') THEN
+    IF NEW.role IS DISTINCT FROM OLD.role THEN
+      RAISE EXCEPTION 'Profile role cannot be modified directly.';
+    END IF;
+    IF NEW.email IS DISTINCT FROM OLD.email THEN
+      RAISE EXCEPTION 'Profile email is governed by Supabase Auth and cannot be modified directly.';
+    END IF;
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_prevent_profile_escalation ON public.profiles;
+CREATE TRIGGER trg_prevent_profile_escalation
+  BEFORE UPDATE ON public.profiles
+  FOR EACH ROW EXECUTE FUNCTION public.prevent_profile_privilege_escalation();
+
+REVOKE ALL ON FUNCTION public.prevent_profile_privilege_escalation() FROM PUBLIC;
+
 -- Trigger: Handle dose status audit log
 CREATE OR REPLACE FUNCTION public.handle_dose_status_change()
 RETURNS TRIGGER
@@ -446,7 +473,12 @@ BEGIN
     RAISE EXCEPTION 'Authentication required.';
   END IF;
 
-  SELECT email INTO v_user_email FROM public.profiles WHERE id = v_user_id;
+  -- Read verified email directly from JWT / auth.users to prevent spoofing
+  v_user_email := COALESCE(
+    auth.jwt() ->> 'email',
+    (SELECT email FROM auth.users WHERE id = v_user_id),
+    (SELECT email FROM public.profiles WHERE id = v_user_id)
+  );
 
   SELECT * INTO v_invitation
   FROM public.care_circle_invitations
