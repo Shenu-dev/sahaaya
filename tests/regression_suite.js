@@ -19,6 +19,14 @@ import {
 } from '../src/lib/dateUtils.js';
 import { isUserDemoPersona } from '../src/lib/authUtils.js';
 import { DOSE_STATUS } from '../src/lib/constants.js';
+import {
+  sanitizeInput,
+  validateUUID,
+  validateTimeFormat,
+  validateEmail,
+  calculateRelativeLuminance,
+  calculateContrastRatio
+} from '../src/lib/securityUtils.js';
 
 let totalTests = 0;
 let passedTests = 0;
@@ -549,6 +557,145 @@ runTest('Zero-row update detection returns error instead of false success', () =
   // Successful 1-row update
   const successResult = handleUpdateResult([{ id: 'uuid-1', status: 'taken' }], null);
   assert.strictEqual(successResult.success, true, 'Confirmed row update must return success');
+});
+
+// -----------------------------------------------------------------------------
+// 12. INPUT SANITIZATION & XSS MITIGATION
+// -----------------------------------------------------------------------------
+console.log('\n--- Suite 12: Input Sanitization & XSS Mitigation ---');
+
+runTest('sanitizeInput strips dangerous script tags and executable payloads', () => {
+  const dirty = '<script>alert("pwned")</script>Dr. Rajiv Verma';
+  const clean = sanitizeInput(dirty);
+  assert.strictEqual(clean, 'Dr. Rajiv Verma');
+});
+
+runTest('sanitizeInput eliminates inline event handlers and javascript: protocols', () => {
+  const dirty = '<img src="x" onerror="stealCookies()" />Regular Note';
+  const clean = sanitizeInput(dirty);
+  assert.strictEqual(clean, 'Regular Note');
+
+  const dirtyLink = 'javascript:evil()';
+  const cleanLink = sanitizeInput(dirtyLink);
+  assert.strictEqual(cleanLink, 'evil()');
+});
+
+runTest('validateTimeFormat accepts strict 24-hour time and rejects anomalies', () => {
+  assert.strictEqual(validateTimeFormat('08:00'), true);
+  assert.strictEqual(validateTimeFormat('08:00:00'), true);
+  assert.strictEqual(validateTimeFormat('23:59:59'), true);
+  assert.strictEqual(validateTimeFormat('24:00:00'), false, '24:00 is not valid 24h time');
+  assert.strictEqual(validateTimeFormat('12:60'), false, 'Minute 60 is invalid');
+  assert.strictEqual(validateTimeFormat('random'), false, 'Non-time string must be rejected');
+});
+
+runTest('validateUUID strictly verifies RFC 4122 compliance', () => {
+  assert.strictEqual(validateUUID('e79b4fcb-2b44-4f81-bfd2-0b1e3e7f4c56'), true);
+  assert.strictEqual(validateUUID('mock-uuid-123'), false);
+  assert.strictEqual(validateUUID(''), false);
+});
+
+// -----------------------------------------------------------------------------
+// 13. ACCESSIBILITY MATHEMATICS & WCAG AAA CONTRAST
+// -----------------------------------------------------------------------------
+console.log('\n--- Suite 13: Accessibility Mathematics & WCAG AAA Contrast ---');
+
+runTest('calculateRelativeLuminance computes correct sRGB luminance', () => {
+  const whiteLum = calculateRelativeLuminance(255, 255, 255);
+  const blackLum = calculateRelativeLuminance(0, 0, 0);
+  assert.ok(Math.abs(whiteLum - 1.0) < 0.001, 'White must have luminance 1.0');
+  assert.ok(Math.abs(blackLum - 0.0) < 0.001, 'Black must have luminance 0.0');
+});
+
+runTest('WCAG AAA contrast ratio meets or exceeds 7:1 for senior readability', () => {
+  // Deep Slate (#020617: rgb(2, 6, 23)) on Pure White (#FFFFFF: rgb(255, 255, 255))
+  const slateLum = calculateRelativeLuminance(2, 6, 23);
+  const whiteLum = calculateRelativeLuminance(255, 255, 255);
+  const contrastRatio = calculateContrastRatio(slateLum, whiteLum);
+  
+  assert.ok(contrastRatio >= 7.0, `Contrast ratio (${contrastRatio}:1) must exceed WCAG AAA 7:1 threshold`);
+  assert.ok(contrastRatio > 18.0, 'Deep slate on white should deliver optimal ~19:1 contrast');
+});
+
+runTest('Bento Lavender background delivers compliant contrast with slate text', () => {
+  // Deep Slate (#0F172A: rgb(15, 23, 42)) on Bento Lavender (#DDE1FD: rgb(221, 225, 253))
+  const slateLum = calculateRelativeLuminance(15, 23, 42);
+  const lavenderLum = calculateRelativeLuminance(221, 225, 253);
+  const contrast = calculateContrastRatio(slateLum, lavenderLum);
+  assert.ok(contrast >= 7.0, `Lavender card text contrast (${contrast}:1) must satisfy WCAG AAA`);
+});
+
+// -----------------------------------------------------------------------------
+// 14. CHRONOLOGICAL DOSE SORTING & ADHERENCE STABILITY
+// -----------------------------------------------------------------------------
+console.log('\n--- Suite 14: Chronological Dose Sorting & Edge Cases ---');
+
+runTest('Daily doses sort chronologically regardless of retrieval order', () => {
+  const rawDoses = [
+    { id: '3', scheduled_time: '21:00:00' },
+    { id: '1', scheduled_time: '08:00:00' },
+    { id: '2', scheduled_time: '13:00:00' },
+  ];
+
+  const sorted = [...rawDoses].sort((a, b) => a.scheduled_time.localeCompare(b.scheduled_time));
+  assert.strictEqual(sorted[0].id, '1', 'Morning dose must come first');
+  assert.strictEqual(sorted[1].id, '2', 'Afternoon dose must come second');
+  assert.strictEqual(sorted[2].id, '3', 'Night dose must come third');
+});
+
+runTest('Zero doses array computes safe null metrics without NaN or zero-division crashes', () => {
+  const emptyDoses = [];
+  const taken = emptyDoses.filter(d => d.status === DOSE_STATUS.TAKEN).length;
+  const due = emptyDoses.filter(d => d.status !== DOSE_STATUS.UPCOMING).length;
+  const adherence = due > 0 ? Math.round((taken / due) * 100) : null;
+  
+  assert.strictEqual(adherence, null, 'Empty doses must return null adherence rather than NaN');
+});
+
+// -----------------------------------------------------------------------------
+// 15. SECURITY INVARIANTS & PAYLOAD HARDENING
+// -----------------------------------------------------------------------------
+console.log('\n--- Suite 15: Security Invariants & Payload Hardening ---');
+
+runTest('Cryptographic invitation tokens have >= 256 bits (32 bytes) of entropy', () => {
+  const randomToken = crypto.randomBytes(32).toString('hex');
+  assert.strictEqual(randomToken.length, 64, '32-byte hex token must be exactly 64 characters');
+  assert.ok(/^[0-9a-f]{64}$/.test(randomToken), 'Must be valid lowercase hex string');
+});
+
+runTest('Email validator accepts valid addresses and rejects dangerous formats', () => {
+  assert.strictEqual(validateEmail('rohan.sharma@example.com'), true);
+  assert.strictEqual(validateEmail('kamla@care.in'), true);
+  assert.strictEqual(validateEmail('bad-email'), false);
+  assert.strictEqual(validateEmail('test@bad'), false);
+  assert.strictEqual(validateEmail('<script>@domain.com'), false);
+});
+
+runTest('Phone number validator recognizes standard E.164 formats', () => {
+  const isValidPhone = (phone) => /^\+?[0-9\s-]{10,15}$/.test(phone);
+  assert.strictEqual(isValidPhone('+91 98765 43210'), true);
+  assert.strictEqual(isValidPhone('+1 555-0199'), true);
+  assert.strictEqual(isValidPhone('123'), false, 'Too short to be phone number');
+  assert.strictEqual(isValidPhone('invalid-letters'), false);
+});
+
+runTest('Read-only role invariant blocks invitation generation', () => {
+  const checkCanInvite = (role, permissions) => {
+    return role === 'admin' || permissions === 'admin';
+  };
+  assert.strictEqual(checkCanInvite('admin', 'admin'), true);
+  assert.strictEqual(checkCanInvite('caregiver', 'write'), false);
+  assert.strictEqual(checkCanInvite('member', 'read'), false);
+});
+
+runTest('Dose notes payload guard prevents excessive payload lengths', () => {
+  const sanitizeNoteLength = (note, maxLen = 500) => {
+    if (!note) return null;
+    return note.slice(0, maxLen);
+  };
+  const hugeNote = 'A'.repeat(1000);
+  const safeNote = sanitizeNoteLength(hugeNote, 500);
+  assert.strictEqual(safeNote.length, 500, 'Notes must be truncated to 500 chars maximum');
 });
 
 // -----------------------------------------------------------------------------

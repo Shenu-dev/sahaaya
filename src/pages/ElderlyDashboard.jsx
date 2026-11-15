@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { CheckCircle2, Clock, Phone, Calendar, Sparkles } from 'lucide-react';
 import { useCareCircle } from '../context/CareCircleContext';
 import { DOSE_STATUS } from '../lib/constants';
@@ -21,9 +21,15 @@ export default function ElderlyDashboard() {
   const [earlyMinutesAhead, setEarlyMinutesAhead] = useState(0);
   const [actionError, setActionError] = useState('');
 
-  // Find the immediate next upcoming dose
-  const nextDose = todayDoses.find((d) => d.status === DOSE_STATUS.UPCOMING);
-  const upcomingAppointment = appointments.find((a) => a.status === 'upcoming');
+  // Find the immediate next upcoming dose and appointment (memoized)
+  const nextDose = useMemo(
+    () => todayDoses.find((d) => d.status === DOSE_STATUS.UPCOMING),
+    [todayDoses]
+  );
+  const upcomingAppointment = useMemo(
+    () => appointments.find((a) => a.status === 'upcoming'),
+    [appointments]
+  );
 
   const handleMarkTaken = async (dose, isEarlyConfirmed = false) => {
     if (!dose) return;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { 
   AlertTriangle, 
   Calendar, 
@@ -46,8 +46,11 @@ export default function FamilyDashboard({ onNavigateTab }) {
   const [earlyMinutesAhead, setEarlyMinutesAhead] = useState(0);
   const [actionError, setActionError] = useState('');
 
-  // Check if any doses are missed
-  const missedDoses = todayDoses.filter((d) => d.status === DOSE_STATUS.MISSED);
+  // Check if any doses are missed (memoized)
+  const missedDoses = useMemo(
+    () => todayDoses.filter((d) => d.status === DOSE_STATUS.MISSED),
+    [todayDoses]
+  );
 
   const handleMarkDoseClick = async (dose, isEarlyConfirmed = false) => {
     setActionError('');

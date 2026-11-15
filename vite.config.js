@@ -9,6 +9,10 @@ export default defineConfig({
     open: false,
   },
   build: {
+    target: 'es2020',
+    cssCodeSplit: true,
+    minify: 'esbuild',
+    reportCompressedSize: true,
     rollupOptions: {
       output: {
         manualChunks: {
